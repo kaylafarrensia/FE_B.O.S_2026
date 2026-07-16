@@ -4,10 +4,12 @@ import EmailForm from '../../components/ComingSoon/EmailForm'
 import SocialLinks from '../../components/ComingSoon/SocialLinks'
 import CountdownTimer from '../../components/ComingSoon/CountDownTimer'
 import Footer from '../../components/ComingSoon/Footer'
+import PerspectiveGrid from '../../components/ComingSoon/PerspectiveGrid'
 
 export default function ComingSoon() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-blue-100 flex flex-col">
+      <PerspectiveGrid className="absolute inset-x-0 -top-60" />
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
