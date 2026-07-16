@@ -30,13 +30,17 @@ export default function ComingSoon() {
           />
 
           <div className="flex flex-col items-center gap-6 text-center">
-            <Badge text="BNCC OPENING SEASON 2026" color="blue" />
+            <h1 className="rounded-[10px] border border-white bg-white/20 px-6 py-2 text-xl font-bold shadow-[inset_0_2px_12px_rgba(68,137,212,0.3)] backdrop-blur-md">
+              <span className="bg-gradient-to-r from-[#0A2745] to-[#2474C0] bg-clip-text text-transparent">
+                BNCC OPENING SEASON 2026
+              </span>
+            </h1>
 
-            <h1 className="border-y-4 border-blue-500 px-6 py-2 text-5xl font-extrabold tracking-tight text-blue-950 sm:text-6xl">
+            <h1 className="border-y-4 border-blue-500 px-6 py-2 text-5xl font-extrabold tracking-tight bg-gradient-to-r from-[#0A2745] to-[#4489D4] bg-clip-text text-transparent sm:text-6xl">
               COMING SOON
             </h1>
 
-            <p className="max-w-md text-slate-600">
+            <p className="max-w-s font-poppins text-black text-[14px]">
               Drop your email and be the first to catch the wave of our latest updates!
             </p>
 

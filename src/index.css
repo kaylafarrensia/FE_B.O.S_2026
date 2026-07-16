@@ -1,5 +1,9 @@
 @import 'tailwindcss';
 
+@theme {
+  --font-poppins: "Poppins", sans-serif;
+}
+
 body {
   margin: 0;
 }

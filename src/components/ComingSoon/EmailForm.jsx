@@ -17,14 +17,14 @@ export default function EmailForm() {
     <div className="w-full flex flex-col items-center gap-4">
       <form
         onSubmit={handleSubmit}
-        className="flex w-full max-w-md overflow-hidden rounded-xl border border-blue-200 bg-white/70 backdrop-blur-sm"
+        className="flex w-full max-w-md overflow-hidden rounded-xl border border-[#2474C0] bg-transparent backdrop-blur-sm"
       >
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter Your E-mail Here"
-          className="flex-1 bg-transparent px-5 py-3 text-slate-700 outline-none placeholder:text-slate-400"
+          className="flex-1 bg-transparent px-5 py-3 text-slate-700 outline-none placeholder:text-slate-400 placeholder:font-poppins"
           required
         />
         <button
