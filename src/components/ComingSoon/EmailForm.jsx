@@ -46,7 +46,7 @@ export default function EmailForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter Your E-mail Here"
-          className="flex-1 bg-transparent px-5 py-2 text-base text-slate-600 outline-none placeholder:text-slate-500"
+          className="flex-1 bg-transparent px-5 py-2 text-lg text-slate-600 outline-none placeholder:text-slate-500"
           required
         />
         <button

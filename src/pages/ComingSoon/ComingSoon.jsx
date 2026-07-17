@@ -5,6 +5,7 @@ import SocialLinks from '../../components/ComingSoon/SocialLinks'
 import CountdownTimer from '../../components/ComingSoon/CountDownTimer'
 import Footer from '../../components/ComingSoon/Footer'
 import PerspectiveGrid from '../../components/ComingSoon/PerspectiveGrid'
+import Typewriter from '../../components/ComingSoon/Typewriter'
 
 export default function ComingSoon() {
   return (
@@ -25,8 +26,9 @@ export default function ComingSoon() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="relative w-full max-w-5xl rounded-3xl border border-[#99BDDF] bg-gradient-to-br from-[#DFEFFF] via-[#DFEFFF] to-[#5393CF66] p-10 backdrop-blur-md shadow-xl"
+          className="relative w-full max-w-5xl rounded-3xl border-2 border-[#99BDDF] bg-white/40 p-10 backdrop-blur-md shadow-xl"
         >
+          {/* Tag mengambang di kiri & kanan, sesuai desain */}
           <Badge
             text="Networking & Community"
             color="pink"
@@ -45,8 +47,8 @@ export default function ComingSoon() {
               </span>
             </h1>
 
-            <h1 className="border-y-4 border-blue-500 px-6 py-2 text-7xl font-extrabold tracking-tight bg-gradient-to-r from-[#0A2745] to-[#4489D4] bg-clip-text text-transparent lg:text-8xl">
-              COMING SOON
+            <h1 className="px-6 py-2 text-7xl font-extrabold tracking-tight bg-gradient-to-r from-[#0A2745] to-[#4489D4] bg-clip-text text-transparent lg:text-8xl">
+              <Typewriter text="COMING SOON" speed={120} startDelay={300} />
             </h1>
 
             <p className="max-w-s font-poppins text-black text-lg">
