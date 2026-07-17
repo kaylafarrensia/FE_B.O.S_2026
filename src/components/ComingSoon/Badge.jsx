@@ -1,6 +1,11 @@
 import { motion } from 'framer-motion'
 
-export default function Badge({ text, color = 'blue', showFlag = false, className = '' }) {
+export default function Badge({
+  text,
+  color = 'blue',
+  showFlag = false,
+  className = '',
+}) {
   const colors = {
     pink: 'bg-pink-600 text-white',
     green: 'bg-green-700 text-white',

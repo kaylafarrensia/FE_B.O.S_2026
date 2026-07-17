@@ -15,7 +15,7 @@ export default function ComingSoon() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="relative w-full max-w-3xl rounded-3xl border border-white/60 bg-white/40 p-10 backdrop-blur-md shadow-xl"
+          className="relative w-full max-w-5xl rounded-3xl border border-[#99BDDF] bg-white/40 p-10 backdrop-blur-md shadow-xl"
         >
           {/* Tag mengambang di kiri & kanan, sesuai desain */}
           <Badge
@@ -36,12 +36,13 @@ export default function ComingSoon() {
               </span>
             </h1>
 
-            <h1 className="border-y-4 border-blue-500 px-6 py-2 text-5xl font-extrabold tracking-tight bg-gradient-to-r from-[#0A2745] to-[#4489D4] bg-clip-text text-transparent sm:text-6xl">
+            <h1 className="border-y-4 border-blue-500 px-6 py-2 text-7xl font-extrabold tracking-tight bg-gradient-to-r from-[#0A2745] to-[#4489D4] bg-clip-text text-transparent lg:text-8xl">
               COMING SOON
             </h1>
 
-            <p className="max-w-s font-poppins text-black text-[14px]">
-              Drop your email and be the first to catch the wave of our latest updates!
+            <p className="max-w-s font-poppins text-black text-lg">
+              Drop your email and be the first to catch the wave of our latest
+              updates!
             </p>
 
             <EmailForm />
@@ -53,10 +54,10 @@ export default function ComingSoon() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="mt-24 flex flex-col items-center gap-8 text-center"
+          className="mt-55 flex flex-col items-center gap-8 text-center"
         >
-          <h2 className="text-3xl font-bold text-blue-950">
-            Brace yourself. It's <span className="text-blue-500">coming.</span>
+          <h2 className="text-4xl font-semibold leading-[1.3] pb-1 bg-linear-to-r from-[#0A2745] to-[#2474C0] bg-clip-text text-transparent">
+            Brace yourself. It's coming.
           </h2>
           <CountdownTimer targetDate="2026-08-01T00:00:00" />
         </motion.div>

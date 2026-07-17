@@ -25,24 +25,25 @@ export default function CountdownTimer({ targetDate }) {
   ]
 
   return (
-    <div className="relative rounded-2xl border-2 border-blue-400 bg-blue-50/60 px-10 py-8">
-      {/* dekorasi kotak di 4 sudut, kayak di desain */}
-      {['-top-1.5 -left-1.5', '-top-1.5 -right-1.5', '-bottom-1.5 -left-1.5', '-bottom-1.5 -right-1.5'].map((pos) => (
-        <span key={pos} className={`absolute ${pos} h-3 w-3 border-2 border-blue-500 bg-white`} />
+    <div className="relative border-3 border-[#2474C0] bg-blue-50/60 px-4 py-4">
+      {['-top-3 -left-3', '-top-3 -right-3', '-bottom-3 -left-3', '-bottom-3 -right-3'].map((pos) => (
+        <span key={pos} className={`absolute ${pos} h-6 w-6 border-2 border-[#2474C0] bg-white`} />
       ))}
 
-      <div className="flex items-center justify-center gap-6">
+      <div className="border-2 border-[#99C4F4] px-20 py-12 rounded-xl bg-linear-to-br from-[#F7F7F599] via-[#F7F7F599] via-60% to-[#7ED6F94D]">
+        <div className="flex items-center justify-center gap-12">
         {units.map((unit, i) => (
-          <div key={unit.label} className="flex items-center gap-6">
-            <div className="text-center">
-              <div className="text-5xl font-extrabold text-blue-950">
-                {String(unit.value).padStart(2, '0')}
+            <div key={unit.label} className="flex items-center gap-12">
+              <div className="text-center">
+                <div className="text-8xl font-extrabold text-blue-950">
+                  {String(unit.value).padStart(2, '0')}
+                </div>
+                <div className="mt-2 text-2xl text-[#99C4F4]">{unit.label}</div>
               </div>
-              <div className="mt-1 text-blue-400">{unit.label}</div>
+              {i < units.length - 1 && <span className="text-8xl font-bold text-blue-950">:</span>}
             </div>
-            {i < units.length - 1 && <span className="text-3xl font-bold text-blue-950">:</span>}
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   )
