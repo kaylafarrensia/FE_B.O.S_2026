@@ -8,16 +8,25 @@ import PerspectiveGrid from '../../components/ComingSoon/PerspectiveGrid'
 
 export default function ComingSoon() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-blue-100 flex flex-col">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-50 to-blue-100 flex flex-col z-10">
       <PerspectiveGrid className="absolute inset-x-0 -top-60" />
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-16">
+        <img
+          src="/public/images/img-glow-tl.svg"
+          alt="color-dodge"
+          className="absolute top-0 left-0 w-[580px] h-[460px] opacity-100 z-20"
+        />
+        <img
+          src="/public/images/img-glow-mid.svg"
+          alt="color-dodge"
+          className="absolute top-140 -right-20 w-[680px] h-[560px] opacity-100 z-20"
+        />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="relative w-full max-w-5xl rounded-3xl border border-[#99BDDF] bg-white/40 p-10 backdrop-blur-md shadow-xl"
+          className="relative w-full max-w-5xl rounded-3xl border border-[#99BDDF] bg-gradient-to-br from-[#DFEFFF] via-[#DFEFFF] to-[#5393CF66] p-10 backdrop-blur-md shadow-xl"
         >
-          {/* Tag mengambang di kiri & kanan, sesuai desain */}
           <Badge
             text="Networking & Community"
             color="pink"
@@ -54,7 +63,7 @@ export default function ComingSoon() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="mt-55 flex flex-col items-center gap-8 text-center"
+          className="mt-55 mb-30 flex flex-col items-center gap-8 text-center z-10"
         >
           <h2 className="text-4xl font-semibold leading-[1.3] pb-1 bg-linear-to-r from-[#0A2745] to-[#2474C0] bg-clip-text text-transparent">
             Brace yourself. It's coming.
@@ -63,6 +72,11 @@ export default function ComingSoon() {
         </motion.div>
       </main>
 
+      <img
+        src="/public/images/img-glow-bl.svg"
+        alt="color-dodge"
+        className="absolute top-220 left-0 w-[680px] h-[560px] opacity-100 z-20"
+      />
       <Footer />
     </div>
   )

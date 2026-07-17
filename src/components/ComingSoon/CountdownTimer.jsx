@@ -30,7 +30,7 @@ export default function CountdownTimer({ targetDate }) {
         <span key={pos} className={`absolute ${pos} h-6 w-6 border-2 border-[#2474C0] bg-white`} />
       ))}
 
-      <div className="border-2 border-[#99C4F4] px-20 py-12 rounded-xl bg-linear-to-br from-[#F7F7F599] via-[#F7F7F599] via-60% to-[#7ED6F94D]">
+      <div className="border-2 border-[#99C4F4] px-20 py-12 rounded-xl bg-linear-to-br from-[#F7F7F599] via-[#F7F7F599] via-60% to-[#7ED6F94D] z-10">
         <div className="flex items-center justify-center gap-12">
         {units.map((unit, i) => (
             <div key={unit.label} className="flex items-center gap-12">
