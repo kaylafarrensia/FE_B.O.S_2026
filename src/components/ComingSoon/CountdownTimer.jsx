@@ -38,7 +38,7 @@ export default function CountdownTimer({ targetDate }) {
                 <div className="text-8xl font-extrabold text-blue-950">
                   {String(unit.value).padStart(2, '0')}
                 </div>
-                <div className="mt-2 text-2xl text-[#99C4F4]">{unit.label}</div>
+                <div className="mt-2 text-2xl text-[#8dbdf5]">{unit.label}</div>
               </div>
               {i < units.length - 1 && <span className="text-8xl font-bold text-blue-950">:</span>}
             </div>

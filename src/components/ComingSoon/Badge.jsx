@@ -3,7 +3,8 @@ import { motion } from 'framer-motion'
 export default function Badge({
   text,
   color = 'blue',
-  showFlag = false,
+  showFlag = true,
+  flagPosition = 'left', // 'left' | 'right'
   className = '',
 }) {
   const colors = {
@@ -18,27 +19,36 @@ export default function Badge({
     blue: 'fill-blue-500',
   }
 
+  const isRight = flagPosition === 'right'
+
+  const cornerClass = isRight
+    ? 'rounded-tl-full rounded-br-full rounded-bl-full rounded-tr-none'
+    : 'rounded-tr-full rounded-br-full rounded-bl-full rounded-tl-none'
+
+  const flagPositionClass = isRight ? '-top-5 -right-5' : '-top-5 -left-5'
+
   return (
     <motion.div
       animate={{ y: [0, -8, 0] }}
       transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-      className={`relative inline-block ${className}`}
+      className={`inline-block ${className}`}
     >
-      {showFlag && (
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          className={`absolute -top-3 -left-3 ${flagColors[color]}`}
-        >
-          <path d="M2 2 L22 9 L13 13 L9 22 Z" />
-        </svg>
-      )}
-
       <span
-        className={`inline-block rounded-full px-5 py-2 text-sm font-medium shadow-md ${colors[color]}`}
+        className={`relative inline-block whitespace-nowrap ${cornerClass} px-8 py-3 text-base font-regular shadow-md ${colors[color]}`}
       >
         {text}
+
+        {showFlag && (
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            className={`absolute ${flagPositionClass} ${flagColors[color]}`}
+            style={{ transform: isRight ? 'scaleX(-1)' : undefined }}
+          >
+            <path d="M2 2 L22 9 L13 13 L9 22 Z" />
+          </svg>
+        )}
       </span>
     </motion.div>
   )

@@ -26,18 +26,19 @@ export default function ComingSoon() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="relative w-full max-w-5xl rounded-3xl border-2 border-[#99BDDF] bg-white/40 p-10 backdrop-blur-md shadow-xl"
+          className="relative w-full max-w-5xl rounded-3xl border-2 border-[#99BDDF] bg-gradient-to-br from-[#DFEFFF] via-[#DFEFFF] to-[#5393CF4D] p-10 backdrop-blur-md shadow-xl"
         >
           {/* Tag mengambang di kiri & kanan, sesuai desain */}
           <Badge
-            text="Networking & Community"
-            color="pink"
-            className="absolute -left-6 top-1/2 hidden -translate-y-1/2 md:block"
-          />
-          <Badge
             text="Tech & Digital Exploration"
             color="green"
-            className="absolute -right-6 top-1/3 hidden -translate-y-1/2 md:block"
+            className="absolute left-210 top-100 hidden -translate-y-1/2 md:block"
+          />
+          <Badge
+            text="Networking & Community"
+            color="pink"
+            flagPosition="right"
+            className="absolute -left-20 top-130 hidden -translate-y-1/2 md:block"
           />
 
           <div className="flex flex-col items-center gap-6 text-center">
