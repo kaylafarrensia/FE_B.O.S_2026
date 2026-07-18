@@ -52,10 +52,7 @@ export default function Typewriter({
     <span
       className={className}
       style={{
-        position: 'relative',
-        display: 'inline-flex',
-        alignItems: 'flex-start',
-        height: '1.6em',
+        display: 'inline',
       }}
     >
       {showCursor && (
@@ -65,34 +62,34 @@ export default function Typewriter({
             display: 'inline-block',
             width: '0.4em',
             height: '1.6em',
-            marginRight: '10px',
-            flexShrink: 0,
+            verticalAlign: 'bottom',
+            marginRight: '0px',
           }}
         >
           <span
+            className="w-[0.1em] sm:w-[0.16em]"
             style={{
               position: 'absolute',
               bottom: '0em',
               right: '-45%',
               transform: 'translateX(-50%)',
-              width: '0.16em',
               height: '1.5em',
               backgroundColor: cursorColor,
               borderRadius: '999px',
             }}
-          />
-          <span
-            style={{
-              position: 'absolute',
-              top: -20,
-              right: '-105%',
-              transform: 'translateX(-50%)',
-              width: '0.4em',
-              height: '0.4em',
-              backgroundColor: cursorColor,
-              borderRadius: '50%',
-            }}
-          />
+          >
+            <span
+              className="w-[0.32em] h-[0.32em] sm:w-[0.5em] sm:h-[0.5em]"
+              style={{
+                position: 'absolute',
+                top: '-0.12em',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                backgroundColor: cursorColor,
+                borderRadius: '50%',
+              }}
+            />
+          </span>
         </span>
       )}
 
@@ -101,10 +98,9 @@ export default function Typewriter({
           backgroundColor: 'rgba(36, 116, 192, 0.15)',
           padding: '4px 16px',
           borderRadius: '8px',
-          height: '1.5em',
-          display: 'inline-flex',
-          alignItems: 'center',
-          overflow: 'visible',
+          lineHeight: '1.6em',
+          boxDecorationBreak: 'clone',
+          WebkitBoxDecorationBreak: 'clone',
         }}
       >
         {displayed}
@@ -117,34 +113,34 @@ export default function Typewriter({
             display: 'inline-block',
             width: '0.4em',
             height: '1.6em',
-            marginLeft: '10px',
-            flexShrink: 0,
+            verticalAlign: 'bottom',
+            marginLeft: '0px',
           }}
         >
           <span
+            className="w-[0.1em] sm:w-[0.16em]"
             style={{
               position: 'absolute',
               top: '0em',
               left: '-5%',
               transform: 'translateX(-50%)',
-              width: '0.16em',
               height: '1.5em',
               backgroundColor: cursorColor,
               borderRadius: '999px',
             }}
-          />
-          <span
-            style={{
-              position: 'absolute',
-              bottom: -20,
-              left: '-5%',
-              transform: 'translateX(-50%)',
-              width: '0.4em',
-              height: '0.4em',
-              backgroundColor: cursorColor,
-              borderRadius: '50%',
-            }}
-          />
+          >
+            <span
+              className="w-[0.32em] h-[0.32em] sm:w-[0.5em] sm:h-[0.5em]"
+              style={{
+                position: 'absolute',
+                bottom: '-0.12em',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                backgroundColor: cursorColor,
+                borderRadius: '50%',
+              }}
+            />
+          </span>
         </span>
       )}
     </span>

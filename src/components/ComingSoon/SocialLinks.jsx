@@ -38,7 +38,7 @@ const links = [
 
 export default function SocialLinks() {
   return (
-    <div className="flex gap-3">
+    <div className="flex flex-wrap justify-center gap-4 sm:gap-3 px-4">
       {links.map(({ icon: Icon, href, label }) => (
         <a
           key={label}
@@ -46,9 +46,10 @@ export default function SocialLinks() {
           target="_blank"
           rel="noopener noreferrer"
           aria-label={label}
-          className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-900 transition hover:bg-blue-100"
+          className="flex h-6 w-5 sm:h-9 sm:w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-900 transition hover:bg-blue-100"
         >
-          <Icon size={18} />
+          <Icon size={12} className="sm:hidden" />
+          <Icon size={18} className="hidden sm:block" />
         </a>
       ))}
     </div>

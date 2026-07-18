@@ -1,8 +1,8 @@
 export default function Footer() {
   return (
-    <footer className="w-full flex flex-col items-center py-10">
+    <footer className="w-full flex flex-col items-center py-6 sm:py-8 md:py-10">
       <div
-        className="relative w-full max-w-[1490px] h-[260px] mx-4 rounded-xl overflow-hidden 
+        className="relative w-[95%] max-w-[1490px] h-[140px] sm:h-[180px] md:h-[220px] md:w-[95%] lg:h-[260px] mx-3 sm:mx-4 rounded-xl overflow-hidden 
                    bg-gradient-to-b from-transparent via-[#13528e] to-[#0A2745]
                    flex items-center justify-center"
       >
@@ -14,7 +14,7 @@ export default function Footer() {
               linear-gradient(rgba(255,255,255,0.10) 1px, transparent 1px),
               linear-gradient(90deg, rgba(255,255,255,0.10) 1px, transparent 1px)
             `,
-            backgroundSize: "60px 60px",
+            backgroundSize: "40px 40px",
             transform: "perspective(500px) rotateX(60deg) scale(2)",
             transformOrigin: "center 30%",
             maskImage:
@@ -28,7 +28,7 @@ export default function Footer() {
         <img
           src="/public/images/img-bncc-logo.png"
           alt="BNCC Logo"
-          className="relative z-10 w-[193px] h-[56px] opacity-100"
+          className="relative z-10 w-[120px] h-[35px] sm:w-[150px] sm:h-[44px] md:w-[175px] md:h-[51px] lg:w-[193px] lg:h-[56px] opacity-100"
         />
       </div>
     </footer>
