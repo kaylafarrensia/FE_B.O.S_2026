@@ -85,7 +85,7 @@ export default function ComingSoon() {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="mt-16 mb-12 sm:mt-24 sm:mb-16 lg:mt-55 lg:mb-30 flex flex-col items-center gap-6 sm:gap-8 text-center z-10 px-4"
         >
-          <h2 className="text-base sm:text-3xl md:text-xl font-semibold leading-[1.3] pb-1 bg-linear-to-r from-[#0A2745] to-[#2474C0] bg-clip-text text-transparent">
+          <h2 className="text-sm md:text-2xl lg:text-3xl font-semibold leading-[1.3] pb-1 bg-linear-to-r from-[#0A2745] to-[#2474C0] bg-clip-text text-transparent">
             Brace yourself. It's coming.
           </h2>
           <CountdownTimer targetDate="2026-07-31T00:00:00" />

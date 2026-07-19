@@ -31,14 +31,14 @@ export default function CountdownTimer({ targetDate }) {
       ))}
 
       <div className="border-2 border-[#99C4F4] px-4 py-6 sm:px-10 sm:py-8 md:px-16 md:py-10 lg:px-20 lg:py-12 rounded-xl bg-linear-to-br from-[#F7F7F599] via-[#F7F7F599] via-60% to-[#7ED6F94D] z-10">
-        <div className="flex items-center justify-center gap-3 sm:gap-6 md:gap-10 lg:gap-12">
+        <div className="flex items-center justify-center gap-8 sm:gap-10 md:gap-10 lg:gap-20">
           {units.map((unit, i) => (
             <div key={unit.label} className="flex items-center gap-3 sm:gap-6 md:gap-10 lg:gap-12">
               <div className="text-center">
-                <div className="text-3xl sm:text-5xl md:text-6xl lg:text-8xl font-extrabold text-blue-950 tabular-nums">
+                <div className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-blue-950 tabular-nums">
                   {String(unit.value).padStart(2, '0')}
                 </div>
-                <div className="mt-1 sm:mt-2 text-xs sm:text-lg md:text-xl lg:text-2xl text-[#8dbdf5]">
+                <div className="mt-0 md:mt-0 lg:mt-0 text-xs md:text-lg lg:text-2xl text-[#8dbdf5]">
                   {unit.label}
                 </div>
               </div>
