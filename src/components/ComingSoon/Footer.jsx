@@ -1,8 +1,11 @@
 export default function Footer() {
   return (
-    <footer className="w-full flex flex-col items-center px-4 py-8">
+    <footer
+      className="w-full flex flex-col items-center py-8"
+      style={{ paddingInline: "clamp(1rem, 4vw, 4rem)" }}
+    >
       <div
-        className="relative w-full max-w-[1490px] mx-auto rounded-xl overflow-hidden
+        className="relative w-full max-w-[1800px] mx-auto rounded-xl overflow-hidden
                    bg-gradient-to-b from-transparent via-[#13528e] to-[#0A2745]
                    flex items-center justify-center"
         style={{
