@@ -29,7 +29,7 @@ export default function ComingSoon() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="relative w-full max-w-5xl rounded-2xl md:rounded-2xl md:max-w-4xl border-2 border-[#99BDDF] bg-gradient-to-br from-[#DFEFFF] via-[#DFEFFF] to-[#5393CF4D] p-6 sm:p-8 md:p-10 backdrop-blur-md shadow-xl md:mb-50 mb-30"
+          className="relative w-full max-w-5xl rounded-2xl md:rounded-2xl md:max-w-4xl border-2 border-[#99BDDF] bg-gradient-to-br from-[#DFEFFF] via-[#DFEFFF] to-[#5393CF4D] p-6 sm:p-8 md:p-10 backdrop-blur-md shadow-xl md:mb-50 mb-30 min-h-[550px] md:min-h-[700px] lg:min-h-[650px]"
         >
           {/* cursor desktop */}
           <Badge

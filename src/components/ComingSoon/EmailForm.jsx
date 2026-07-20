@@ -53,12 +53,12 @@ export default function EmailForm() {
     <div className="w-full sm:w-[70%] flex flex-col items-center gap-3 sm:gap-4 px-4 py-6 sm:p-8">
       <style>{`
         @keyframes toastIn {
-          from { opacity: 0; transform: translateY(-10px) scale(0.96); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
+          from { opacity: 0; transform: translateX(10px) scale(0.96); }
+          to { opacity: 1; transform: translateX(0) scale(1); }
         }
         @keyframes toastOut {
-          from { opacity: 1; transform: translateY(0) scale(1); }
-          to { opacity: 0; transform: translateY(-10px) scale(0.96); }
+          from { opacity: 1; transform: translateX(0) scale(1); }
+          to { opacity: 0; transform: translateX(10px) scale(0.96); }
         }
       `}</style>
 
@@ -91,19 +91,20 @@ export default function EmailForm() {
               ? 'toastOut 0.25s ease-in forwards'
               : 'toastIn 0.3s ease-out forwards',
           }}
-          className={`flex items-center gap-3 rounded-lg border px-3 py-2 sm:px-4 max-w-full text-xs sm:text-sm shadow-sm backdrop-blur-sm ${
+          className={`absolute bottom-2 right-2 sm:bottom-4 sm:right-4 md:bottom-5 md:right-5 lg:bottom-6 lg:right-6 z-30 flex items-center gap-2 sm:gap-3 rounded-lg border px-2.5 py-1.5 sm:px-3 sm:py-2 md:px-4 whitespace-nowrap text-[10px] sm:text-xs md:text-sm shadow-lg backdrop-blur-sm ${
             toast.type === 'success'
               ? 'border-blue-100 bg-white/80 text-slate-700'
               : 'border-red-200 bg-red-50/90 text-red-700'
           }`}
         >
-          <span className="text-left">{toast.message}</span>
+          <span>{toast.message}</span>
           <button
             onClick={closeToast}
             aria-label="Tutup notifikasi"
             className="shrink-0 transition-transform duration-200 hover:scale-110"
           >
-            <X size={16} className="opacity-70 hover:opacity-100" />
+            <X size={14} className="sm:hidden opacity-70 hover:opacity-100" />
+            <X size={16} className="hidden sm:block opacity-70 hover:opacity-100" />
           </button>
         </div>
       )}
