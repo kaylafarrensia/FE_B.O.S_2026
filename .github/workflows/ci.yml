@@ -133,3 +133,6 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Trigger CD via Portainer Webhook
+        run: curl -X POST https://portainer.bncc.net/api/stacks/webhooks/5871c42b-57f8-4b19-a93f-3e01f6a37189
