@@ -84,6 +84,9 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Trigger CD via Portainer Webhook
+        run: curl -X POST https://portainer.bncc.net/api/webhooks/fb0f069b-527d-4cbf-a8e0-fcaab6cbc939
+
   publish_release:
     name: Publish Release
     runs-on: ubuntu-latest
