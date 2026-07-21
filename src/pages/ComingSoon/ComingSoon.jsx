@@ -15,14 +15,14 @@ export default function ComingSoon() {
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-10 sm:py-16">
         {/* Glow images: disembunyikan di mobile, ukuran diperkecil di tablet, full di desktop */}
         <img
-          src="/public/images/img-glow-tl.svg"
-          alt="color-dodge"
-          className="pointer-events-none absolute top-0 left-0 hidden sm:block sm:w-[320px] sm:h-[260px] md:w-[440px] md:h-[360px] lg:w-[580px] lg:h-[460px] opacity-100 z-20"
+          src="/images/img-glow-tl.svg"
+          alt="glow top left"
+          className="pointer-events-none absolute top-0 left-0 hidden sm:block sm:w-[320px] sm:h-[260px] md:w-[440px] md:h-[360px] lg:w-[580px] lg:h-[460px] opacity-100 z-20 mix-blend-color-dodge"
         />
         <img
-          src="/public/images/img-glow-mid.svg"
-          alt="color-dodge"
-          className="pointer-events-none absolute top-80 -right-10 hidden sm:block sm:w-[360px] sm:h-[300px] md:w-[500px] md:h-[420px] lg:top-140 md:top-150 lg:-right-20 lg:w-[680px] lg:h-[560px] opacity-100 z-20"
+          src="/images/img-glow-mid.svg"
+          alt="glow middle"
+          className="pointer-events-none absolute top-80 -right-10 hidden sm:block sm:w-[360px] sm:h-[300px] md:w-[500px] md:h-[420px] lg:top-140 md:top-150 lg:-right-20 lg:w-[680px] lg:h-[560px] opacity-100 z-20 mix-blend-color-dodge"
         />
 
         <motion.div
@@ -43,12 +43,12 @@ export default function ComingSoon() {
             flagPosition="right"
             className="absolute left-4 top-40 -translate-y-1/2 hidden lg:block lg:-left-30 lg:top-130"
           />
-          
+
           {/* cursor tablet & mobile */}
           <Badge
             text="Tech & Digital Exploration"
             color="green"
-            flagPosition='right'
+            flagPosition="right"
             className="absolute -left-3 top-58 -translate-y-1/2 block md:block lg:hidden md:left-0 md:top-70"
           />
           <Badge
@@ -93,9 +93,9 @@ export default function ComingSoon() {
       </main>
 
       <img
-        src="/public/images/img-glow-bl.svg"
-        alt="color-dodge"
-        className="pointer-events-none absolute bottom-0 left-0 hidden sm:block sm:w-[360px] sm:h-[300px] md:w-[500px] md:h-[420px] lg:top-220 lg:left-0 lg:w-[680px] lg:h-[560px] opacity-100 z-20"
+        src="/images/img-glow-bl.svg"
+        alt="glow bottom left"
+        className="pointer-events-none absolute bottom-0 left-0 hidden sm:block sm:w-[360px] sm:h-[300px] md:w-[500px] md:h-[420px] lg:top-220 lg:left-0 lg:w-[680px] lg:h-[560px] opacity-100 z-20 mix-blend-color-dodge"
       />
       <Footer />
     </div>
