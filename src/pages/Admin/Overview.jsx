@@ -1,10 +1,6 @@
-// import {
-//   type Error as AdminOverviewError,
-//   type AdminOverviewResponse,
-//   getAdminOverview,
-// } from '@/services/admin';
-// import { useQuery } from '@tanstack/react-query';
-// import { AxiosError } from 'axios';
+import { getAdminOverview } from '@/services/admin';
+import { useQuery } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import {
@@ -63,71 +59,71 @@ export default function Overview() {
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [activeBatch, setActiveBatch] = useState(null);
 
-  // const {
-  //   data: overviewData,
-  //   isLoading,
-  //   isError,
-  //   error,
-  //   refetch,
-  // } = useQuery({
-  //   queryKey: ['admin-overview'],
-  //   queryFn: getAdminOverview,
-  //   retry: false,
-  // });
+  const {
+    data: overviewData,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ['admin-overview'],
+    queryFn: getAdminOverview,
+    retry: false,
+  });
 
-  // useEffect(() => {
-  //   if (isError) {
-  //     setShowErrorModal(true);
-  //   }
-  // }, [isError]);
+  useEffect(() => {
+    if (isError) {
+      setShowErrorModal(true);
+    }
+  }, [isError]);
 
-  // const handleRetry = () => {
-  //   setShowErrorModal(false);
-  //   refetch();
-  // };
+  const handleRetry = () => {
+    setShowErrorModal(false);
+    refetch();
+  };
 
-  // if (!overviewData && isLoading) {
-  //   return <div className="p-6">Loading...</div>;
-  // }
+  if (!overviewData && isLoading) {
+    return <div className="p-6">Loading...</div>;
+  }
 
-  // const angkatanKeys = overviewData?.data?.angkatan
-  //   ? Object.keys(overviewData.data.angkatan)
-  //   : [];
+  const angkatanKeys = overviewData?.data?.angkatan
+    ? Object.keys(overviewData.data.angkatan)
+    : [];
 
   let donutChartData = [];
 
-  // if (overviewData) {
-  //   donutChartData = angkatanKeys.map((x) => ({
-  //     name: x,
-  //     value: overviewData.data.angkatan[x].count,
-  //   }));
+  if (overviewData) {
+    donutChartData = angkatanKeys.map((x) => ({
+      name: x,
+      value: overviewData.data.angkatan[x].count,
+    }));
 
-  //   const totalFromData = donutChartData.reduce(
-  //     (acc, cur) => acc + cur.value,
-  //     0
-  //   );
-  //   const totalExpected = overviewData.data.totalPendaftar;
+    const totalFromData = donutChartData.reduce(
+      (acc, cur) => acc + cur.value,
+      0
+    );
+    const totalExpected = overviewData.data.totalPendaftar;
 
-  //   if (totalFromData < totalExpected) {
-  //     donutChartData.push({
-  //       name: 'Others',
-  //       value: totalExpected - totalFromData,
-  //     });
-  //   }
-  // }
+    if (totalFromData < totalExpected) {
+      donutChartData.push({
+        name: 'Others',
+        value: totalExpected - totalFromData,
+      });
+    }
+  }
 
-  // const donutColors = ['#FDAD15', '#02CACD', '#818CF8', '#34D399'];
+  const donutColors = ['#FDAD15', '#02CACD', '#818CF8', '#34D399'];
 
-  // const lntClassesData = overviewData?.data?.lntClasses
-  //   ? overviewData.data.lntClasses.map((x) => ({
-  //       name: x.className.split(' ')[0],
-  //       count: x.count,
-  //     }))
-  //   : [];
+  const lntClassesData = overviewData?.data?.lntClasses
+    ? overviewData.data.lntClasses.map((x) => ({
+        name: x.className.split(' ')[0],
+        count: x.count,
+      }))
+    : [];
 
   return (
     <>
-      {/* {showErrorModal && (
+      {showErrorModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-lg shadow-xl text-center">
             <h3 className="text-xl font-bold mb-4">Error</h3>
@@ -152,7 +148,7 @@ export default function Overview() {
             </div>
           </div>
         </div>
-      )} */}
+      )}
 
       <div className="py-6 space-y-7">
         <div className="flex flex-row gap-7 min-w-fit px-6">
@@ -160,7 +156,7 @@ export default function Overview() {
             <CardHeader>
               <CardTitle>Registrants by Batch</CardTitle>
             </CardHeader>
-            {/* <CardContent className="flex flex-col items-center justify-center h-[312px]">
+            <CardContent className="flex flex-col items-center justify-center h-[312px]">
               {isLoading ? (
                 <div className="w-40 h-40 my-4 bg-gray-200 rounded-full animate-pulse"></div>
               ) : (
@@ -257,13 +253,13 @@ export default function Overview() {
                   ))
                 )}
               </div>
-            </CardContent> */}
+            </CardContent>
           </Card>
           <Card className="col-span-1 row-span-1 w-[540px] h-[360px]">
             <CardHeader>
               <CardTitle>LnT Classes</CardTitle>
             </CardHeader>
-            {/* <CardContent>
+            <CardContent>
               {isLoading ? (
                 <div className="h-[312px] bg-gray-200 rounded animate-pulse"></div>
               ) : (
@@ -316,13 +312,13 @@ export default function Overview() {
                   })()}
                 </ResponsiveContainer>
               )}
-            </CardContent> */}
+            </CardContent>
           </Card>
           <Card className="col-span-1 row-span-2 w-[400px] h-[360px]">
             <CardHeader>
               <CardTitle>Top 3 Majors</CardTitle>
             </CardHeader>
-            {/* <CardContent className="h-[312px] flex justify-center items-center">
+            <CardContent className="h-[312px] flex justify-center items-center">
               {isLoading ? (
                 <div className="w-full flex flex-col gap-2">
                   <div className="h-12 w-full bg-gray-200 rounded animate-pulse"></div>
@@ -349,7 +345,7 @@ export default function Overview() {
                   ))}
                 </div>
               )}
-            </CardContent> */}
+            </CardContent>
           </Card>
         </div>
         <div className="flex flex-row gap-7 min-w-fit px-6">
@@ -357,7 +353,7 @@ export default function Overview() {
             <CardHeader>
               <CardTitle>Launching Progress</CardTitle>
             </CardHeader>
-            {/* <CardContent className="h-[132px] w-full flex flex-col">
+            <CardContent className="h-[132px] w-full flex flex-col">
               {isLoading ? (
                 <div className="w-full flex flex-col gap-3">
                   <div className="h-[42px] w-full bg-gray-200 rounded animate-pulse"></div>
@@ -404,13 +400,13 @@ export default function Overview() {
                   </div>
                 </div>
               )}
-            </CardContent> */}
+            </CardContent>
           </Card>
           <Card className="col-span-1 row-span-1 w-[550px] h-[180px]">
             <CardHeader>
               <CardTitle>Membership Status</CardTitle>
             </CardHeader>
-            {/* <CardContent className="h-[132px] w-full flex flex-col justify-center items-center">
+            <CardContent className="h-[132px] w-full flex flex-col justify-center items-center">
               {isLoading ? (
                 <div className="w-full flex flex-col gap-3">
                   <div className="h-[42px] w-full bg-gray-200 rounded animate-pulse"></div>
@@ -458,7 +454,7 @@ export default function Overview() {
                   </div>
                 </div>
               )}
-            </CardContent> */}
+            </CardContent>
           </Card>
         </div>
       </div>
