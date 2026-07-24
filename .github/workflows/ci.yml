@@ -35,6 +35,8 @@ jobs:
         run: npm ci
 
       - name: Build application
+        env:
+          VITE_API_URL: https://staging-launching-api.bncc.net/api
         run: npm run build
 
   publish_staging:
@@ -83,9 +85,11 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            VITE_API_URL=https://staging-launching-api.bncc.net/api
 
       - name: Trigger CD via Portainer Webhook
-        run: curl -X POST https://portainer.bncc.net/api/webhooks/fb0f069b-527d-4cbf-a8e0-fcaab6cbc939
+        run: curl -X POST https://portainer.bncc.net/api/stacks/webhooks/bd86556f-1a17-46a0-9f85-bcd3a46d9c19
 
   publish_release:
     name: Publish Release
@@ -133,6 +137,8 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            VITE_API_URL=https://launching-api.bncc.net/api
 
       - name: Trigger CD via Portainer Webhook
-        run: curl -X POST https://portainer.bncc.net/api/stacks/webhooks/5871c42b-57f8-4b19-a93f-3e01f6a37189
+        run: curl -X POST https://portainer.bncc.net/api/stacks/webhooks/3466bb85-8ec6-434d-9526-0674fb9ba8c3
