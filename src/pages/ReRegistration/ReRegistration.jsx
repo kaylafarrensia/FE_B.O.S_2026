@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import Navbar from '../../components/ReRegistration/Navbar'
-import ReRegistrationForm from '../../components/ReRegistration/ReRegistrationForm'
+import ReRegistrationForm from '../../components/ReRegistration/RegistrationForm'
 import ContactPersonCard from '../../components/ReRegistration/ContactPersonCard'
 import PerspectiveGrid from '../../components/ComingSoon/PerspectiveGrid'
 
