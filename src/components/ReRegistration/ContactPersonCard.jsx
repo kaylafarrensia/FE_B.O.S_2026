@@ -1,5 +1,6 @@
 import Card from './Card'
-import PersonIllustration from './PersonIllustration'
+import cpIcon from '../../../public/icons/ic-cp.svg'
+import lineIcon from '../../../public/icons/ic-line.svg'
 
 export default function ContactPersonCard({
   username = 'johndowney123',
@@ -15,10 +16,11 @@ export default function ContactPersonCard({
           </h2>
 
           <div className="mt-8 flex items-center gap-3">
-            {/* badge LINE */}
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#0A2745] text-[7px] font-bold leading-none text-white">
-              LINE
-            </span>
+            <img
+              src={lineIcon}
+              alt="LINE"
+              className="h-8 w-8 shrink-0"
+            />
             <span className="text-sm font-medium text-slate-700 sm:text-base">
               {username} ({name})
             </span>
@@ -33,7 +35,11 @@ export default function ContactPersonCard({
           </button>
         </div>
 
-        <PersonIllustration className="hidden h-40 w-40 shrink-0 sm:block md:h-48 md:w-48" />
+        <img
+          src={cpIcon}
+          alt="contact person illustration"
+          className="hidden h-40 w-40 shrink-0 sm:block md:h-48 md:w-48"
+        />
       </div>
     </Card>
   )

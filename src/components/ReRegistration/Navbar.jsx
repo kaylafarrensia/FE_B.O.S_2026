@@ -1,4 +1,5 @@
 import { RefreshCcw, Trophy, User } from 'lucide-react'
+import bnccLogo from '../../../public/images/img-BNCC.png'
 
 const TABS = [
   { key: 'reregist', label: 'Re-Regist', icon: RefreshCcw },
@@ -6,26 +7,11 @@ const TABS = [
   { key: 'profile', label: 'Profile', icon: User },
 ]
 
-export default function Navbar({ activeTab = 'reregist', onTabChange, logoSrc }) {
+export default function Navbar({ activeTab = 'reregist', onTabChange }) {
   return (
-    <nav className="flex items-center justify-between px-6 py-4 sm:px-10 sm:py-6">
-      {/* Logo */}
-      <div className="flex flex-col leading-none">
-        {logoSrc ? (
-          <img src={logoSrc} alt="BNCC" className="h-8 sm:h-10" />
-        ) : (
-          <>
-            <span className="text-2xl sm:text-3xl font-black tracking-tight text-[#1B9DE0]">
-              BNCC
-            </span>
-            <span className="text-[8px] sm:text-[9px] font-semibold tracking-wide text-slate-700">
-              BINA NUSANTARA COMPUTER CLUB
-            </span>
-          </>
-        )}
-      </div>
+    <nav className="flex shrink-0 items-center justify-between px-6 py-4 sm:px-10 sm:py-6">
+      <img src={bnccLogo} alt="BNCC" className="h-8 sm:h-10" />
 
-      {/* Tab group */}
       <div className="flex items-center gap-1 rounded-full border border-white/60 bg-white/70 p-2 shadow-md backdrop-blur-md sm:gap-2">
         {TABS.map((tab) => {
           const Icon = tab.icon
