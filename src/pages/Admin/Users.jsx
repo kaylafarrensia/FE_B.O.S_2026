@@ -1,9 +1,9 @@
-import Table from '@/components/Table';
-import Pagination from '@/components/Pagination';
-import Loader from '@/components/ui/loader';
-import { useState, useEffect, useRef } from 'react';
-import { usersColumns } from './constants';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import Table from '@/components/Table'
+import Pagination from '@/components/Pagination'
+import Loader from '@/components/ui/loader'
+import { useState, useEffect, useRef } from 'react'
+import { usersColumns } from './constants'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import {
   getUsersDetails,
   deleteUser,
@@ -11,24 +11,24 @@ import {
   createUser,
   downloadUsersExcel,
   getUserDetail,
-} from '@/services/admin';
-import { base64ToBlob, isDataUrl } from '@/lib/utils';
-import useLookupQuery from '@/hooks/queries/useLookupQuery';
+} from '@/services/admin'
+import { base64ToBlob, isDataUrl } from '@/lib/utils'
+import useLookupQuery from '@/hooks/queries/useLookupQuery'
 
 export default function Users() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [pageIndex, setPageIndex] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [showErrorModal, setShowErrorModal] = useState(false);
-  const [error, setError] = useState(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState(null);
-  const [deleting, setDeleting] = useState(false);
-  const [alert, setAlert] = useState(null);
-  const [showViewModal, setShowViewModal] = useState(false);
-  const [viewUser, setViewUser] = useState(null);
-  const [viewLoading, setViewLoading] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('')
+  const [pageIndex, setPageIndex] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
+  const [showErrorModal, setShowErrorModal] = useState(false)
+  const [error, setError] = useState(null)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState(null)
+  const [deleting, setDeleting] = useState(false)
+  const [alert, setAlert] = useState(null)
+  const [showViewModal, setShowViewModal] = useState(false)
+  const [viewUser, setViewUser] = useState(null)
+  const [viewLoading, setViewLoading] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
   const [editForm, setEditForm] = useState({
     id: 0,
     name: '',
@@ -42,9 +42,9 @@ export default function Users() {
     lntCourseId: 0,
     scheduleId: 0,
     status: '',
-  });
-  const [editLoading, setEditLoading] = useState(false);
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  })
+  const [editLoading, setEditLoading] = useState(false)
+  const [showCreateModal, setShowCreateModal] = useState(false)
   const [createForm, setCreateForm] = useState({
     fullName: '',
     email: '',
@@ -58,23 +58,23 @@ export default function Users() {
     lntCourseId: 0,
     scheduleId: 0,
     isJapres: null,
-  });
-  const [createLoading, setCreateLoading] = useState(false);
-  const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
-  const [showViewMessageModal, setShowViewMessageModal] = useState(false);
+  })
+  const [createLoading, setCreateLoading] = useState(false)
+  const [showWhatsAppModal, setShowWhatsAppModal] = useState(false)
+  const [showViewMessageModal, setShowViewMessageModal] = useState(false)
 
   const [whatsAppMessage, setWhatsAppMessage] = useState(
-    `Halo, {nama}!
+    `Haloo, {nama}! 👋
 
-Jangan lewatkan codesign BNCC 2025 untuk mendapatkan materi yang dapat mempersiapkan kamu sebagai seorang developers!
+Jangan lewatkan Codesign BNCC 2026 untuk mendapatkan materi yang dapat mempersiapkan kamu sebagai seorang developer!
 
 https://www.instagram.com/bnccbinus/
 
 Best Regards,
-Panitia BNCC Launching`
-  );
+Panitia BNCC Launching`,
+  )
   const [tempWhatsAppMessage, setTempWhatsAppMessage] =
-    useState(whatsAppMessage);
+    useState(whatsAppMessage)
 
   const {
     regionQuery,
@@ -82,50 +82,49 @@ Panitia BNCC Launching`
     majorQuery,
     lntCourseQuery,
     scheduleQuery,
-  } = useLookupQuery();
+  } = useLookupQuery()
 
-  const abortRef = useRef(null);
+  const abortRef = useRef(null)
 
-  const watchedRegionId = editForm.regionId;
-  const watchedFacultyId = editForm.facultyId;
+  const watchedRegionId = editForm.regionId
+  const watchedFacultyId = editForm.facultyId
 
-  const regions = regionQuery.data || [];
+  const regions = regionQuery.data || []
   const faculties =
     facultyQuery.data?.filter(
-      (faculty) => faculty.regionId === watchedRegionId
-    ) || [];
+      (faculty) => faculty.regionId === watchedRegionId,
+    ) || []
   const majors =
-    majorQuery.data?.filter(
-      (major) => major.facultyId === watchedFacultyId
-    ) || [];
+    majorQuery.data?.filter((major) => major.facultyId === watchedFacultyId) ||
+    []
   const lntCourses =
     lntCourseQuery.data?.filter(
-      (course) => course.regionId === watchedRegionId
-    ) || [];
+      (course) => course.regionId === watchedRegionId,
+    ) || []
   const schedules =
     scheduleQuery.data?.filter(
-      (schedule) => schedule.regionId === watchedRegionId
-    ) || [];
+      (schedule) => schedule.regionId === watchedRegionId,
+    ) || []
 
-  const watchedCreateRegionId = createForm.regionId;
-  const watchedCreateFacultyId = createForm.facultyId;
+  const watchedCreateRegionId = createForm.regionId
+  const watchedCreateFacultyId = createForm.facultyId
 
   const createFaculties =
     facultyQuery.data?.filter(
-      (faculty) => faculty.regionId === watchedCreateRegionId
-    ) || [];
+      (faculty) => faculty.regionId === watchedCreateRegionId,
+    ) || []
   const createMajors =
     majorQuery.data?.filter(
-      (major) => major.facultyId === watchedCreateFacultyId
-    ) || [];
+      (major) => major.facultyId === watchedCreateFacultyId,
+    ) || []
   const createLntCourses =
     lntCourseQuery.data?.filter(
-      (course) => course.regionId === watchedCreateRegionId
-    ) || [];
+      (course) => course.regionId === watchedCreateRegionId,
+    ) || []
   const createSchedules =
     scheduleQuery.data?.filter(
-      (schedule) => schedule.regionId === watchedCreateRegionId
-    ) || [];
+      (schedule) => schedule.regionId === watchedCreateRegionId,
+    ) || []
 
   const {
     data,
@@ -136,74 +135,74 @@ Panitia BNCC Launching`
   } = useQuery({
     queryKey: ['user-details'],
     queryFn: getUsersDetails,
-  });
+  })
 
   useEffect(() => {
     if (isError) {
-      setError(fetchError);
-      setShowErrorModal(true);
+      setError(fetchError)
+      setShowErrorModal(true)
     }
-  }, [isError, fetchError]);
+  }, [isError, fetchError])
 
   useEffect(() => {
     return () => {
-      abortRef.current?.abort();
-    };
-  }, []);
+      abortRef.current?.abort()
+    }
+  }, [])
 
   const mutation = useMutation({
     mutationFn: (id) => {
-      abortRef.current = new AbortController();
-      return deleteUser(id, { signal: abortRef.current.signal });
+      abortRef.current = new AbortController()
+      return deleteUser(id, { signal: abortRef.current.signal })
     },
     onSuccess: () => {
-      setDeleting(false);
-      setShowDeleteModal(false);
-      setAlert({ type: 'success', message: 'User deleted successfully.' });
-      refetch();
+      setDeleting(false)
+      setShowDeleteModal(false)
+      setAlert({ type: 'success', message: 'User deleted successfully.' })
+      refetch()
     },
     onError: (err) => {
-      setDeleting(false);
-      setShowDeleteModal(false);
+      setDeleting(false)
+      setShowDeleteModal(false)
       setAlert({
         type: 'error',
         message:
           err?.response?.data?.error ||
           err?.message ||
           'An unknown error occurred.',
-      });
+      })
     },
-  });
+  })
 
   const editMutation = useMutation({
     mutationFn: (form) => updateUser(form),
     onMutate: () => setEditLoading(true),
     onSuccess: () => {
-      setEditLoading(false);
-      setShowEditModal(false);
-      setAlert({ type: 'success', message: 'User updated successfully.' });
-      refetch();
+      setEditLoading(false)
+      setShowEditModal(false)
+      setAlert({ type: 'success', message: 'User updated successfully.' })
+      refetch()
     },
     onError: (err) => {
-      setEditLoading(false);
+      setEditLoading(false)
       setAlert({
         type: 'error',
         message:
           err?.response?.data?.error ||
           err?.message ||
           'An unknown error occurred.',
-      });
+      })
     },
-  });
+  })
 
   const createMutation = useMutation({
     mutationFn: (form) => createUser(form),
     onMutate: () => setCreateLoading(true),
     onSuccess: () => {
-      setCreateLoading(false);
-      setShowCreateModal(false);
-      setAlert({ type: 'success', message: 'User created successfully.' });
-      refetch();
+      setCreateLoading(false)
+      setShowCreateModal(false)
+      setAlert({ type: 'success', message: 'User created successfully.' })
+      refetch()
       setCreateForm({
         fullName: '',
         email: '',
@@ -217,28 +216,28 @@ Panitia BNCC Launching`
         lntCourseId: 0,
         scheduleId: 0,
         isJapres: null,
-      });
+      })
     },
     onError: (err) => {
-      setCreateLoading(false);
+      setCreateLoading(false)
       setAlert({
         type: 'error',
         message:
           err?.response?.data?.error ||
           err?.message ||
           'An unknown error occurred.',
-      });
+      })
     },
-  });
+  })
 
   const OpenWhatsApp = (number, text) => {
-    const formatText = encodeURIComponent(text);
-    window.open(`https://wa.me/+62${number}?text=${formatText}`);
-  };
+    const formatText = encodeURIComponent(text)
+    window.open(`https://wa.me/+62${number}?text=${formatText}`)
+  }
 
   const allData =
     data?.data?.map((user) => {
-      const reg = user.registrations?.[0] || {};
+      const reg = user.registrations?.[0] || {}
       return {
         ID: user.id,
         'BNCC ID': reg.bnccId || '-',
@@ -250,9 +249,9 @@ Panitia BNCC Launching`
           <a
             href="#"
             onClick={(e) => {
-              e.preventDefault();
-              const message = whatsAppMessage.replace('{nama}', user.name);
-              OpenWhatsApp(reg.whatsappNumber, message);
+              e.preventDefault()
+              const message = whatsAppMessage.replace('{nama}', user.name)
+              OpenWhatsApp(reg.whatsappNumber, message)
             }}
             className="text-blue-600 underline"
           >
@@ -314,8 +313,8 @@ Panitia BNCC Launching`
                   lntCourseId: reg.lntCourse?.id ?? 0,
                   scheduleId: reg.schedule?.id ?? 0,
                   status: user.status ?? '',
-                });
-                setShowEditModal(true);
+                })
+                setShowEditModal(true)
               }}
               aria-label="Edit"
               className="mx-1"
@@ -338,8 +337,8 @@ Panitia BNCC Launching`
             </button>
             <button
               onClick={() => {
-                setDeleteTarget(user.id);
-                setShowDeleteModal(true);
+                setDeleteTarget(user.id)
+                setShowDeleteModal(true)
               }}
               aria-label="Delete"
               className="mx-1"
@@ -362,76 +361,76 @@ Panitia BNCC Launching`
             </button>
           </div>
         ),
-      };
-    }) ?? [];
+      }
+    }) ?? []
 
   const filteredData = searchQuery
     ? allData.filter((row) =>
-      (row['Full Name'] || '')
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase())
-    )
-    : allData;
+        (row['Full Name'] || '')
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()),
+      )
+    : allData
 
   const pagedData = filteredData.slice(
     (pageIndex - 1) * itemsPerPage,
-    pageIndex * itemsPerPage
-  );
+    pageIndex * itemsPerPage,
+  )
 
   const handleRetry = () => {
-    setShowErrorModal(false);
-    setError(null);
-    refetch();
-  };
+    setShowErrorModal(false)
+    setError(null)
+    refetch()
+  }
 
   const handleDeleteConfirm = () => {
     if (deleteTarget) {
-      setDeleting(true);
-      mutation.mutate(deleteTarget);
+      setDeleting(true)
+      mutation.mutate(deleteTarget)
     }
-  };
+  }
 
-  const handleAlertClose = () => setAlert(null);
+  const handleAlertClose = () => setAlert(null)
 
   const handleEditChange = (e) => {
-    setEditForm({ ...editForm, [e.target.name]: e.target.value });
-  };
+    setEditForm({ ...editForm, [e.target.name]: e.target.value })
+  }
 
   const handleEditSubmit = (e) => {
-    e.preventDefault();
-    editMutation.mutate(editForm);
-  };
+    e.preventDefault()
+    editMutation.mutate(editForm)
+  }
 
   const handleCreateChange = (e) => {
-    setCreateForm({ ...createForm, [e.target.name]: e.target.value });
-  };
+    setCreateForm({ ...createForm, [e.target.name]: e.target.value })
+  }
 
   const handleCreateSubmit = (e) => {
-    e.preventDefault();
-    createMutation.mutate(createForm);
-  };
+    e.preventDefault()
+    createMutation.mutate(createForm)
+  }
 
   const handleViewUser = async (userId) => {
-    setViewLoading(true);
+    setViewLoading(true)
     try {
-      const detail = await getUserDetail(String(userId));
-      setViewUser(detail.data?.[0] ?? detail.data ?? null);
-      setShowViewModal(true);
+      const detail = await getUserDetail(String(userId))
+      setViewUser(detail.data?.[0] ?? detail.data ?? null)
+      setShowViewModal(true)
     } catch (err) {
       setAlert({
         type: 'error',
         message: 'Failed to fetch user details.',
-      });
-      setShowViewModal(true);
+      })
+      setShowViewModal(true)
     } finally {
-      setViewLoading(false);
+      setViewLoading(false)
     }
-  };
+  }
 
   const handleSaveWhatsAppMessage = () => {
-    setWhatsAppMessage(tempWhatsAppMessage);
-    setShowWhatsAppModal(false);
-  };
+    setWhatsAppMessage(tempWhatsAppMessage)
+    setShowWhatsAppModal(false)
+  }
 
   return (
     <div className={`py-6 space-y-7 ${deleting ? 'pointer-events-none' : ''}`}>
@@ -553,116 +552,116 @@ Panitia BNCC Launching`
                       <b>Member Letter:</b>{' '}
                       {reg.suratMember
                         ? (() => {
-                          const v = reg.suratMember;
-                          if (
-                            isDataUrl(v) ||
-                            /^([A-Za-z0-9+\/=\-_\s]+)$/.test(v)
-                          ) {
-                            return (
-                              <button
-                                onClick={async () => {
-                                  try {
-                                    let blob;
-                                    if (isDataUrl(v)) blob = base64ToBlob(v);
-                                    else {
-                                      const normalized = v
-                                        .replace(/\s/g, '')
-                                        .replace(/-/g, '+')
-                                        .replace(/_/g, '/');
-                                      blob = base64ToBlob(
-                                        'data:application/octet-stream;base64,' +
-                                        normalized
-                                      );
+                            const v = reg.suratMember
+                            if (
+                              isDataUrl(v) ||
+                              /^([A-Za-z0-9+\/=\-_\s]+)$/.test(v)
+                            ) {
+                              return (
+                                <button
+                                  onClick={async () => {
+                                    try {
+                                      let blob
+                                      if (isDataUrl(v)) blob = base64ToBlob(v)
+                                      else {
+                                        const normalized = v
+                                          .replace(/\s/g, '')
+                                          .replace(/-/g, '+')
+                                          .replace(/_/g, '/')
+                                        blob = base64ToBlob(
+                                          'data:application/octet-stream;base64,' +
+                                            normalized,
+                                        )
+                                      }
+                                      const url = URL.createObjectURL(blob)
+                                      window.open(url, '_blank')
+                                      setTimeout(
+                                        () => URL.revokeObjectURL(url),
+                                        5000,
+                                      )
+                                    } catch (e) {
+                                      console.error(
+                                        'Failed to open member letter',
+                                        e,
+                                      )
+                                      window.alert('Failed to open file')
                                     }
-                                    const url = URL.createObjectURL(blob);
-                                    window.open(url, '_blank');
-                                    setTimeout(
-                                      () => URL.revokeObjectURL(url),
-                                      5000
-                                    );
-                                  } catch (e) {
-                                    console.error(
-                                      'Failed to open member letter',
-                                      e
-                                    );
-                                    window.alert('Failed to open file');
-                                  }
-                                }}
+                                  }}
+                                  className="text-blue-600 underline"
+                                >
+                                  Member Letter
+                                </button>
+                              )
+                            }
+                            return (
+                              <a
+                                href={v}
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 className="text-blue-600 underline"
                               >
                                 Member Letter
-                              </button>
-                            );
-                          }
-                          return (
-                            <a
-                              href={v}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 underline"
-                            >
-                              Member Letter
-                            </a>
-                          );
-                        })()
+                              </a>
+                            )
+                          })()
                         : '-'}
                     </div>
                     <div>
                       <b>Binusian Card:</b>{' '}
                       {reg.binusianCard
                         ? (() => {
-                          const v = reg.binusianCard;
-                          if (
-                            isDataUrl(v) ||
-                            /^([A-Za-z0-9+\/=\-_\s]+)$/.test(v)
-                          ) {
-                            return (
-                              <button
-                                onClick={async () => {
-                                  try {
-                                    let blob;
-                                    if (isDataUrl(v)) blob = base64ToBlob(v);
-                                    else {
-                                      const normalized = v
-                                        .replace(/\s/g, '')
-                                        .replace(/-/g, '+')
-                                        .replace(/_/g, '/');
-                                      blob = base64ToBlob(
-                                        'data:application/octet-stream;base64,' +
-                                        normalized
-                                      );
+                            const v = reg.binusianCard
+                            if (
+                              isDataUrl(v) ||
+                              /^([A-Za-z0-9+\/=\-_\s]+)$/.test(v)
+                            ) {
+                              return (
+                                <button
+                                  onClick={async () => {
+                                    try {
+                                      let blob
+                                      if (isDataUrl(v)) blob = base64ToBlob(v)
+                                      else {
+                                        const normalized = v
+                                          .replace(/\s/g, '')
+                                          .replace(/-/g, '+')
+                                          .replace(/_/g, '/')
+                                        blob = base64ToBlob(
+                                          'data:application/octet-stream;base64,' +
+                                            normalized,
+                                        )
+                                      }
+                                      const url = URL.createObjectURL(blob)
+                                      window.open(url, '_blank')
+                                      setTimeout(
+                                        () => URL.revokeObjectURL(url),
+                                        5000,
+                                      )
+                                    } catch (e) {
+                                      console.error(
+                                        'Failed to open binusian card',
+                                        e,
+                                      )
+                                      window.alert('Failed to open file')
                                     }
-                                    const url = URL.createObjectURL(blob);
-                                    window.open(url, '_blank');
-                                    setTimeout(
-                                      () => URL.revokeObjectURL(url),
-                                      5000
-                                    );
-                                  } catch (e) {
-                                    console.error(
-                                      'Failed to open binusian card',
-                                      e
-                                    );
-                                    window.alert('Failed to open file');
-                                  }
-                                }}
+                                  }}
+                                  className="text-blue-600 underline"
+                                >
+                                  Binusian Card
+                                </button>
+                              )
+                            }
+                            return (
+                              <a
+                                href={v}
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 className="text-blue-600 underline"
                               >
                                 Binusian Card
-                              </button>
-                            );
-                          }
-                          return (
-                            <a
-                              href={v}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 underline"
-                            >
-                              Binusian Card
-                            </a>
-                          );
-                        })()
+                              </a>
+                            )
+                          })()
                         : '-'}
                     </div>
                   </div>
@@ -674,8 +673,8 @@ Panitia BNCC Launching`
             <div className="flex justify-end">
               <button
                 onClick={() => {
-                  setShowViewModal(false);
-                  setViewUser(null);
+                  setShowViewModal(false)
+                  setViewUser(null)
                 }}
                 className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
               >
@@ -745,7 +744,7 @@ Panitia BNCC Launching`
                     majorId: 0,
                     lntCourseId: 0,
                     scheduleId: 0,
-                  });
+                  })
                 }}
                 className="border p-2 rounded w-full"
                 required
@@ -765,7 +764,7 @@ Panitia BNCC Launching`
                     ...editForm,
                     facultyId: Number(e.target.value),
                     majorId: 0,
-                  });
+                  })
                 }}
                 className="border p-2 rounded w-full"
                 required
@@ -785,7 +784,7 @@ Panitia BNCC Launching`
                   setEditForm({
                     ...editForm,
                     majorId: Number(e.target.value),
-                  });
+                  })
                 }}
                 className="border p-2 rounded w-full"
                 required
@@ -805,7 +804,7 @@ Panitia BNCC Launching`
                   setEditForm({
                     ...editForm,
                     lntCourseId: Number(e.target.value),
-                  });
+                  })
                 }}
                 className="border p-2 rounded w-full"
                 required
@@ -825,7 +824,7 @@ Panitia BNCC Launching`
                   setEditForm({
                     ...editForm,
                     scheduleId: Number(e.target.value),
-                  });
+                  })
                 }}
                 className="border p-2 rounded w-full"
                 required
@@ -945,7 +944,7 @@ Panitia BNCC Launching`
                     majorId: undefined,
                     lntCourseId: undefined,
                     scheduleId: undefined,
-                  });
+                  })
                 }}
                 className="border p-2 rounded w-full"
                 required
@@ -965,7 +964,7 @@ Panitia BNCC Launching`
                     ...createForm,
                     facultyId: Number(e.target.value),
                     majorId: undefined,
-                  });
+                  })
                 }}
                 className="border p-2 rounded w-full"
                 required
@@ -985,7 +984,7 @@ Panitia BNCC Launching`
                   setCreateForm({
                     ...createForm,
                     majorId: Number(e.target.value),
-                  });
+                  })
                 }}
                 className="border p-2 rounded w-full"
                 required
@@ -1005,7 +1004,7 @@ Panitia BNCC Launching`
                   setCreateForm({
                     ...createForm,
                     lntCourseId: Number(e.target.value),
-                  });
+                  })
                 }}
                 className="border p-2 rounded w-full"
                 required
@@ -1025,7 +1024,7 @@ Panitia BNCC Launching`
                   setCreateForm({
                     ...createForm,
                     scheduleId: Number(e.target.value),
-                  });
+                  })
                 }}
                 className="border p-2 rounded w-full"
                 required
@@ -1046,11 +1045,11 @@ Panitia BNCC Launching`
                     : ''
                 }
                 onChange={(e) => {
-                  const val = e.target.value;
+                  const val = e.target.value
                   setCreateForm({
                     ...createForm,
                     isJapres: val === '' ? null : Number(val),
-                  });
+                  })
                 }}
                 className="border p-2 rounded w-full"
               >
@@ -1241,8 +1240,8 @@ Panitia BNCC Launching`
           <button
             className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
             onClick={() => {
-              setTempWhatsAppMessage(whatsAppMessage);
-              setShowWhatsAppModal(true);
+              setTempWhatsAppMessage(whatsAppMessage)
+              setShowWhatsAppModal(true)
             }}
             type="button"
           >
@@ -1278,8 +1277,8 @@ Panitia BNCC Launching`
                   optionItemPerPage={[5, 10, 25, 50, 100]}
                   onChangeIndex={setPageIndex}
                   onChangeItemsPerPage={(val) => {
-                    setItemsPerPage(val);
-                    setPageIndex(1);
+                    setItemsPerPage(val)
+                    setPageIndex(1)
                   }}
                 />
                 <button
@@ -1295,5 +1294,5 @@ Panitia BNCC Launching`
         </div>
       </div>
     </div>
-  );
+  )
 }

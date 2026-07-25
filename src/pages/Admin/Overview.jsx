@@ -335,7 +335,7 @@ export default function Overview() {
                       <div>
                         <p className="font-semibold text-black">{major.name}</p>
                         <p className="text-sm text-gray-500">
-                          {major.count} Registrant
+                          {major.count} {major.count > 1 ? 'Registrants' : 'Registrant'}
                         </p>
                       </div>
                       <div className="flex items-center space-x-2 text-black">
@@ -370,7 +370,7 @@ export default function Overview() {
                         <strong>
                           {overviewData?.data?.statusLaunching.percentage}%
                         </strong>
-                        &nbsp; Registrant
+                        &nbsp; Registrants
                       </span>
                     </div>
                     <ProgressBar
@@ -390,7 +390,7 @@ export default function Overview() {
                           {overviewData?.data?.statusMember.percentage}%
                         </strong>
                         {''}
-                        &nbsp; Registrant
+                        &nbsp; Registrants
                       </span>
                     </div>
                     <ProgressBar
@@ -424,7 +424,7 @@ export default function Overview() {
                           {overviewData?.data?.statusLaunching.percentage}%
                         </strong>
                         {''}
-                        &nbsp; Registrant
+                        &nbsp; Registrants
                       </span>
                     </div>
                     <ProgressBar
@@ -437,14 +437,14 @@ export default function Overview() {
                   <div className="flex flex-col gap-2">
                     <div className="flex justify-between text-sm mb-1">
                       <span className="font-semibold text-black">
-                        Registrant
+                        {overviewData?.data?.totalPendaftar > 1 ? 'Registrants' : 'Registrant'}
                       </span>
                       <span className="text-gray-600">
                         <strong>
                           {overviewData?.data?.statusMember.percentage}%
                         </strong>
                         {''}
-                        &nbsp; Registrant
+                        &nbsp; Registrants
                       </span>
                     </div>
                     <ProgressBar
