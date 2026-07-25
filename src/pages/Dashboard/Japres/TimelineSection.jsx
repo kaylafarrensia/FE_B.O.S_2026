@@ -5,10 +5,10 @@ import Card from '../../../components/ui/Card.jsx';
 import Glass from '../../../components/ui/Glass.jsx';
 
 const timelineEvents = [
-  { compareDate: '2026-08-12', displayDate: 'August 12, 2026', description: 'Submission Deadline' },
-  { compareDate: '2026-08-17', displayDate: 'August 17, 2026', description: 'Result Announcement' },
-  { compareDate: '2026-08-19', displayDate: 'August 19-21, 2026', description: 'Interview' },
-  { compareDate: '2026-08-25', displayDate: 'August 25, 2026', description: 'Final Result' },
+  { compareDate: '2026-08-12', displayDate: 'August 12 2026', description: 'Submission Deadline' },
+  { compareDate: '2026-08-17', displayDate: 'August 17 2026', description: 'Result Announcement' },
+  { compareDate: '2026-08-19', displayDate: 'August 19-21 2026', description: 'Interview' },
+  { compareDate: '2026-08-25', displayDate: 'August 25 2026', description: 'Final Result' },
 ];
 
 const GLASS_FILLED_STYLE = {

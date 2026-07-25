@@ -22,6 +22,11 @@ function Dashboard() {
   const location = useLocation();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [userSchedule, setUserSchedule] = useState({
+    id: 2,
+    startTime: '2026-08-15T09:00:00Z',
+    endTime: '2026-08-15T12:00:00Z',
+  });
   const pillWidth = 180;
   const [pillStyle, setPillStyle] = useState({ left: 0 });
   const tabRefs = useRef([]);
@@ -192,7 +197,7 @@ function Dashboard() {
         </div>
       </ul>
 
-      <Outlet />
+      <Outlet context={{ userSchedule, setUserSchedule }} />
     </div>
   );
 }

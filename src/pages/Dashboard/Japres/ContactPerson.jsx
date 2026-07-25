@@ -22,7 +22,8 @@ export default function ContactPerson() {
         <div className="flex flex-row gap-3 items-center">
           <img src={IconLine} alt="" className="w-5 sm:w-7" />
           <p className="text-xs sm:text-base">
-            {DUMMY_CONTACT.line} ({DUMMY_CONTACT.name})
+            <span className="whitespace-nowrap">{DUMMY_CONTACT.line}</span>{' '}
+            <span className="whitespace-nowrap">({DUMMY_CONTACT.name})</span>
           </p>
         </div>
         <Button onClick={() => openWhatsApp(DUMMY_CONTACT.wa)}>

@@ -46,7 +46,7 @@ export default function DocumentSubmission({
             <div className="flex items-center gap-2 md:gap-4">
               <img src={IconSchedule} alt="" className="size-4 sm:size-6" />
               <p className="text-xs sm:text-lg">
-                Due: August 7, 2026 at 23:59 WIB
+                Due: August 7 2026 at 23:59 WIB
               </p>
             </div>
           </div>
@@ -91,7 +91,7 @@ export default function DocumentSubmission({
             <div className="flex items-center gap-4">
               <img src={IconTime} alt="" className="size-4 sm:size-6" />
               <p className="text-xs sm:text-lg xl:text-xl">
-                Last uploaded: {submittedAt ? formatToWIB(submittedAt) : '-'}
+                {submittedAt ? `Last uploaded: ${formatToWIB(submittedAt)}` : 'No latest submission'}
               </p>
             </div>
           </div>
@@ -101,7 +101,7 @@ export default function DocumentSubmission({
         <div className="self-center">
           <Button
             onClick={onSubmit}
-            disabled={!japresUrl.trim() || !hasReadGuideline}
+            disabled={!japresUrl.trim()}
             className="px-8 py-2 sm:px-10 sm:py-3 mx-auto w-fit"
           >
             SUBMIT

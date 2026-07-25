@@ -10,8 +10,8 @@ import ContactPerson from './Japres/ContactPerson.jsx';
 
 // ── Dummy Data (replace with API when backend is ready) ───────────────────────
 const DUMMY_JAPRES_STATUS = {
-  status: 'Pending',
-  submittedAt: '2026-07-22T14:30:00Z',
+  status: 'Not Submitted',
+  submittedAt: null,
 };
 
 const REASONS = [
@@ -34,7 +34,11 @@ export default function Japres() {
   const [hoveredIdx, setHoveredIdx] = useState(null);
 
   const handleSubmit = () => {
-    if (!japresUrl.trim() || !hasReadGuideline) return;
+    if (!japresUrl.trim()) return;
+    if (!hasReadGuideline) {
+      alert('Please read and check the JaPres guideline first!');
+      return;
+    }
     setCurrentStatus({ status: 'Pending', submittedAt: new Date().toISOString() });
     setJapresUrl('');
   };
@@ -55,15 +59,54 @@ export default function Japres() {
             </Card>
           </motion.div>
 
-          <h1 className="text-2xl sm:text-4xl xl:text-[90px] font-bold w-fit">
-            <span className="relative inline-block bg-[#2474C0]/10 border-t-[1px] border-b-[1px] border-l-[5px] border-r-[5px] sm:border-l-[10px] sm:border-r-[10px] border-[#2474C0] px-4 py-1 leading-[1.6em] [box-decoration-break:clone] [-webkit-box-decoration-break:clone]">
-              {/* Lingkaran di atas border kiri */}
-              <span className="absolute top-0 left-[-2.5px] sm:left-[-4.5px] -translate-x-1/2 -translate-y-1/2 w-[18px] h-[18px] sm:w-[46px] sm:h-[46px] bg-[#2474C0] rounded-full" />
+          <h1 className="text-2xl sm:text-4xl md:text-5xl xl:text-[62px] font-bold font-outfit text-persian-indigo text-center select-none max-w-full">
+            {/* Left Cursor */}
+            <span
+              className="inline-block relative shrink-0 align-middle w-[0.12em] sm:w-[0.16em] h-[1.6em] bg-[#2474C0] rounded-full"
+              style={{ marginRight: '0px' }}
+            >
+              <span
+                className="w-[0.36em] h-[0.36em] sm:w-[0.55em] sm:h-[0.55em]"
+                style={{
+                  position: 'absolute',
+                  top: '-0.14em',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  backgroundColor: '#2474C0',
+                  borderRadius: '50%',
+                }}
+              />
+            </span>
 
+            {/* Text Highlight Block */}
+            <span
+              className="inline px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg sm:rounded-xl"
+              style={{
+                backgroundColor: 'rgba(36, 116, 192, 0.15)',
+                lineHeight: '1.6em',
+                boxDecorationBreak: 'clone',
+                WebkitBoxDecorationBreak: 'clone',
+              }}
+            >
               BNCC Achievement Track (JaPres)
+            </span>
 
-              {/* Lingkaran di bawah border kanan */}
-              <span className="absolute bottom-0 right-[-2.5px] sm:right-[-4.5px] translate-x-1/2 translate-y-1/2 w-[18px] h-[18px] sm:w-[46px] sm:h-[46px] bg-[#2474C0] rounded-full" />
+            {/* Right Cursor */}
+            <span
+              className="inline-block relative shrink-0 align-middle w-[0.12em] sm:w-[0.16em] h-[1.6em] bg-[#2474C0] rounded-full"
+              style={{ marginLeft: '0px' }}
+            >
+              <span
+                className="w-[0.36em] h-[0.36em] sm:w-[0.55em] sm:h-[0.55em]"
+                style={{
+                  position: 'absolute',
+                  bottom: '-0.14em',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  backgroundColor: '#2474C0',
+                  borderRadius: '50%',
+                }}
+              />
             </span>
           </h1>
         </header>

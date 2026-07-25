@@ -1,6 +1,7 @@
-import Card from '../../components/ui/Card.jsx';
-import Button from '../../components/ui/Button.jsx';
-import IconDownload from '../../assets/icons/IconDownload.svg';
+import Card from '../../components/ui/Card.jsx'
+import Button from '../../components/ui/Button.jsx'
+import IconDownload from '../../assets/icons/IconDownload.svg'
+import { useOutletContext } from 'react-router-dom'
 
 // ── DUMMY DATA ─────────────────────────────────────────────────────────────────
 const DUMMY_USER = {
@@ -24,36 +25,51 @@ const DUMMY_USER = {
     linkedinUrl: 'https://linkedin.com/in/john-doe',
     githubUrl: 'https://github.com/johndoe',
   },
-};
+}
 
 function formatDate(isoString) {
-  if (!isoString) return '-';
-  const d = new Date(isoString);
-  return d.toLocaleDateString('en-US', {
+  if (!isoString) return '-'
+  const d = new Date(isoString)
+  const formatted = d.toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric',
     timeZone: 'UTC',
-  });
+  })
+  return formatted.replace(/,\s*(\d{4})/, ' $1')
 }
 
 function formatTime(startIso, endIso) {
-  if (!startIso) return '-';
-  const s = new Date(startIso);
-  const e = new Date(endIso);
+  if (!startIso) return '-'
+  const s = new Date(startIso)
+  const e = new Date(endIso)
   const fmt = (d) =>
     d.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false,
       timeZone: 'UTC',
-    });
-  return `${fmt(s)} – ${fmt(e)} WIB`;
+    })
+  return `${fmt(s)} – ${fmt(e)} WIB`
+}
+
+function renderEmail(email) {
+  if (!email) return '';
+  const parts = email.split('@');
+  if (parts.length === 2) {
+    return (
+      <>
+        {parts[0]}@<wbr />{parts[1]}
+      </>
+    );
+  }
+  return email;
 }
 
 function Profile() {
-  const user = DUMMY_USER;
+  const user = DUMMY_USER
+  const { userSchedule } = useOutletContext()
 
   return (
     <div className="relative">
@@ -75,7 +91,7 @@ function Profile() {
                     </p>
                   </div>
                   <div className="flex flex-col gap-2">
-                    <p className="text-sm text-gray-500">Whatsapp Number</p>
+                    <p className="text-sm text-gray-500">WhatsApp Number</p>
                     <p className="text-sm sm:text-lg font-semibold">
                       {user.registration.whatsappNumber}
                     </p>
@@ -89,7 +105,7 @@ function Profile() {
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">Email</p>
                     <p className="text-sm sm:text-lg font-semibold break-words">
-                      {user.email}
+                      {renderEmail(user.email)}
                     </p>
                   </div>
                 </div>
@@ -102,14 +118,13 @@ function Profile() {
                 </h1>
                 <div className="grid grid-cols-2 gap-5 justify-start items-start">
                   <div className="flex flex-col gap-2">
-                    <p className="text-sm text-gray-500">BNCC Launching Schedule</p>
+                    <p className="text-sm text-gray-500">
+                      BNCC Launching Schedule
+                    </p>
                     <p className="text-sm sm:text-lg font-semibold break-words">
-                      {formatDate(user.registration.schedule.startTime)}
+                      {formatDate(userSchedule.startTime)}
                       <br />
-                      {formatTime(
-                        user.registration.schedule.startTime,
-                        user.registration.schedule.endTime
-                      )}
+                      {formatTime(userSchedule.startTime, userSchedule.endTime)}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2">
@@ -157,7 +172,7 @@ function Profile() {
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">Binus Email</p>
                     <p className="text-sm sm:text-lg font-semibold break-words">
-                      {user.email}
+                      {renderEmail(user.email)}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2">
@@ -170,47 +185,60 @@ function Profile() {
               </Card>
 
               {/* Re-Registration (only shown when files available) */}
-              {user.registration.suratMember && user.registration.binusianCard && (
-                <Card className="border-white border-2 rounded-2xl px-6 sm:px-10 py-10">
-                  <h1 className="font-bold pb-10 text-lg sm:text-2xl text-center">
-                    RE-REGISTRATION
-                  </h1>
-                  <div className="flex flex-col gap-5 justify-start items-start">
-                    <div className="flex flex-col gap-2">
-                      <p className="text-sm text-gray-500">LinkedIn URL</p>
-                      <p className="text-sm sm:text-lg font-semibold">
-                        {user.registration.linkedinUrl || 'https://'}
-                      </p>
+              {user.registration.suratMember &&
+                user.registration.binusianCard && (
+                  <Card className="border-white border-2 rounded-2xl px-6 sm:px-10 py-10">
+                    <h1 className="font-bold pb-10 text-lg sm:text-2xl text-center">
+                      RE-REGISTRATION
+                    </h1>
+                    <div className="flex flex-col gap-5 justify-start w-full">
+                      <div className="flex flex-col gap-2">
+                        <p className="text-sm text-gray-500">LinkedIn URL</p>
+                        <p className="text-sm sm:text-lg font-semibold">
+                          {user.registration.linkedinUrl || 'https://'}
+                        </p>
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <p className="text-sm text-gray-500">Github URL</p>
+                        <p className="text-sm sm:text-lg font-semibold">
+                          {user.registration.githubUrl || 'https://'}
+                        </p>
+                      </div>
+                      <div className="gap-2 flex flex-col w-full">
+                        <p className="text-sm text-gray-500">Member Letter</p>
+                        <Button className="w-full">
+                          <img
+                            src={IconDownload}
+                            alt="Download"
+                            className="w-6 h-6 mr-2"
+                          />
+                          <p className="text-xs sm:text-sm">
+                            Download Latest Submission
+                          </p>
+                        </Button>
+                      </div>
+                      <div className="gap-2 flex flex-col w-full">
+                        <p className="text-sm text-gray-500">Binusian Card</p>
+                        <Button className="w-full">
+                          <img
+                            src={IconDownload}
+                            alt="Download"
+                            className="w-6 h-6 mr-2"
+                          />
+                          <p className="text-xs sm:text-sm">
+                            Download Binusian Card
+                          </p>
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex flex-col gap-2">
-                      <p className="text-sm text-gray-500">Github URL</p>
-                      <p className="text-sm sm:text-lg font-semibold">
-                        {user.registration.githubUrl || 'https://'}
-                      </p>
-                    </div>
-                    <div className="gap-2 flex flex-col">
-                      <p className="text-sm text-gray-500">Member Letter</p>
-                      <Button>
-                        <img src={IconDownload} alt="Download" className="w-6 h-6 mr-2" />
-                        <p className='text-xs sm:text-sm'>Download Latest Submission</p>
-                      </Button>
-                    </div>
-                    <div className="gap-2 flex flex-col">
-                      <p className="text-sm text-gray-500">Binusian Card</p>
-                      <Button>
-                        <img src={IconDownload} alt="Download" className="w-6 h-6 mr-2" />
-                        <p className='text-xs sm:text-sm'>Download Binusian Card</p>
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              )}
+                  </Card>
+                )}
             </div>
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-export default Profile;
+export default Profile

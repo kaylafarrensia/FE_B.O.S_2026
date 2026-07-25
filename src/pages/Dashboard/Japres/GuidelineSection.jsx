@@ -37,7 +37,7 @@ export default function GuidelineSection({ hasReadGuideline, setHasReadGuideline
           onChange={() => setHasReadGuideline(!hasReadGuideline)}
         />
         <div
-          className={`flex items-center justify-center size-3 sm:size-5 transition-colors border-2 rounded-sm shrink-0 ${hasReadGuideline ? 'bg-persian-indigo' : 'bg-transparent'}`}
+          className={`flex items-center justify-center size-3 sm:size-5 transition-colors border-2 rounded-sm shrink-0 ${hasReadGuideline ? 'bg-persian-indigo border-persian-indigo' : 'bg-transparent border-[#2474C0]'}`}
         >
           <Check
             className={`size-2 sm:size-4 text-white transition-opacity ${hasReadGuideline ? 'opacity-100' : 'opacity-0'}`}

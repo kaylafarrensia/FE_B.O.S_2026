@@ -18,10 +18,7 @@ const EVENT_GLASS_STYLE = {
   '--glass-to': 'rgba(68, 137, 212, 0.9)',
 };
 
-const SELECTED_GLASS_STYLE = {
-  '--glass-from': 'rgba(234, 178, 8, 0.73)',
-  '--glass-to': 'rgba(250, 204, 21, 0.84)',
-};
+
 
 export default function Calendar({ schedules, userScheduleId }) {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -115,9 +112,6 @@ export default function Calendar({ schedules, userScheduleId }) {
             stl = TODAY_GLASS_STYLE;
           } else if (isUserDay) {
             cls = 'font-semibold text-white glassmorphism';
-            stl = SELECTED_GLASS_STYLE;
-          } else if (events.length > 0) {
-            cls = 'font-semibold text-white glassmorphism';
             stl = EVENT_GLASS_STYLE;
           } else {
             cls = `hover:bg-lavender-white hover:shadow-sm hover:rounded-lg ${isSunday ? 'text-red-500' : 'text-persian-indigo'}`;
@@ -144,10 +138,6 @@ export default function Calendar({ schedules, userScheduleId }) {
         <div className="flex items-center gap-2">
           <span className="w-6 h-6 rounded-md shadow-sm glassmorphism" style={EVENT_GLASS_STYLE} />
           <span className="font-semibold">BNCC Launching</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-6 h-6 rounded-md shadow-sm glassmorphism" style={SELECTED_GLASS_STYLE} />
-          <span className="font-semibold">Your Selected Schedule</span>
         </div>
       </div>
     </Card>

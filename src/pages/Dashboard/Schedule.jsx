@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import Card from '../../components/ui/Card.jsx';
 import Button from '../../components/ui/Button.jsx';
 import IconSchedule from '../../assets/icons/IconSchedule.svg';
@@ -27,17 +28,16 @@ const DUMMY_SCHEDULES = [
 ];
 
 const DUMMY_CONTACT = {
-  name: 'Valentina Azalea Kanaya',
-  line: 'every1woo',
-  wa: '082261395005',
+  name: 'BNCC Official',
+  line: '211guyli',
+  wa: '6285178100246',
 };
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function Schedule() {
   const [popupOpen, setPopupOpen] = useState(false);
   const [tempSchedule, setTempSchedule] = useState(null);
-  // null = user belum pernah memilih/mengonfirmasi jadwal apapun
-  const [userSchedule, setUserSchedule] = useState(null);
+  const { userSchedule, setUserSchedule } = useOutletContext();
 
   const handleConfirm = () => {
     if (!tempSchedule) return;

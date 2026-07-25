@@ -11,13 +11,14 @@ export function cn(...classes) {
  */
 export function formatDate(isoString) {
   if (!isoString) return '';
-  return new Date(isoString).toLocaleDateString('en-US', {
+  const formatted = new Date(isoString).toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric',
     timeZone: 'UTC',
   });
+  return formatted.replace(/,\s*(\d{4})/, ' $1');
 }
 
 /**
@@ -51,11 +52,12 @@ export function formatToWIB(dateString) {
     month: 'long',
     day: 'numeric',
   });
+  const cleanDatePart = datePart.replace(/,\s*(\d{4})/, ' $1');
   const timePart = date.toLocaleTimeString('en-US', {
     timeZone: 'Asia/Jakarta',
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
   });
-  return `${datePart} at ${timePart} WIB`;
+  return `${cleanDatePart} at ${timePart} WIB`;
 }
