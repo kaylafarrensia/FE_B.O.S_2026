@@ -1,4 +1,4 @@
-import gridImage from '../../../public/images/img-perspective-grid.svg'
+import gridImage from '../../../public/images/img-grid-reregist.svg'
 
 export default function PerspectiveGrid({ className = '' }) {
   return (
