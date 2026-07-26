@@ -4,10 +4,11 @@ import Card from './Card'
 
 const LNT_COURSES = [
   'UI/UX Design',
-  'Web Development',
-  'Data Science',
-  'Mobile Development',
-  'Cyber Security',
+  'Front-End Development',
+  'Back-End Development',
+  'Java Programming',
+  'Mobile Application Development',
+  'Machine Learning',
 ]
 
 export default function ReRegistrationForm() {
@@ -28,17 +29,17 @@ export default function ReRegistrationForm() {
   }
 
   const inputClass =
-    'w-full rounded-xl border-2 border-[#99C4F4] bg-white/50 px-5 py-3.5 text-sm text-slate-700 outline-none placeholder:text-slate-400 focus:border-[#2474C0] sm:text-base'
+    'w-full rounded-[8px] border-2 border-[#99C4F4] bg-white/50 px-4 py-2.5 text-sm text-[#0A2745] outline-none placeholder:text-slate-400 focus:border-[#207CDB]'
 
   return (
-    <Card className="w-full">
-      <h1 className="text-2xl font-extrabold text-[#0A2745] sm:text-3xl md:text-4xl">
-        Re-Registration <span className="text-[#2474C0]">Form</span>
+    <Card className="w-[80%] max-w-[820px] p-6 md:p-7 lg:p-8 lg:ml-30">
+      <h1 className="inline-block py-1 text-xl font-bold leading-[1.3] bg-gradient-to-r from-[#0A2745] to-[#2474C0] bg-clip-text text-transparent md:text-[36px]">
+        Re-Registration Form
       </h1>
 
-      <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-6">
+      <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-4">
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-700 sm:text-base">
+          <label className="mb-1.5 block text-xs font-medium text-slate-700 lg:text-base">
             LinkedIn URL
           </label>
           <input
@@ -51,7 +52,7 @@ export default function ReRegistrationForm() {
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-700 sm:text-base">
+          <label className="mb-1.5 block text-xs font-medium text-slate-700 lg:text-base">
             Github URL
           </label>
           <input
@@ -64,15 +65,15 @@ export default function ReRegistrationForm() {
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-700 sm:text-base">
+          <label className="mb-1.5 block text-xs font-medium text-slate-700 lg:text-base">
             LnT Course
           </label>
           <div className="relative">
             <select
               value={form.course}
               onChange={handleChange('course')}
-              className={`${inputClass} appearance-none pr-12 ${
-                form.course === '' ? 'text-slate-400' : 'text-slate-700'
+              className={`${inputClass} appearance-none pr-10 ${
+                form.course === '' ? 'text-slate-400' : 'text-[#0A2745]'
               }`}
             >
               <option value="" disabled>
@@ -85,15 +86,15 @@ export default function ReRegistrationForm() {
               ))}
             </select>
             <ChevronDown
-              size={20}
-              className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"
+              size={16}
+              className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500"
             />
           </div>
         </div>
 
         <button
           type="submit"
-          className="mx-auto mt-4 rounded-xl bg-gradient-to-br from-[#0A2745] to-[#2474C0] px-14 py-3.5 text-base font-bold text-white shadow-md transition hover:brightness-110 active:scale-95 sm:text-lg"
+          className="mx-auto mt-2 rounded-[10px] bg-gradient-to-br from-[#0A2745] to-[#2474C0] px-10 py-2.5 text-sm font-medium text-white shadow-md transition hover:brightness-110 active:scale-95"
         >
           Submit
         </button>
