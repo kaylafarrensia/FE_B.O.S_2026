@@ -23,7 +23,7 @@ export default function Navbar({ activeTab = 'reregist', onTabChange }) {
               key={tab.key}
               type="button"
               onClick={() => onTabChange?.(tab.key)}
-              className={`relative flex items-center gap-2 overflow-hidden rounded-[10px] px-4 py-2.5 text-xs font-medium tracking-wide sm:px-7 sm:py-3.5 sm:text-sm ${
+              className={`relative flex items-center gap-2 overflow-hidden rounded-[10px] px-4 py-2.5 text-xs font-medium font-outfit tracking-wide sm:px-7 sm:py-3.5 sm:text-sm ${
                 isActive ? 'text-white' : 'text-slate-700'
               }`}
             >
