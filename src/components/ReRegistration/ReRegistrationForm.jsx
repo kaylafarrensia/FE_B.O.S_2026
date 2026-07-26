@@ -94,7 +94,7 @@ export default function ReRegistrationForm() {
 
         <button
           type="submit"
-          className="mx-auto mt-2 rounded-[10px] bg-gradient-to-br from-[#0A2745] to-[#2474C0] px-10 py-2.5 text-sm font-medium text-white shadow-md transition hover:brightness-110 active:scale-95"
+          className="mx-auto mt-2 rounded-[10px] bg-gradient-to-br from-[#0A2745] to-[#2474C0] px-10 py-2.5 text-sm font-medium text-white shadow-md transition hover:brightness-110 active:scale-95 cursor-pointer"
         >
           Submit
         </button>

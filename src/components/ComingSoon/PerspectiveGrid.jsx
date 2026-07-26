@@ -6,7 +6,7 @@ export default function PerspectiveGrid({ className = '' }) {
       src={gridImage}
       alt=""
       aria-hidden="true"
-      className={`pointer-events-none w-full select-none object-cover ${className} opacity-60`}
+      className={`pointer-events-none w-full select-none object-cover ${className} opacity-80`}
     />
   )
 }

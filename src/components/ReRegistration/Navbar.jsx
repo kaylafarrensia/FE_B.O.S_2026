@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import bnccLogo from '../../../public/images/img-BNCC.png'
 import icReregist from '../../../public/icons/ic-reregist.svg'
 import icJapres from '../../../public/icons/ic-japres.svg'
@@ -22,16 +23,26 @@ export default function Navbar({ activeTab = 'reregist', onTabChange }) {
               key={tab.key}
               type="button"
               onClick={() => onTabChange?.(tab.key)}
-              className={`flex items-center gap-2 rounded-[10px] px-4 py-2.5 text-xs font-bold tracking-wide transition sm:px-7 sm:py-3.5 sm:text-sm ${
-                isActive
-                  ? 'border border-[#99C4F4] bg-gradient-to-br from-[#0A2745] to-[#2474C0] text-white shadow-[2px_4px_4px_0px_rgba(0,0,0,0.25)] backdrop-blur-md'
-                  : 'border border-transparent text-slate-700 hover:bg-slate-100'
+              className={`relative flex items-center gap-2 overflow-hidden rounded-[10px] px-4 py-2.5 text-xs font-medium tracking-wide sm:px-7 sm:py-3.5 sm:text-sm ${
+                isActive ? 'text-white' : 'text-slate-700'
               }`}
             >
+              {isActive && (
+                <motion.div
+                  layoutId="navbar-active-pill"
+                  className="absolute inset-0 rounded-[10px] border border-[#99C4F4] bg-gradient-to-br from-[#0A2745] to-[#2474C0] shadow-[2px_4px_4px_0px_rgba(0,0,0,0.25)] backdrop-blur-md"
+                  transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+                />
+              )}
+
+              {!isActive && (
+                <span className="absolute inset-0 rounded-[10px] border border-transparent transition-colors duration-300 hover:bg-slate-100" />
+              )}
+
               <img
                 src={tab.icon}
                 alt=""
-                className={`h-4 w-4 ${
+                className={`relative z-10 h-4 w-4 transition-[filter] duration-300 ${
                   isActive
                     ? 'brightness-0 invert'
                     : tab.key === 'reregist'
@@ -39,7 +50,9 @@ export default function Navbar({ activeTab = 'reregist', onTabChange }) {
                     : ''
                 }`}
               />
-              <span className="hidden sm:inline uppercase">{tab.label}</span>
+              <span className="relative z-10 hidden uppercase transition-colors duration-300 sm:inline">
+                {tab.label}
+              </span>
             </button>
           )
         })}

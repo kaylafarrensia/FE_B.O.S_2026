@@ -29,7 +29,7 @@ export default function ContactPersonCard({
           <button
             type="button"
             onClick={onContactClick}
-            className="mt-5 rounded-[10px] bg-gradient-to-br from-[#0A2745] to-[#2474C0] px-6 py-2.5 text-xs font-medium text-white shadow-md transition hover:brightness-110 active:scale-95 sm:text-sm"
+            className="mt-5 rounded-[10px] bg-gradient-to-br from-[#0A2745] to-[#2474C0] px-6 py-2.5 text-xs font-medium text-white shadow-md transition hover:brightness-110 active:scale-95 sm:text-sm cursor-pointer"
           >
             Contact Us
           </button>
