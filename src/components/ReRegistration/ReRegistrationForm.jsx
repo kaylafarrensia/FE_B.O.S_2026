@@ -11,7 +11,7 @@ const LNT_COURSES = [
   { id: 6, name: 'Machine Learning' },
 ]
 
-// const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'
 
 function isValidUrl(value) {
   try {
@@ -75,13 +75,6 @@ export default function ReRegistrationForm({ onSubmitSuccess }) {
 
     setIsSubmitting(true)
 
-    // TEMP: bypass API call buat preview SuccessCard, uncomment blok di bawah nanti
-    setTimeout(() => {
-      onSubmitSuccess?.()
-      setIsSubmitting(false)
-    }, 500)
-    return
-    /*
     try {
       const token = localStorage.getItem('accessToken')
 
@@ -137,7 +130,6 @@ export default function ReRegistrationForm({ onSubmitSuccess }) {
       setGeneralError('Failed to connect to the server. Please check your connection.')
       setIsSubmitting(false)
     }
-    */
   }
 
   const inputClass = (field) =>
