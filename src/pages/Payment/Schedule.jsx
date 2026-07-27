@@ -6,8 +6,10 @@ import IconTime from '@/assets/icons/IconTime.svg';
 import { formatDate, formatStartEndTime } from '@/utils/index.js';
 import Calendar from './Calendar.jsx';
 import RegistrationTypeDropdown from './RegistrationTypeDropdown.jsx';
-import SavedPopup from '@/pages/Dashboard/Schedule/SavedPopup.jsx';
 import ContactPerson from '@/pages/Dashboard/Japres/ContactPerson.jsx';
+import IndividualForm from './IndividualForm.jsx';
+import GroupCode from './GroupCode.jsx';
+import { useNavigate } from 'react-router-dom';
 
 // ── Dummy Data (replace with API when backend is ready) ───────────────────────
 const DUMMY_USER = {
@@ -45,16 +47,17 @@ const DUMMY_CONTACT = {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function Schedule() {
-  const [popupOpen, setPopupOpen] = useState(false);
   const [tempType, setTempType] = useState(null);
-  // null = user belum pernah memilih/mengonfirmasi jadwal apapun
-  const [userSchedule, setUserSchedule] = useState(null);
+  const [userType, setUserType] = useState(null);
+  const navigate = useNavigate();
 
   const handleConfirm = () => {
     if (!tempType) return;
-    setUserSchedule(tempType);
+    setUserType(tempType);
+    if (tempType.type === 'Individual') {
+      navigate('/payment/individual-form');
+    }
     setTempType(null);
-    setPopupOpen(true);
   };
 
   const openWhatsApp = (number) => {
@@ -64,8 +67,6 @@ export default function Schedule() {
 
   return (
     <>
-      {popupOpen && <SavedPopup setIsOpen={setPopupOpen} />}
-
       <div className="relative">
         <div className="flex flex-col xl:flex-row justify-center w-full py-5 xl:py-15 px-6 xl:px-[10vw] gap-4 xl:gap-5">
           {/* ── Left Column ── */}
@@ -80,33 +81,40 @@ export default function Schedule() {
               </p>
             </Card>
 
-            {/* Change Schedule */}
             <Card className="flex flex-col p-10 mt-0 rounded-xl border-white border-[3px] z-[99]">
-              <h1 className="text-xl font-bold sm:text-3xl  w-fit">
-                Payment Submission
-              </h1>
-              <p className="pt-2 xl:pt-5 text-xs sm:text-lg flex flex-col gap-1">
-                Registration Type
-              </p>
-              <RegistrationTypeDropdown
-                types={REGISTRATION_TYPES}
-                onSelect={setTempType}
-              />
-              <div className="flex justify-start xl:block">
-                <Button
-                  className=""
-                  onClick={handleConfirm}
-                  disabled={!tempType}
-                >
-                  Next
-                </Button>
-              </div>
+              {userType && userType.type === 'Group (3 People)' ? (
+                <GroupCode />
+              ) : (
+                <>
+                  <h1 className="text-xl font-bold sm:text-3xl w-fit">
+                    Payment Submission
+                  </h1>
+
+                  <p className="pt-2 xl:pt-5 text-xs sm:text-lg flex flex-col gap-1">
+                    Registration Type
+                  </p>
+
+                  <RegistrationTypeDropdown
+                    types={REGISTRATION_TYPES}
+                    onSelect={setTempType}
+                  />
+
+                  <div className="flex justify-start xl:block">
+                    <Button
+                      onClick={handleConfirm}
+                      disabled={!tempType}
+                    >
+                      NEXT
+                    </Button>
+                  </div>
+                </>
+              )}
             </Card>
           </div>
 
           {/* ── Right Column ── */}
           <div className="flex flex-col w-full gap-4 xl:gap-5">
-            <Calendar schedules={DUMMY_SCHEDULES} userScheduleId={userSchedule?.id} />
+            <Calendar schedules={DUMMY_SCHEDULES} userScheduleId={userType?.id} />
 
             {/* Contact Person */}
             <ContactPerson />

@@ -39,13 +39,13 @@ export default function Payment() {
                 label: 'JAPRES',
                 icon: IconTrophy,
                 iconWhite: IconTrophyWhite,
-                path: '/payment/japres',
+                path: '/dashboard/japres',
             },
             {
                 label: 'PROFILE',
                 icon: IconProfile,
                 iconWhite: IconProfileWhite,
-                path: '/payment/profile',
+                path: '/dashboard/profile',
             },
         ];
     }, []);
