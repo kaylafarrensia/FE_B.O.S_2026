@@ -14,14 +14,19 @@ const TODAY_GLASS_STYLE = {
 };
 
 const DUEDATE_EARLY_BIRD_STYLE = {
-  '--glass-from': 'rgba(12, 64, 118, 0.9)',
-  '--glass-to': 'rgba(68, 137, 212, 0.9)',
+  background: 'linear-gradient(to right, #166313 0%, #2DC927 100%)',
 };
 
 const DUEDATE_REGISTRATION_STYLE = {
-  '--glass-from': 'rgba(234, 178, 8, 0.73)',
-  '--glass-to': 'rgba(250, 204, 21, 0.84)',
+  background: 'linear-gradient(to right, #992C3D 0%, #FF2A4A 100%)',
 };
+const EARLY_BIRD_DATES = [
+  '2026-09-11',
+];
+
+const REGISTRATION_DATES = [
+  '2026-09-18',
+];
 
 export default function Calendar({ schedules, userScheduleId }) {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -29,10 +34,13 @@ export default function Calendar({ schedules, userScheduleId }) {
   const today = new Date();
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
-
   const firstDayWeekday = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const prevMonthDays = new Date(year, month, 0).getDate();
+  const isDateInList = (day, month, year, dateList) => {
+    const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    return dateList.includes(date);
+  };
 
   const isToday = (day) =>
     day === today.getDate() &&
@@ -104,8 +112,19 @@ export default function Calendar({ schedules, userScheduleId }) {
           const day = i + 1;
           const weekday = (firstDayWeekday + i) % 7;
           const isSunday = weekday === 0;
-          const events = getEventsForDay(day);
-          const isUserDay = events.some((e) => e.id === userScheduleId);
+          const isEarlyBird = isDateInList(
+            day,
+            month,
+            year,
+            EARLY_BIRD_DATES
+          );
+
+          const isRegistration = isDateInList(
+            day,
+            month,
+            year,
+            REGISTRATION_DATES
+          );
 
           let cls = '';
           let stl = {};
@@ -113,14 +132,15 @@ export default function Calendar({ schedules, userScheduleId }) {
           if (isToday(day)) {
             cls = 'font-semibold glassmorphism';
             stl = TODAY_GLASS_STYLE;
-          } else if (isUserDay) {
-            cls = 'font-semibold text-white glassmorphism';
+          } else if (isRegistration) {
+            cls = 'font-semibold text-white';
             stl = DUEDATE_REGISTRATION_STYLE;
-          } else if (events.length > 0) {
-            cls = 'font-semibold text-white glassmorphism';
+          } else if (isEarlyBird) {
+            cls = 'font-semibold text-white';
             stl = DUEDATE_EARLY_BIRD_STYLE;
           } else {
-            cls = `hover:bg-lavender-white hover:shadow-sm hover:rounded-lg ${isSunday ? 'text-red-500' : 'text-persian-indigo'}`;
+            cls = `hover:bg-lavender-white hover:shadow-sm hover:rounded-lg ${isSunday ? 'text-red-500' : 'text-persian-indigo'
+              }`;
           }
 
           return (
@@ -142,11 +162,11 @@ export default function Calendar({ schedules, userScheduleId }) {
           <span className="font-semibold">Today</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-6 h-6 rounded-md shadow-sm glassmorphism" style={DUEDATE_EARLY_BIRD_STYLE} />
+          <span className="w-6 h-6 rounded-md shadow-sm" style={DUEDATE_EARLY_BIRD_STYLE} />
           <span className="font-semibold">Duedate Early Bird</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-6 h-6 rounded-md shadow-sm glassmorphism" style={DUEDATE_REGISTRATION_STYLE} />
+          <span className="w-6 h-6 rounded-md shadow-sm" style={DUEDATE_REGISTRATION_STYLE} />
           <span className="font-semibold">Duedate Registration</span>
         </div>
       </div>
