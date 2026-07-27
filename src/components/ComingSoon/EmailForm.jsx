@@ -64,21 +64,21 @@ export default function EmailForm() {
 
       <form
         onSubmit={handleSubmit}
-        className="flex w-full max-w-2xl items-center overflow-hidden rounded-xl border border-[#2474C0] bg-transparent p-1 sm:p-1.5"
+        className="flex w-full max-w-2xl items-center overflow-hidden rounded-[10px] border border-[#2474C0] bg-transparent p-1 sm:p-1.5"
       >
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter Your E-mail Here"
-          className="flex-1 min-w-0 bg-transparent px-3 py-2 text-sm sm:px-5 sm:text-lg text-slate-600 outline-none placeholder:text-slate-500"
+          className="flex-1 min-w-0 bg-transparent px-3 py-2 text-[9px] sm:px-5 sm:text-lg text-slate-600 outline-none placeholder:text-slate-500"
           required
           disabled={loading}
         />
         <button
           type="submit"
           disabled={loading}
-          className="shrink-0 rounded-xl bg-gradient-to-br from-[#0C4076] to-[#4489D4] px-4 py-2 text-sm sm:px-6 sm:text-base font-medium text-white cursor-pointer transition-all duration-300 ease-out hover:scale-105 hover:brightness-110 hover:shadow-lg hover:shadow-blue-900/30 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
+          className="shrink-0 rounded-[6px] bg-gradient-to-br from-[#0C4076] to-[#4489D4] px-4 py-2 text-xs sm:px-6 sm:text-base font-medium text-white cursor-pointer transition-all duration-300 ease-out hover:scale-105 hover:brightness-110 hover:shadow-lg hover:shadow-blue-900/30 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {loading ? 'Sending...' : 'Send'}
         </button>

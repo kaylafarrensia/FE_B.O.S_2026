@@ -1,10 +1,146 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
 @import 'tailwindcss';
 
 @theme {
   --font-poppins: 'Poppins', sans-serif;
+  --font-outfit: 'Outfit', sans-serif;
+
+  --color-persian-indigo: #0A2745;
+  --color-bright-lavender: #FF332C;
+  --color-baby-blue: #99C4F4;
+  --color-lavender-white: #F5F3FF;
+}
+
+* {
+  box-sizing: border-box;
+  text-decoration: none;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
+  min-height: 100vh;
   font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg,
+      rgba(234, 245, 255, 0.15) 0%,
+      rgba(172, 214, 255, 0.15) 15%,
+      rgba(68, 137, 212, 0.15) 49%,
+      rgba(16, 94, 169, 0.15) 81%,
+      rgba(10, 39, 69, 0.15) 100%), #FFFFFF;
+  background-attachment: fixed;
+  color: var(--color-persian-indigo, #251369);
+}
+
+h1,
+h2 {
+  font-family: 'Outfit', sans-serif;
+  background: linear-gradient(90deg,
+      #0A2745 0%,
+      #2474C0 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+img {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.content {
+  padding-left: 10%;
+  padding-right: 10%;
+}
+
+.glassmorphism {
+  position: relative;
+  --glass-from: rgba(247, 247, 245, 0.2);
+  --glass-to: rgba(126, 214, 249, 0.1);
+  --glass-stroke: rgba(153, 196, 244, 0.6);
+
+  background: linear-gradient(135deg,
+      var(--glass-from) 40%,
+      var(--glass-to) 100%);
+  border: 1.5px solid var(--glass-stroke);
+  background-clip: padding-box;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 0 24px rgba(255, 255, 255, 0.15),
+    0 2px 8px rgba(37, 19, 105, 0.06);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.liquidGlass-wrapper {
+  display: flex;
+  font-weight: 600;
+  overflow: hidden;
+  color: black;
+  box-shadow:
+    0 6px 6px rgba(0, 0, 0, 0.2),
+    0 0 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 2.2);
+}
+
+.liquidGlass-effect {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  backdrop-filter: blur(3px);
+  filter: url(#glass-distortion);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.liquidGlass-tint {
+  z-index: 1;
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.liquidGlass-shine {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  box-shadow:
+    inset 2px 2px 1px 0 rgba(255, 255, 255, 0.5),
+    inset -1px -1px 1px 1px rgba(255, 255, 255, 0.5);
+}
+
+.background-blur-circles div,
+.ellipse-background,
+.bobbing {
+  will-change: transform, filter;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.yourDropdownContent {
+  overflow-y: auto;
+  max-height: 80vh;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+.dropdown {
+  position: relative;
 }
