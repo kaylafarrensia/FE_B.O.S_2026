@@ -1,19 +1,19 @@
-import Card from '../../../components/ui/Card.jsx';
-import Button from '../../../components/ui/Button.jsx';
-import IconLine from '../../../assets/icons/IconLine.svg';
-import Team from '../../../assets/images/Team.svg';
+import Card from '../../../components/ui/Card.jsx'
+import Button from '../../../components/ui/Button.jsx'
+import IconLine from '../../../assets/icons/IconLine.svg'
+import Team from '../../../assets/images/Team.svg'
 
 const DUMMY_CONTACT = {
-  name: 'BNCC Official',
-  line: '211guyli',
+  name: 'Yovi Gracia Lo',
+  line: '@yviluo',
   wa: '6285178100246',
-};
+}
 
 export default function ContactPerson() {
   const openWhatsApp = (number) => {
-    const formatted = number.startsWith('0') ? number.slice(1) : number;
-    window.open(`https://wa.me/${formatted}`, '_blank', 'noopener,noreferrer');
-  };
+    const formatted = number.startsWith('0') ? number.slice(1) : number
+    window.open(`https://wa.me/${formatted}`, '_blank', 'noopener,noreferrer')
+  }
 
   return (
     <Card className="flex flex-row px-7 py-6 sm:px-14 sm:py-8 xl:px-16 rounded-xl border-white border-[3px]">
@@ -31,8 +31,12 @@ export default function ContactPerson() {
         </Button>
       </div>
       <div className="flex justify-center items-center shrink-0">
-        <img src={Team} alt="" className="w-32 h-32 sm:w-48 sm:h-48 object-contain" />
+        <img
+          src={Team}
+          alt=""
+          className="w-32 h-32 sm:w-48 sm:h-48 object-contain"
+        />
       </div>
     </Card>
-  );
+  )
 }

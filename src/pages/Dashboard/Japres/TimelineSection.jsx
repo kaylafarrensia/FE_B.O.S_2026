@@ -1,56 +1,77 @@
-'use client';
+'use client'
 
-import { useEffect, useRef, useState } from 'react';
-import Card from '../../../components/ui/Card.jsx';
-import Glass from '../../../components/ui/Glass.jsx';
+import { useEffect, useRef, useState } from 'react'
+import Card from '../../../components/ui/Card.jsx'
+import Glass from '../../../components/ui/Glass.jsx'
 
 const timelineEvents = [
-  { compareDate: '2026-08-12', displayDate: 'August 12 2026', description: 'Submission Deadline' },
-  { compareDate: '2026-08-17', displayDate: 'August 17 2026', description: 'Result Announcement' },
-  { compareDate: '2026-08-19', displayDate: 'August 19-21 2026', description: 'Interview' },
-  { compareDate: '2026-08-25', displayDate: 'August 25 2026', description: 'Final Result' },
-];
+  {
+    compareDate: '2026-08-23',
+    displayDate: 'August 23 2026',
+    description: 'Submission Deadline',
+  },
+  {
+    compareDate: '2026-08-30',
+    displayDate: 'August 30 2026',
+    description: 'Result Announcement',
+  },
+  {
+    compareDate: '2026-09-01',
+    displayDate: 'September 1-2 2026',
+    description: 'Interview',
+  },
+  {
+    compareDate: '2026-09-05',
+    displayDate: 'September 5 2026',
+    description: 'Final Result',
+  },
+  {
+    compareDate: '2026-09-08',
+    displayDate: 'September 8 2026',
+    description: 'Requirement Submission',
+  },
+]
 
 const GLASS_FILLED_STYLE = {
   '--glass-from': 'rgba(12, 64, 118, 0.9)',
   '--glass-to': 'rgba(68, 137, 212, 0.9)',
-};
+}
 
 const GLASS_FILLED_STYLE_DOT = {
   '--glass-from': 'rgba(12, 64, 118, 0.5)',
   '--glass-to': 'rgba(68, 137, 212, 0.5)',
-};
+}
 
 const GLASS_UNFILLED_STYLE_DOT = {
   '--glass-from': 'rgba(192, 224, 236, 1)',
   '--glass-to': 'rgba(178, 204, 211, 1)',
-};
+}
 
 function parseLocalDate(dateString) {
-  const [year, month, day] = dateString.split('-').map(Number);
-  return new Date(year, month - 1, day);
+  const [year, month, day] = dateString.split('-').map(Number)
+  return new Date(year, month - 1, day)
 }
 
 function getFallbackPercent(index) {
-  return (index / (timelineEvents.length - 1)) * 100;
+  return (index / (timelineEvents.length - 1)) * 100
 }
 
 function getReachedIndex(today) {
-  let lastReached = -1;
+  let lastReached = -1
   for (let i = 0; i < timelineEvents.length; i++) {
     if (today >= parseLocalDate(timelineEvents[i].compareDate)) {
-      lastReached = i;
+      lastReached = i
     } else {
-      break;
+      break
     }
   }
-  return lastReached;
+  return lastReached
 }
 
 function getProgressPercent(reachedIndex, dotPercents) {
-  if (reachedIndex === -1) return 0;
-  if (reachedIndex === timelineEvents.length - 1) return 100;
-  return dotPercents[reachedIndex] ?? 0;
+  if (reachedIndex === -1) return 0
+  if (reachedIndex === timelineEvents.length - 1) return 100
+  return dotPercents[reachedIndex] ?? 0
 }
 
 function TimelineTrack({ progressPercent }) {
@@ -64,7 +85,7 @@ function TimelineTrack({ progressPercent }) {
         style={{ ...GLASS_FILLED_STYLE, height: `${progressPercent}%` }}
       />
     </div>
-  );
+  )
 }
 
 function TimelineDot({ isReached, dotRef }) {
@@ -76,68 +97,87 @@ function TimelineDot({ isReached, dotRef }) {
     >
       <Glass className="rounded-full" />
     </div>
-  );
+  )
 }
 
 function TimelineEvent({ displayDate, description, isReached, dotRef }) {
+  const formatDisplayDate = (dateStr) => {
+    const match = dateStr.match(/^(.*)\s+(\d{4})$/);
+    if (match) {
+      return (
+        <>
+          {match[1]}
+          <br />
+          {match[2]}
+        </>
+      );
+    }
+    return dateStr;
+  };
+
   return (
     <div className="flex items-center justify-between w-full font-medium">
-      <p className="text-xs sm:text-lg xl:text-xl text-right basis-2/5">{displayDate}</p>
+      <p className="text-xs sm:text-lg xl:text-xl text-right basis-2/5 leading-tight">
+        {formatDisplayDate(displayDate)}
+      </p>
       <TimelineDot isReached={isReached} dotRef={dotRef} />
-      <p className="text-xs sm:text-lg xl:text-xl basis-2/5">{description}</p>
+      <p className="text-xs sm:text-lg xl:text-xl basis-2/5 leading-tight">{description}</p>
     </div>
-  );
+  )
 }
 
 export default function TimelineSection({ overrideToday } = {}) {
-  const today = overrideToday ? new Date(overrideToday) : new Date();
-  today.setHours(0, 0, 0, 0);
+  const today = overrideToday ? new Date(overrideToday) : new Date()
+  today.setHours(0, 0, 0, 0)
 
-  const containerRef = useRef(null);
-  const dotRefs = useRef([]);
+  const containerRef = useRef(null)
+  const dotRefs = useRef([])
   const [dotPercents, setDotPercents] = useState(
-    timelineEvents.map((_, i) => getFallbackPercent(i))
-  );
+    timelineEvents.map((_, i) => getFallbackPercent(i)),
+  )
 
   useEffect(() => {
     function measure() {
-      const container = containerRef.current;
-      if (!container) return;
+      const container = containerRef.current
+      if (!container) return
 
-      const containerRect = container.getBoundingClientRect();
-      if (containerRect.height === 0) return;
+      const containerRect = container.getBoundingClientRect()
+      if (containerRect.height === 0) return
 
       const percents = dotRefs.current.map((dotEl) => {
-        if (!dotEl) return 0;
-        const dotRect = dotEl.getBoundingClientRect();
-        const dotCenterY = dotRect.top + dotRect.height / 2 - containerRect.top;
-        return (dotCenterY / containerRect.height) * 100;
-      });
+        if (!dotEl) return 0
+        const dotRect = dotEl.getBoundingClientRect()
+        const dotCenterY = dotRect.top + dotRect.height / 2 - containerRect.top
+        return (dotCenterY / containerRect.height) * 100
+      })
 
-      setDotPercents(percents);
+      setDotPercents(percents)
     }
 
-    measure();
+    measure()
 
-    const resizeObserver = new ResizeObserver(measure);
-    if (containerRef.current) resizeObserver.observe(containerRef.current);
-    window.addEventListener('resize', measure);
+    const resizeObserver = new ResizeObserver(measure)
+    if (containerRef.current) resizeObserver.observe(containerRef.current)
+    window.addEventListener('resize', measure)
 
     return () => {
-      resizeObserver.disconnect();
-      window.removeEventListener('resize', measure);
-    };
-  }, []);
+      resizeObserver.disconnect()
+      window.removeEventListener('resize', measure)
+    }
+  }, [])
 
-  const reachedIndex = getReachedIndex(today);
-  const progressPercent = getProgressPercent(reachedIndex, dotPercents);
+  const reachedIndex = getReachedIndex(today)
+  const progressPercent = getProgressPercent(reachedIndex, dotPercents)
 
   return (
     <Card className="flex flex-col px-7 py-6 sm:px-14 sm:py-10 xl:px-16 xl:py-12 rounded-xl border-white border-[3px]">
       <div className="space-y-4 sm:space-y-12">
         <h2 className="text-lg font-bold sm:text-3xl w-fit">JaPres Timeline</h2>
 
-        <div ref={containerRef} className="flex flex-col gap-y-14 relative py-10 md:py-20">
+        <div
+          ref={containerRef}
+          className="flex flex-col gap-y-14 relative py-10 md:py-20"
+        >
           <TimelineTrack progressPercent={progressPercent} />
 
           {timelineEvents.map((event, i) => (
@@ -146,11 +186,13 @@ export default function TimelineSection({ overrideToday } = {}) {
               displayDate={event.displayDate}
               description={event.description}
               isReached={today >= parseLocalDate(event.compareDate)}
-              dotRef={(el) => { dotRefs.current[i] = el; }}
+              dotRef={(el) => {
+                dotRefs.current[i] = el
+              }}
             />
           ))}
         </div>
       </div>
     </Card>
-  );
+  )
 }

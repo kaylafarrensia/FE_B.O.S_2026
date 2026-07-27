@@ -1,9 +1,9 @@
-import Card from '../../../components/ui/Card.jsx';
-import Button from '../../../components/ui/Button.jsx';
-import IconUpload from '../../../assets/icons/IconUpload.svg';
-import IconTime from '../../../assets/icons/IconTime.svg';
-import IconSchedule from '../../../assets/icons/IconSchedule.svg';
-import { formatToWIB } from '../../../utils/index.js';
+import Card from '../../../components/ui/Card.jsx'
+import Button from '../../../components/ui/Button.jsx'
+import IconUpload from '../../../assets/icons/IconUpload.svg'
+import IconTime from '../../../assets/icons/IconTime.svg'
+import IconSchedule from '../../../assets/icons/IconSchedule.svg'
+import { formatToWIB } from '../../../utils/index.js'
 
 const STATUS_STYLES = {
   'Not Submitted': 'bg-red-500 text-white',
@@ -11,13 +11,14 @@ const STATUS_STYLES = {
   Rejected: 'bg-red-600 text-white',
   'Accepted Gold': 'bg-yellow-400 text-black',
   'Accepted Silver': 'bg-gray-400 text-white',
-};
-
-function getStatusStyling(status) {
-  return STATUS_STYLES[status] || STATUS_STYLES['Not Submitted'];
 }
 
-const SECTION_TITLE_CLASS = 'font-poppins text-xs sm:text-lg xl:text-xl font-semibold';
+function getStatusStyling(status) {
+  return STATUS_STYLES[status] || STATUS_STYLES['Not Submitted']
+}
+
+const SECTION_TITLE_CLASS =
+  'font-poppins text-xs sm:text-lg xl:text-xl font-semibold'
 
 export default function DocumentSubmission({
   japresUrl,
@@ -46,7 +47,7 @@ export default function DocumentSubmission({
             <div className="flex items-center gap-2 md:gap-4">
               <img src={IconSchedule} alt="" className="size-4 sm:size-6" />
               <p className="text-xs sm:text-lg">
-                Due: August 7 2026 at 23:59 WIB
+                Due: August 23 2026 at 23:59 WIB
               </p>
             </div>
           </div>
@@ -57,7 +58,8 @@ export default function DocumentSubmission({
             <ul className="text-xs sm:text-lg xl:text-xl list-disc pl-5">
               <li>
                 Ensure your Google Drive link is{' '}
-                <span className="font-bold">accessible</span> without request access.
+                <span className="font-bold">accessible</span> without request
+                access.
               </li>
               <li>
                 Accepted File Type{' '}
@@ -91,7 +93,9 @@ export default function DocumentSubmission({
             <div className="flex items-center gap-4">
               <img src={IconTime} alt="" className="size-4 sm:size-6" />
               <p className="text-xs sm:text-lg xl:text-xl">
-                {submittedAt ? `Last uploaded: ${formatToWIB(submittedAt)}` : 'No latest submission'}
+                {submittedAt
+                  ? `Last uploaded: ${formatToWIB(submittedAt)}`
+                  : 'No latest submission'}
               </p>
             </div>
           </div>
@@ -109,5 +113,5 @@ export default function DocumentSubmission({
         </div>
       </div>
     </Card>
-  );
+  )
 }
