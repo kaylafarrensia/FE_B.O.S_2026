@@ -9,6 +9,7 @@ import RegistrationTypeDropdown from './RegistrationTypeDropdown.jsx';
 import ContactPerson from '@/pages/Dashboard/Japres/ContactPerson.jsx';
 import IndividualForm from './IndividualForm.jsx';
 import GroupCode from './GroupCode.jsx';
+import IconSad from '@/assets/icons/IconSad.svg';
 import { useNavigate } from 'react-router-dom';
 
 // ── Dummy Data (replace with API when backend is ready) ───────────────────────
@@ -44,9 +45,14 @@ const DUMMY_CONTACT = {
   line: 'every1woo',
   wa: '082261395005',
 };
+const REGISTRATION_DUEDATE = "2026-09-18";
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function Schedule() {
+  const today = new Date();
+  const deadline = new Date(REGISTRATION_DUEDATE);
+
+  const isRegistrationClosed = today > deadline;
   const [tempType, setTempType] = useState(null);
   const [userType, setUserType] = useState(null);
   const navigate = useNavigate();
@@ -68,58 +74,87 @@ export default function Schedule() {
   return (
     <>
       <div className="relative">
-        <div className="flex flex-col xl:flex-row justify-center w-full py-5 xl:py-15 px-6 xl:px-[10vw] gap-4 xl:gap-5">
-          {/* ── Left Column ── */}
-          <div className="flex flex-col w-full gap-4 xl:gap-5">
-            {/* Current Schedule Info */}
-            <Card className="flex flex-col p-10 rounded-xl border-white border-[3px]">
-              <h1 className="text-xl font-bold sm:text-3xl  w-fit">
-                Hello, {DUMMY_USER.name}!
+        {isRegistrationClosed ? (
+          <Card className="flex flex-col justify-center items-center text-center p-10 rounded-xl border-[#0088FF] border-[3px] mx-6 xl:mx-[5vw] my-8 w-auto min-h-[420px]">
+            <div className="flex flex-col items-center justify-center gap-4">
+              <img
+                src={IconSad}
+                alt="Sad Icon"
+                className="w-16 h-16 sm:w-24 sm:h-24"
+              />
+
+              <h1 className="text-xl sm:text-3xl font-bold text-[#0A2745]">
+                Registration is now closed!
               </h1>
-              <p className="pt-2 xl:pt-5 text-xs sm:text-lg">
-                Thank you for attending the BNCC Launching! Don&#x27;t forget to complete your payment on time so you can officially become part of the <span className="font-bold">BNCC family</span>.
+
+              <p className="text-xs sm:text-lg text-[#0A2745] max-w-3xl">
+                We&#x27;re sorry, BNCC membership registration is no longer available.
+                See you next year!
               </p>
-            </Card>
+            </div>
+          </Card>
 
-            <Card className="flex flex-col p-10 mt-0 rounded-xl border-white border-[3px] z-[99]">
-              {userType && userType.type === 'Group (3 People)' ? (
-                <GroupCode />
-              ) : (
-                <>
-                  <h1 className="text-xl font-bold sm:text-3xl w-fit">
-                    Payment Submission
-                  </h1>
+        ) : (
+          <div className="flex flex-col xl:flex-row justify-center w-full py-5 xl:py-15 px-6 xl:px-[10vw] gap-4 xl:gap-5">
+            {/* ── Left Column ── */}
+            <div className="flex flex-col w-full gap-4 xl:gap-5">
+              {/* Current Schedule Info */}
+              <Card className="flex flex-col p-10 rounded-xl border-white border-[3px]">
+                <h1 className="text-xl font-bold sm:text-3xl  w-fit">
+                  Hello, {DUMMY_USER.name}!
+                </h1>
+                <p className="pt-2 xl:pt-5 text-xs sm:text-lg">
+                  Thank you for attending the BNCC Launching! Don&#x27;t forget to complete your{' '}
+                  <span className="bg-[#FFF200] px-1.5 py-0.5 rounded-md text-[#0A2745]">
+                    payment
+                  </span>{' '}
+                  on time so you can officially become part of the{' '}
+                  <span className="font-bold">BNCC family</span>.
+                </p>
+              </Card>
 
-                  <p className="pt-2 xl:pt-5 text-xs sm:text-lg flex flex-col gap-1">
-                    Registration Type
-                  </p>
+              <Card className="flex flex-col p-10 mt-0 rounded-xl border-white border-[3px] z-[99]">
+                {userType && userType.type === 'Group (3 People)' ? (
+                  <GroupCode />
+                ) : (
+                  <>
+                    <h1 className="text-xl font-bold sm:text-3xl w-fit">
+                      <span className="bg-[#FFF200] px-1.5 py-0.5 rounded-md text-[#0A2745]">
+                        Payment
+                      </span> Submission
+                    </h1>
 
-                  <RegistrationTypeDropdown
-                    types={REGISTRATION_TYPES}
-                    onSelect={setTempType}
-                  />
+                    <p className="pt-2 xl:pt-5 text-xs sm:text-lg flex flex-col gap-1">
+                      Registration Type
+                    </p>
 
-                  <div className="flex justify-start xl:block">
-                    <Button
-                      onClick={handleConfirm}
-                      disabled={!tempType}
-                    >
-                      NEXT
-                    </Button>
-                  </div>
-                </>
-              )}
-            </Card>
+                    <RegistrationTypeDropdown
+                      types={REGISTRATION_TYPES}
+                      onSelect={setTempType}
+                    />
+
+                    <div className="flex justify-start xl:block">
+                      <Button
+                        onClick={handleConfirm}
+                        disabled={!tempType}
+                      >
+                        NEXT
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </Card>
+            </div>
+
+            {/* ── Right Column ── */}
+            <div className="flex flex-col w-full gap-4 xl:gap-5">
+              <Calendar schedules={DUMMY_SCHEDULES} userScheduleId={userType?.id} />
+
+              {/* Contact Person */}
+              <ContactPerson />
+            </div>
           </div>
-
-          {/* ── Right Column ── */}
-          <div className="flex flex-col w-full gap-4 xl:gap-5">
-            <Calendar schedules={DUMMY_SCHEDULES} userScheduleId={userType?.id} />
-
-            {/* Contact Person */}
-            <ContactPerson />
-          </div>
-        </div>
+        )}
       </div>
     </>
   );
