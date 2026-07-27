@@ -162,7 +162,9 @@ export default function Seniors() {
             <motion.a
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
-              href="#seniors"
+              href="https://bcaf.bncc.net"
+              target="_blank"
+              rel="noopener noreferrer"
               className="relative mt-4 sm:mt-8 inline-block rounded-lg bg-gradient-to-r from-[#12376B] to-[#1E5FA8] px-4 sm:px-7 py-1.5 sm:py-2 text-xs md:text-lg font-poppins font-medium text-base-2"
             >
               Learn more
