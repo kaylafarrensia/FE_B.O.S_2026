@@ -1,23 +1,33 @@
 import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import Navbar from '../../components/ReRegistration/Navbar'
-import ReRegistrationForm from '../../components/ReRegistration/RegistrationForm'
+import ReRegistrationForm from '../../components/ReRegistration/ReRegistrationForm'
 import ContactPersonCard from '../../components/ReRegistration/ContactPersonCard'
+import SuccessCard from '../../components/ReRegistration/SuccessCard'
 import PerspectiveGrid from '../../components/ComingSoon/PerspectiveGrid'
 
 export default function ReRegistration() {
   const [activeTab, setActiveTab] = useState('reregist')
+  const [isSubmitted, setIsSubmitted] = useState(false)
   const location = useLocation()
   const isInsideDashboard = location.pathname.startsWith('/dashboard')
 
   const formContent = (
     <main className="w-full px-6 sm:px-[10vw] py-8 flex flex-col lg:flex-row gap-6 sm:gap-8 items-start justify-center flex-1 overflow-y-auto">
-      <div className="w-full lg:flex-[1.3] min-w-0">
-        <ReRegistrationForm />
-      </div>
-      <div className="w-full lg:flex-1 min-w-0">
-        <ContactPersonCard />
-      </div>
+      {isSubmitted ? (
+        <div className="w-full">
+          <SuccessCard />
+        </div>
+      ) : (
+        <>
+          <div className="w-full lg:flex-[1.3] min-w-0">
+            <ReRegistrationForm onSubmitSuccess={() => setIsSubmitted(true)} />
+          </div>
+          <div className="w-full lg:flex-1 min-w-0">
+            <ContactPersonCard />
+          </div>
+        </>
+      )}
     </main>
   )
 
@@ -31,7 +41,25 @@ export default function ReRegistration() {
 
       <div className="relative z-10 flex h-full flex-col overflow-hidden">
         <Navbar activeTab={activeTab} onTabChange={setActiveTab} />
-        {formContent}
+
+        <div className="flex flex-1 min-h-0 flex-col overflow-hidden px-6 md:px-10 lg:px-16">
+          <main className="flex flex-1 min-h-0 flex-col items-center justify-start gap-4 overflow-y-auto pt-4 pb-2 md:gap-8 md:pt-6 md:pb-3 lg:flex-row lg:items-start lg:justify-start lg:gap-0 lg:overflow-hidden lg:py-4">
+            {isSubmitted ? (
+              <div className="w-full max-w-[520px] md:max-w-3xl lg:min-h-0 lg:max-w-none">
+                <SuccessCard />
+              </div>
+            ) : (
+              <>
+                <div className="w-full max-w-[520px] md:max-w-3xl lg:min-h-0 lg:max-w-none lg:flex-[1.4]">
+                  <ReRegistrationForm onSubmitSuccess={() => setIsSubmitted(true)} />
+                </div>
+                <div className="w-full max-w-[520px] md:max-w-3xl lg:min-h-0 lg:max-w-none lg:mr-30 lg:flex-1">
+                  <ContactPersonCard />
+                </div>
+              </>
+            )}
+          </main>
+        </div>
       </div>
     </div>
   )
