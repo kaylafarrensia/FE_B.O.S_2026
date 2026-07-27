@@ -1,6 +1,10 @@
 // ── Class name merger ──────────────────────────────────────────────────────────
+import { clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+// ── Class name merger ──────────────────────────────────────────────────────────
 export function cn(...classes) {
-  return classes.filter(Boolean).join(' ');
+  return twMerge(clsx(classes));
 }
 
 // ── Date / Time formatters ─────────────────────────────────────────────────────
