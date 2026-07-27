@@ -126,7 +126,7 @@ export default function ReRegistrationForm({ onSubmitSuccess }) {
       }
 
       onSubmitSuccess?.(data)
-    } catch (err) {
+    } catch {
       setGeneralError('Failed to connect to the server. Please check your connection.')
       setIsSubmitting(false)
     }
