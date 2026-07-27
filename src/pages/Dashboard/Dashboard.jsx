@@ -32,14 +32,47 @@ function Dashboard() {
   const tabRefs = useRef([]);
   const cardRef = useRef(null);
 
+  const [userStatus, setUserStatus] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('status') || 'schedule';
+  });
+
+  // Promote userStatus based on visited path to keep state consistent
+  useEffect(() => {
+    if (location.pathname === '/dashboard/re-registration') {
+      setUserStatus('done_launching');
+    } else if (location.pathname === '/dashboard/registration') {
+      setUserStatus('registration');
+    }
+  }, [location.pathname]);
+
   const tabs = useMemo(() => {
-    return [
-      {
+    let firstTab;
+    if (userStatus === 'schedule') {
+      firstTab = {
         label: 'SCHEDULE',
         icon: IconCalendar,
         iconWhite: IconCalendarWhite,
         path: '/dashboard/schedule',
-      },
+      };
+    } else if (userStatus === 'registration') {
+      firstTab = {
+        label: 'REGIST',
+        icon: IconCalendar,
+        iconWhite: IconCalendarWhite,
+        path: '/dashboard/registration',
+      };
+    } else {
+      firstTab = {
+        label: 'RE-REGIST',
+        icon: IconCalendar,
+        iconWhite: IconCalendarWhite,
+        path: '/dashboard/re-registration',
+      };
+    }
+
+    return [
+      firstTab,
       {
         label: 'JAPRES',
         icon: IconTrophy,
@@ -53,7 +86,7 @@ function Dashboard() {
         path: '/dashboard/profile',
       },
     ];
-  }, []);
+  }, [userStatus]);
 
   const updatePillPosition = (path) => {
     const activeIndex = tabs.findIndex((t) => t.path === path);
@@ -67,9 +100,15 @@ function Dashboard() {
   useEffect(() => {
     const normalizedPath = location.pathname.replace(/\/+$/, '');
     if (normalizedPath === '/dashboard') {
-      navigate('/dashboard/schedule', { replace: true });
+      let defaultPath = '/dashboard/schedule';
+      if (userStatus === 'registration') {
+        defaultPath = '/dashboard/registration';
+      } else if (userStatus === 'done_launching') {
+        defaultPath = '/dashboard/re-registration';
+      }
+      navigate(defaultPath, { replace: true });
     }
-  }, [location.pathname, navigate]);
+  }, [location.pathname, navigate, userStatus]);
 
   useEffect(() => {
     setIsSidebarOpen(false);
@@ -80,7 +119,7 @@ function Dashboard() {
   }, [location.pathname, tabs]);
 
   return (
-    <div className="relative z-0 min-h-screen overflow-hidden">
+    <div className="relative z-0 min-h-screen flex flex-col overflow-hidden">
       <PerspectiveGrid className="opacity-85" />
       <BubbleBackground />
 
@@ -197,7 +236,7 @@ function Dashboard() {
         </div>
       </ul>
 
-      <Outlet context={{ userSchedule, setUserSchedule }} />
+      <Outlet context={{ userSchedule, setUserSchedule, userStatus, setUserStatus }} />
     </div>
   );
 }

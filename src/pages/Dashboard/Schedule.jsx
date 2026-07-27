@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useNavigate } from 'react-router-dom';
 import Card from '../../components/ui/Card.jsx';
 import Button from '../../components/ui/Button.jsx';
 import IconSchedule from '../../assets/icons/IconSchedule.svg';
@@ -35,9 +35,10 @@ const DUMMY_CONTACT = {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function Schedule() {
+  const navigate = useNavigate();
   const [popupOpen, setPopupOpen] = useState(false);
   const [tempSchedule, setTempSchedule] = useState(null);
-  const { userSchedule, setUserSchedule } = useOutletContext();
+  const { userSchedule, setUserSchedule, setUserStatus } = useOutletContext();
 
   const handleConfirm = () => {
     if (!tempSchedule) return;
@@ -49,6 +50,13 @@ export default function Schedule() {
   const openWhatsApp = (number) => {
     const formatted = number.startsWith('0') ? number.slice(1) : number;
     window.open(`https://wa.me/62${formatted}`, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleJoinNow = () => {
+    if (setUserStatus) {
+      setUserStatus('registration');
+    }
+    navigate('/dashboard/registration');
   };
 
   return (
@@ -84,7 +92,7 @@ export default function Schedule() {
                 </li>
               </ul>
               <div className="flex justify-center xl:block">
-                <Button className="" disabled={!userSchedule}>
+                <Button className="" disabled={!userSchedule} onClick={handleJoinNow}>
                   Join Now!
                 </Button>
               </div>

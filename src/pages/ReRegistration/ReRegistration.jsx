@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import Navbar from '../../components/ReRegistration/Navbar'
 import ReRegistrationForm from '../../components/ReRegistration/RegistrationForm'
 import ContactPersonCard from '../../components/ReRegistration/ContactPersonCard'
@@ -6,6 +7,23 @@ import PerspectiveGrid from '../../components/ComingSoon/PerspectiveGrid'
 
 export default function ReRegistration() {
   const [activeTab, setActiveTab] = useState('reregist')
+  const location = useLocation()
+  const isInsideDashboard = location.pathname.startsWith('/dashboard')
+
+  const formContent = (
+    <main className="w-full px-6 sm:px-[10vw] py-8 flex flex-col lg:flex-row gap-6 sm:gap-8 items-start justify-center flex-1 overflow-y-auto">
+      <div className="w-full lg:flex-[1.3] min-w-0">
+        <ReRegistrationForm />
+      </div>
+      <div className="w-full lg:flex-1 min-w-0">
+        <ContactPersonCard />
+      </div>
+    </main>
+  )
+
+  if (isInsideDashboard) {
+    return formContent
+  }
 
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-gradient-to-b from-slate-50 to-blue-100">
@@ -13,15 +31,7 @@ export default function ReRegistration() {
 
       <div className="relative z-10 flex h-full flex-col overflow-hidden">
         <Navbar activeTab={activeTab} onTabChange={setActiveTab} />
-
-        <main className="mx-auto flex w-full max-w-6xl flex-1 min-h-0 flex-col gap-4 overflow-hidden px-4 py-4 sm:px-8 lg:flex-row lg:items-center lg:gap-8">
-          <div className="min-h-0 lg:flex-[1.4]">
-            <ReRegistrationForm />
-          </div>
-          <div className="min-h-0 lg:flex-1">
-            <ContactPersonCard />
-          </div>
-        </main>
+        {formContent}
       </div>
     </div>
   )

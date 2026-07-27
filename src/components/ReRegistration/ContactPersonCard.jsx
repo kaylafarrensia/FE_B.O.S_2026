@@ -1,46 +1,40 @@
-import Card from './Card'
-import cpIcon from '../../../public/icons/ic-cp.svg'
-import lineIcon from '../../../public/icons/ic-line.svg'
+import Card from '../ui/Card.jsx';
+import Button from '../ui/Button.jsx';
+import IconLine from '../../assets/icons/IconLine.svg';
+import Team from '../../assets/images/Team.svg';
 
 export default function ContactPersonCard({
-  username = 'johndowney123',
-  name = 'John Downey',
-  onContactClick,
+  username = '@yviluo',
+  name = 'Yovi Gracia Lo',
+  wa = '6285178100246',
 }) {
+  const openWhatsApp = (number) => {
+    const formatted = number.startsWith('0') ? number.slice(1) : number;
+    window.open(`https://wa.me/${formatted}`, '_blank', 'noopener,noreferrer');
+  };
+
   return (
-    <Card className="relative w-full overflow-hidden">
-      <div className="flex items-center justify-between gap-6">
-        <div className="min-w-0">
-          <h2 className="text-2xl font-extrabold text-[#0A2745] sm:text-3xl md:text-4xl">
-            Contact <span className="text-[#2474C0]">Person</span>
-          </h2>
-
-          <div className="mt-8 flex items-center gap-3">
-            <img
-              src={lineIcon}
-              alt="LINE"
-              className="h-8 w-8 shrink-0"
-            />
-            <span className="text-sm font-medium text-slate-700 sm:text-base">
-              {username} ({name})
-            </span>
-          </div>
-
-          <button
-            type="button"
-            onClick={onContactClick}
-            className="mt-8 rounded-xl bg-gradient-to-br from-[#0A2745] to-[#2474C0] px-8 py-3.5 text-sm font-bold text-white shadow-md transition hover:brightness-110 active:scale-95 sm:text-base"
-          >
-            Contact Us
-          </button>
+    <Card className="flex flex-row px-7 py-6 sm:px-14 sm:py-8 xl:px-16 rounded-xl border-white border-[3px] shadow-sm">
+      <div className="flex-1 flex flex-col justify-center items-start gap-4">
+        <h1 className="font-bold sm:text-3xl text-xl w-fit">Contact Person</h1>
+        <div className="flex flex-row gap-3 items-center">
+          <img src={IconLine} alt="LINE" className="w-5 sm:w-7" />
+          <p className="text-xs sm:text-base">
+            <span className="whitespace-nowrap">{username}</span>{' '}
+            <span className="whitespace-nowrap">({name})</span>
+          </p>
         </div>
-
+        <Button onClick={() => openWhatsApp(wa)}>
+          <p className="text-xs sm:text-base">Contact Us</p>
+        </Button>
+      </div>
+      <div className="flex justify-center items-center shrink-0">
         <img
-          src={cpIcon}
-          alt="contact person illustration"
-          className="hidden h-40 w-40 shrink-0 sm:block md:h-48 md:w-48"
+          src={Team}
+          alt="Team"
+          className="w-32 h-32 sm:w-48 sm:h-48 object-contain"
         />
       </div>
     </Card>
-  )
+  );
 }
