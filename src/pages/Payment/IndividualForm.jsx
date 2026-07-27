@@ -8,6 +8,7 @@ import Calendar from './Calendar.jsx';
 import RegistrationTypeDropdown from './RegistrationTypeDropdown.jsx';
 import ContactPerson from '@/pages/Dashboard/Japres/ContactPerson.jsx';
 import { useNavigate } from 'react-router-dom';
+import PaymentStatusButton from '@/components/ui/PaymentStatusButton.jsx';
 
 // ── Dummy Data (replace with API when backend is ready) ───────────────────────
 const DUMMY_USER = {
@@ -28,13 +29,11 @@ export default function IndividualForm() {
         // Simulate payment process
         setIsPaid(true);
     }
+    const handleBack = () => {
+        navigate(-1);
+    }
     const handleConfirm = () => {
-        if (!tempType) return;
-        setUserType(tempType);
-        if (tempType.type === 'Individual') {
-            navigate('/payment/individual-form');
-        }
-        setTempType(null);
+        
     };
 
     return (
@@ -42,10 +41,10 @@ export default function IndividualForm() {
             <div className="px-6 xl:px-[10vw] py-5 xl:py-15">
                 <div className="flex flex-col items-center gap-5">
                     {/* Two Columns */}
-                    <div className="flex flex-col xl:flex-row justify-center w-full gap-4 xl:gap-5">
+                    <div className="flex flex-col xl:flex-row items-stretch justify-center w-full gap-4 xl:gap-5">
                         {/* Left Column */}
-                        <div className="flex flex-col w-full">
-                            <Card className="flex flex-col p-10 rounded-xl border-white border-[3px]">
+                        <div className="flex w-full">
+                            <Card className="flex flex-col p-10 rounded-xl border-white border-[3px] w-full">
                                 <h1 className="text-xl font-bold sm:text-3xl w-fit">
                                     Individual
                                 </h1>
@@ -57,21 +56,15 @@ export default function IndividualForm() {
                         </div>
 
                         {/* Right Column */}
-                        <div className="flex flex-col w-full">
-                            <Card className="flex flex-col p-10 rounded-xl border-white border-[3px]">
+                        <div className="flex w-full">
+                            <Card className="flex flex-col p-10 rounded-xl border-white border-[3px] w-full">
                                 <div className="flex flex-col gap-3">
                                     <div className="flex items-center justify-between">
                                         <h1 className="text-xl font-bold sm:text-3xl">
                                             Payment Submission
                                         </h1>
 
-                                        <button
-                                            disabled
-                                            className={`px-6 py-2 rounded-full text-sm font-semibold text-white cursor-default ${isPaid ? 'bg-green-500' : 'bg-red-500'
-                                                }`}
-                                        >
-                                            {isPaid ? 'Paid' : 'Unpaid'}
-                                        </button>
+                                        <PaymentStatusButton isPaid={isPaid} />
                                     </div>
 
                                     <div>
@@ -122,7 +115,8 @@ export default function IndividualForm() {
                         <div className="flex gap-4">
                             <Button
                                 variant="outline"
-                                onClick={() => navigate(-1)}
+                                className="border-[#0A2745] text-[#0A2745] hover:bg-[#0A2745] hover:text-white"
+                                onClick={handleBack}
                             >
                                 BACK
                             </Button>
