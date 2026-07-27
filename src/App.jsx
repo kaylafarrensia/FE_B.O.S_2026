@@ -13,6 +13,8 @@ import Japres from './pages/Dashboard/Japres.jsx'
 import Profile from './pages/Dashboard/Profile.jsx'
 import Payment from './pages/Payment/Payment.jsx'
 import PaymentSchedule from './pages/Payment/Schedule.jsx'
+import IndividualForm from './pages/Payment/IndividualForm.jsx'
+import GroupForm from './pages/Payment/GroupCode.jsx'
 
 function App() {
   return (
@@ -29,7 +31,7 @@ function App() {
       </Route>
       {/* nanti tambah route lain di sini, misal: */}
       {/* <Route path="/about" element={<About />} /> */}
-      
+
       <Route path="/dashboard" element={<Dashboard />}>
         <Route path="schedule" element={<Schedule />} />
         <Route path="japres" element={<Japres />} />
@@ -37,6 +39,7 @@ function App() {
       </Route>
       <Route path="/payment" element={<Payment />}>
         <Route path="schedule" element={<PaymentSchedule />} />
+        <Route path="individual-form" element={<IndividualForm />} />
       </Route>
     </Routes>
   )
