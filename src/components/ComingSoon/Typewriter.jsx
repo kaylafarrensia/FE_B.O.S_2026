@@ -10,6 +10,8 @@ export default function Typewriter({
   loop = true,
   showCursor = true,
   cursorColor = '#2474C0',
+  gradientFrom,
+  gradientTo,
   className = '',
 }) {
   const [displayed, setDisplayed] = useState('')
@@ -48,6 +50,8 @@ export default function Typewriter({
     }
   }, [text, speed, deleteSpeed, startDelay, pauseAfterType, pauseAfterDelete, loop])
 
+  const hasGradient = Boolean(gradientFrom && gradientTo)
+
   return (
     <span
       className={className}
@@ -73,7 +77,7 @@ export default function Typewriter({
               bottom: '0em',
               right: '-45%',
               transform: 'translateX(-50%)',
-              height: '1.5em',
+              height: '1.8em',
               backgroundColor: cursorColor,
               borderRadius: '999px',
             }}
@@ -103,7 +107,21 @@ export default function Typewriter({
           WebkitBoxDecorationBreak: 'clone',
         }}
       >
-        {displayed}
+        <span
+          style={
+            hasGradient
+              ? {
+                  backgroundImage: `linear-gradient(to right, ${gradientFrom}, ${gradientTo})`,
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  color: 'transparent',
+                  WebkitTextFillColor: 'transparent',
+                }
+              : undefined
+          }
+        >
+          {displayed}
+        </span>
       </span>
 
       {showCursor && (
@@ -124,7 +142,7 @@ export default function Typewriter({
               top: '0em',
               left: '-5%',
               transform: 'translateX(-50%)',
-              height: '1.5em',
+              height: '1.8em',
               backgroundColor: cursorColor,
               borderRadius: '999px',
             }}

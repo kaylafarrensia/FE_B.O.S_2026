@@ -59,14 +59,20 @@ export default function ComingSoon() {
           />
 
           <div className="flex flex-col items-center gap-4 sm:gap-6 text-center">
-            <h1 className="rounded-[10px] border border-white bg-white/20 px-4 py-2 sm:px-6 text-xs md:text-xl font-bold shadow-[inset_0_2px_12px_rgba(68,137,212,0.3)] backdrop-blur-md">
+            <h1 className="rounded-[10px] border border-white bg-white/20 px-4 py-2 sm:px-6 text-xs md:text-xl font-semibold font-outfit shadow-[inset_0_2px_12px_rgba(68,137,212,0.3)] backdrop-blur-md">
               <span className="bg-gradient-to-r from-[#0A2745] to-[#2474C0] bg-clip-text text-transparent">
                 BNCC OPENING SEASON 2026
               </span>
             </h1>
 
-            <h1 className="px-2 sm:px-6 py-2 min-h-[4em] sm:min-h-[1.6em] text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight bg-gradient-to-r from-[#0A2745] to-[#4489D4] bg-clip-text text-transparent">
-              <Typewriter text="COMING SOON" speed={120} startDelay={300} />
+            <h1 className="px-2 sm:px-6 py-2 min-h-[4em] sm:min-h-[1.6em] text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight">
+              <Typewriter
+                text="COMING SOON"
+                speed={120}
+                startDelay={300}
+                gradientFrom="#0A2745"
+                gradientTo="#4489D4"
+              />
             </h1>
 
             <p className="max-w-xs lg:max-w-xl font-poppins text-black text-xs sm:text-lg mt-10 md:mt-10">
