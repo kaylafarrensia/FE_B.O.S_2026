@@ -11,7 +11,7 @@ const LNT_COURSES = [
   { id: 6, name: 'Machine Learning' },
 ]
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'
+// const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'
 
 function isValidUrl(value) {
   try {
@@ -75,6 +75,13 @@ export default function ReRegistrationForm({ onSubmitSuccess }) {
 
     setIsSubmitting(true)
 
+    // TEMP: bypass API call buat preview SuccessCard, uncomment blok di bawah nanti
+    setTimeout(() => {
+      onSubmitSuccess?.()
+      setIsSubmitting(false)
+    }, 500)
+    return
+    /*
     try {
       const token = localStorage.getItem('accessToken')
 
@@ -130,30 +137,31 @@ export default function ReRegistrationForm({ onSubmitSuccess }) {
       setGeneralError('Failed to connect to the server. Please check your connection.')
       setIsSubmitting(false)
     }
+    */
   }
 
   const inputClass = (field) =>
-    `w-full rounded-[8px] border-2 bg-white/50 px-4 py-2.5 text-sm text-[#0A2745] outline-none placeholder:text-slate-400 ${
+    `w-full rounded-[8px] border-2 bg-white/50 px-2.5 py-1 text-[11px] text-[#0A2745] outline-none placeholder:text-slate-400 lg:px-4 lg:py-2.5 lg:text-sm ${
       errors[field]
         ? 'border-red-400 focus:border-red-500'
         : 'border-[#99C4F4] focus:border-[#207CDB]'
     }`
 
   return (
-    <Card className="w-[80%] max-w-[820px] p-6 md:p-7 lg:p-8 lg:ml-30">
-      <h1 className="inline-block py-1 text-xl font-bold leading-[1.3] bg-gradient-to-r from-[#0A2745] to-[#2474C0] bg-clip-text text-transparent md:text-[36px]">
+    <Card className="w-full max-w-[520px] mx-auto p-3.5 md:p-4 lg:mx-0 lg:ml-30 lg:w-[80%] lg:max-w-[820px] lg:p-8">
+      <h1 className="inline-block py-0.5 text-sm font-bold leading-[1.3] bg-gradient-to-r from-[#0A2745] to-[#2474C0] bg-clip-text text-transparent md:text-base lg:text-4xl">
         Re-Registration Form
       </h1>
 
       {generalError && (
-        <div className="mt-4 rounded-[8px] border border-red-300 bg-red-50 px-4 py-2.5 text-sm text-red-600">
+        <div className="mt-1.5 rounded-[8px] border border-red-300 bg-red-50 px-2.5 py-1 text-[11px] text-red-600 lg:mt-4 lg:px-4 lg:py-2.5 lg:text-sm">
           {generalError}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-4" noValidate>
+      <form onSubmit={handleSubmit} className="mt-2 flex flex-col gap-1.5 lg:mt-5 lg:gap-4" noValidate>
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-slate-700 lg:text-base">
+          <label className="mb-0.5 block text-[10px] font-medium text-slate-700 lg:mb-1.5 lg:text-base">
             LinkedIn URL
           </label>
           <input
@@ -164,12 +172,12 @@ export default function ReRegistrationForm({ onSubmitSuccess }) {
             className={inputClass('linkedin')}
           />
           {errors.linkedin && (
-            <p className="mt-1 text-xs text-red-500">{errors.linkedin}</p>
+            <p className="mt-0.5 text-[9px] text-red-500 lg:mt-1 lg:text-xs">{errors.linkedin}</p>
           )}
         </div>
 
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-slate-700 lg:text-base">
+          <label className="mb-0.5 block text-[10px] font-medium text-slate-700 lg:mb-1.5 lg:text-base">
             Github URL
           </label>
           <input
@@ -180,19 +188,19 @@ export default function ReRegistrationForm({ onSubmitSuccess }) {
             className={inputClass('github')}
           />
           {errors.github && (
-            <p className="mt-1 text-xs text-red-500">{errors.github}</p>
+            <p className="mt-0.5 text-[9px] text-red-500 lg:mt-1 lg:text-xs">{errors.github}</p>
           )}
         </div>
 
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-slate-700 lg:text-base">
+          <label className="mb-0.5 block text-[10px] font-medium text-slate-700 lg:mb-1.5 lg:text-base">
             LnT Course
           </label>
           <div className="relative">
             <select
               value={form.course}
               onChange={handleChange('course')}
-              className={`${inputClass('course')} appearance-none pr-10 ${
+              className={`${inputClass('course')} appearance-none pr-8 lg:pr-10 ${
                 form.course === '' ? 'text-slate-400' : 'text-[#0A2745]'
               }`}
             >
@@ -206,21 +214,21 @@ export default function ReRegistrationForm({ onSubmitSuccess }) {
               ))}
             </select>
             <ChevronDown
-              size={16}
-              className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500"
+              size={13}
+              className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 lg:right-3.5 lg:h-4 lg:w-4"
             />
           </div>
           {errors.course && (
-            <p className="mt-1 text-xs text-red-500">{errors.course}</p>
+            <p className="mt-0.5 text-[9px] text-red-500 lg:mt-1 lg:text-xs">{errors.course}</p>
           )}
         </div>
 
         <button
           type="submit"
           disabled={isSubmitting}
-          className="mx-auto mt-2 flex items-center gap-2 rounded-[10px] bg-gradient-to-br from-[#0A2745] to-[#2474C0] px-10 py-2.5 lg:text-lg font-medium text-white shadow-md transition hover:brightness-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+          className="mx-auto mt-0.5 flex items-center gap-1.5 rounded-[10px] bg-gradient-to-br from-[#0A2745] to-[#2474C0] px-6 py-1 text-[11px] font-medium text-white shadow-md transition hover:brightness-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer lg:mt-2 lg:px-10 lg:py-2.5 lg:text-lg"
         >
-          {isSubmitting && <Loader2 size={18} className="animate-spin" />}
+          {isSubmitting && <Loader2 size={13} className="animate-spin" />}
           {isSubmitting ? 'Submitting...' : 'Submit'}
         </button>
       </form>

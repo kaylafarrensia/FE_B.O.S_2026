@@ -8,20 +8,20 @@ export default function ContactPersonCard({
   onContactClick,
 }) {
   return (
-    <Card className="relative w-full overflow-hidden p-6 sm:p-7 md:p-8">
-      <div className="flex items-center justify-between gap-4">
+    <Card className="relative w-full overflow-hidden p-3.5 sm:p-4 md:p-4 lg:p-8">
+      <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
-          <h1 className="text-xl font-bold leading-[1.3] bg-gradient-to-r from-[#0A2745] to-[#2474C0] bg-clip-text text-transparent lg:text-[36px]">
+          <h1 className="text-sm font-bold leading-[1.3] bg-gradient-to-r from-[#0A2745] to-[#2474C0] bg-clip-text text-transparent sm:text-base lg:text-4xl">
             Contact Person
           </h1>
 
-          <div className="mt-5 flex items-center gap-2.5">
+          <div className="mt-1.5 flex items-center gap-1.5 sm:mt-2 lg:mt-5 lg:gap-2.5">
             <img
               src={lineIcon}
               alt="LINE"
-              className="h-6 w-6 shrink-0"
+              className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4 lg:h-6 lg:w-6"
             />
-            <span className="text-xs font-medium text-slate-700 sm:text-sm">
+            <span className="text-[9px] font-medium text-slate-700 sm:text-[10px] lg:text-sm">
               {username} ({name})
             </span>
           </div>
@@ -29,7 +29,7 @@ export default function ContactPersonCard({
           <button
             type="button"
             onClick={onContactClick}
-            className="mt-5 rounded-[10px] bg-gradient-to-br from-[#0A2745] to-[#2474C0] px-6 py-2.5 text-xs font-medium text-white shadow-md transition hover:brightness-110 active:scale-95 sm:text-lg cursor-pointer"
+            className="mt-1.5 rounded-[10px] bg-gradient-to-br from-[#0A2745] to-[#2474C0] px-3 py-1 text-[10px] font-medium text-white shadow-md transition hover:brightness-110 active:scale-95 cursor-pointer sm:mt-2 sm:px-4 sm:py-1 sm:text-[11px] lg:mt-5 lg:px-6 lg:py-2.5 lg:text-lg"
           >
             Contact Us
           </button>
@@ -38,7 +38,7 @@ export default function ContactPersonCard({
         <img
           src={cpIcon}
           alt="contact person illustration"
-          className="hidden h-28 w-28 shrink-0 sm:block lg:h-40 lg:w-40"
+          className="hidden h-10 w-10 shrink-0 sm:block md:h-12 md:w-12 lg:h-40 lg:w-40"
         />
       </div>
     </Card>
