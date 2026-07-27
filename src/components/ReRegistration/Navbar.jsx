@@ -21,8 +21,8 @@ export default function Navbar({ activeTab = 'reregist', onTabChange }) {
   }
 
   return (
-    <nav className="flex w-full shrink-0 items-center justify-between bg-gradient-to-r from-[#F7F7F5] via-[#F7F7F5] to-[#7ED6F9] px-6 py-4 md:px-10 lg:bg-none lg:px-30 lg:py-2">
-      <img src={bnccLogo} alt="BNCC" className="h-9 sm:h-11 md:h-14 lg:h-35" />
+    <nav className="flex w-full shrink-0 items-center justify-between bg-gradient-to-r from-[#99c3f456] via-[#f7f7f574] to-[#7ed6f956] px-6 py-0 md:px-10 md:py-0 lg:bg-none lg:px-30 lg:py-2">
+      <img src={bnccLogo} alt="BNCC" className="h-12 sm:h-11 md:h-20 lg:h-35" />
 
       {/* Desktop pill tabs */}
       <div className="hidden items-center gap-1 rounded-[10px] border border-[#99C4F4] bg-gradient-to-br from-[#F7F7F5] via-[#F7F7F5] to-[#7ed6f97a] p-0 shadow-[2px_4px_4px_0px_rgba(0,0,0,0.25)] backdrop-blur-md lg:flex lg:gap-2">
@@ -74,7 +74,7 @@ export default function Navbar({ activeTab = 'reregist', onTabChange }) {
         type="button"
         onClick={() => setMenuOpen(true)}
         aria-label="Open menu"
-        className="flex h-10 w-10 flex-col items-center justify-center gap-[6px] sm:h-11 sm:w-11 md:h-14 md:w-14 md:gap-2 lg:hidden"
+        className="flex h-7 w-7 flex-col items-center justify-center gap-[6px] sm:h-8 sm:w-8 md:h-11 md:w-11 md:gap-2 lg:hidden"
       >
         <span className="h-[3.5px] w-6 rounded-full bg-gradient-to-r from-[#0C4076] to-[#4489D4] sm:w-7 md:h-[4.5px] md:w-9" />
         <span className="h-[3.5px] w-6 rounded-full bg-gradient-to-r from-[#0C4076] to-[#4489D4] sm:w-7 md:h-[4.5px] md:w-9" />

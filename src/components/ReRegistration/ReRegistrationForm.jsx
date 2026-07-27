@@ -141,7 +141,7 @@ export default function ReRegistrationForm({ onSubmitSuccess }) {
   }
 
   const inputClass = (field) =>
-    `w-full rounded-[8px] border-2 bg-white/50 px-2.5 py-1 text-[11px] text-[#0A2745] outline-none placeholder:text-slate-400 lg:px-4 lg:py-2.5 lg:text-sm ${
+    `w-full rounded-[5px] border-1 border-[#207CDB] bg-white/10 px-2.5 py-1 text-[9px] text-[#0A2745] outline-none placeholder:text-slate-400 md:py-2 lg:px-4 lg:py-2.5 lg:text-sm ${
       errors[field]
         ? 'border-red-400 focus:border-red-500'
         : 'border-[#99C4F4] focus:border-[#207CDB]'
@@ -149,7 +149,7 @@ export default function ReRegistrationForm({ onSubmitSuccess }) {
 
   return (
     <Card className="w-full max-w-[520px] mx-auto p-3.5 md:p-4 lg:mx-0 lg:ml-30 lg:w-[80%] lg:max-w-[820px] lg:p-8">
-      <h1 className="inline-block py-0.5 text-sm font-bold leading-[1.3] bg-gradient-to-r from-[#0A2745] to-[#2474C0] bg-clip-text text-transparent md:text-base lg:text-4xl">
+      <h1 className="inline-block py-0.5 text-[15px] font-bold leading-[1.3] bg-gradient-to-r from-[#0A2745] to-[#2474C0] bg-clip-text text-transparent md:text-[23px] lg:text-4xl">
         Re-Registration Form
       </h1>
 
@@ -161,7 +161,7 @@ export default function ReRegistrationForm({ onSubmitSuccess }) {
 
       <form onSubmit={handleSubmit} className="mt-2 flex flex-col gap-1.5 lg:mt-5 lg:gap-4" noValidate>
         <div>
-          <label className="mb-0.5 block text-[10px] font-medium text-slate-700 lg:mb-1.5 lg:text-base">
+          <label className="mb-0.5 block text-[10px] font-medium text-[#0a27459b] md:text-[13px] lg:mb-1.5 lg:text-base">
             LinkedIn URL
           </label>
           <input
@@ -177,7 +177,7 @@ export default function ReRegistrationForm({ onSubmitSuccess }) {
         </div>
 
         <div>
-          <label className="mb-0.5 block text-[10px] font-medium text-slate-700 lg:mb-1.5 lg:text-base">
+          <label className="mb-0.5 block text-[10px] font-medium text-[#0a27459b] md:text-[13px] lg:mb-1.5 lg:text-base">
             Github URL
           </label>
           <input
@@ -193,7 +193,7 @@ export default function ReRegistrationForm({ onSubmitSuccess }) {
         </div>
 
         <div>
-          <label className="mb-0.5 block text-[10px] font-medium text-slate-700 lg:mb-1.5 lg:text-base">
+          <label className="mb-0.5 block text-[10px] font-medium text-[#0a27459b] md:text-[13px] lg:mb-1.5 lg:text-base">
             LnT Course
           </label>
           <div className="relative">
@@ -226,7 +226,7 @@ export default function ReRegistrationForm({ onSubmitSuccess }) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="mx-auto mt-0.5 flex items-center gap-1.5 rounded-[10px] bg-gradient-to-br from-[#0A2745] to-[#2474C0] px-6 py-1 text-[11px] font-medium text-white shadow-md transition hover:brightness-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer lg:mt-2 lg:px-10 lg:py-2.5 lg:text-lg"
+          className="mx-auto mt-0.5 flex items-center gap-1.5 rounded-[8px] bg-gradient-to-br from-[#0A2745] to-[#2474C0] px-5 py-2 text-[11px] font-medium text-white shadow-md transition hover:brightness-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer lg:mt-2 lg:px-10 lg:py-2.5 lg:text-lg md:text-[15px]"
         >
           {isSubmitting && <Loader2 size={13} className="animate-spin" />}
           {isSubmitting ? 'Submitting...' : 'Submit'}
