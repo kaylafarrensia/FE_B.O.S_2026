@@ -23,20 +23,21 @@ export default function Navbar({ activeTab = 'reregist', onTabChange }) {
               key={tab.key}
               type="button"
               onClick={() => onTabChange?.(tab.key)}
-              className={`relative flex items-center gap-2 overflow-hidden rounded-[10px] px-4 py-2.5 text-xs font-medium font-outfit tracking-wide sm:px-7 sm:py-3.5 sm:text-sm ${
+              aria-current={isActive ? 'page' : undefined}
+              className={`relative flex items-center gap-2 overflow-hidden rounded-[10px] px-4 py-2.5 font-outfit text-xs font-regular tracking-[0.15em] sm:px-7 sm:py-3.5 sm:text-xs ${
                 isActive ? 'text-white' : 'text-slate-700'
               }`}
             >
               {isActive && (
                 <motion.div
                   layoutId="navbar-active-pill"
-                  className="absolute inset-0 rounded-[10px] border border-[#99C4F4] bg-gradient-to-br from-[#0A2745] to-[#2474C0] shadow-[2px_4px_4px_0px_rgba(0,0,0,0.25)] backdrop-blur-md"
+                  className="pointer-events-none absolute inset-0 rounded-[10px] border border-[#99C4F4] bg-gradient-to-br from-[#0A2745] to-[#2474C0] shadow-[2px_4px_4px_0px_rgba(0,0,0,0.25)] backdrop-blur-md"
                   transition={{ type: 'spring', stiffness: 400, damping: 32 }}
                 />
               )}
 
               {!isActive && (
-                <span className="absolute inset-0 rounded-[10px] border border-transparent transition-colors duration-300 hover:bg-slate-100" />
+                <span className="pointer-events-none absolute inset-0 rounded-[10px] border border-transparent transition-colors duration-300 hover:bg-slate-100" />
               )}
 
               <img

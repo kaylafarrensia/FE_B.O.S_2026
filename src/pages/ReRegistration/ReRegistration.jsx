@@ -14,7 +14,7 @@ export default function ReRegistration() {
       <div className="relative z-10 flex h-full flex-col overflow-hidden px-6 lg:px-16">
         <Navbar activeTab={activeTab} onTabChange={setActiveTab} />
 
-        <main className="flex flex-1 min-h-0 flex-col gap-4 overflow-hidden py-4 lg:flex-row lg:items-start lg:gap-1">
+        <main className="flex flex-1 min-h-0 flex-col gap-4 overflow-hidden py-4 lg:flex-row lg:items-start lg:gap-0">
           <div className="min-h-0 lg:flex-[1.4]">
             <ReRegistrationForm />
           </div>
