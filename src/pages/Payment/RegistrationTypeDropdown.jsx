@@ -17,7 +17,7 @@ export default function RegistrationTypeDropdown({ types, onSelect }) {
 
   return (
     <div className="relative w-full text-left py-5">
-      <div className="w-full rounded-xl border border-white/60 bg-gradient-to-r from-blue-50 to-blue-100/60 divide-y divide-white/70 overflow-hidden shadow-[8px_8px_8px_rgba(0,0,0,0.05)]">
+      <div className="w-full rounded-xl border border-[#0A2745] bg-gradient-to-r from-blue-50 to-blue-100/60 divide-y divide-white/70 overflow-hidden shadow-[8px_8px_8px_rgba(0,0,0,0.05)]">
         {/* Trigger */}
         <button
           type="button"
@@ -30,7 +30,7 @@ export default function RegistrationTypeDropdown({ types, onSelect }) {
             </div>
           ) : (
             <span className="flex-1 text-left text-xs sm:text-lg text-gray-400">
-              Select registration type
+              Select your registration type
             </span>
           )}
           <svg
