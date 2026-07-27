@@ -1,10 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Poppins:wght@400;500;600&display=swap');
+
 @import 'tailwindcss';
 
 @theme {
+  /* Fonts */
   --font-poppins: 'Poppins', sans-serif;
+  --font-outfit: 'Outfit', sans-serif;
+
+  /* Colors */
+  --color-primary: #4489d4;
+  --color-secondary: #0a2745;
+  --color-secondary-2: #105ea9;
+
+  --color-base: #010103;
+  --color-base-2: #eaf5ff;
+}
+
+:root {
+  --gradient-bg: linear-gradient(180deg, #f9fcff 19%, #d8ecff 100%);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
-  font-family: 'Poppins', sans-serif;
+  font-family: var(--font-outfit);
+  color: var(--color-base);
+  background: #fff;
+}
+
+.gradient-text {
+  background: linear-gradient(to bottom right, #0a2745 0%, #2474c0 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.btn-gradient {
+  background: linear-gradient(135deg, #0c4076 0%, #4489d4 100%);
+  transition: all 0.3s ease;
+}
+
+.btn-gradient:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+.bg-landing {
+  background: var(--gradient-bg);
+}
+
+@media (pointer: fine) {
+  body {
+    cursor: none;
+  }
+  a,
+  button,
+  [role='button'] {
+    cursor: none;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f7fafe;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #4489d4 0%, #0a2745 100%);
+  border-radius: 999px;
+  border: 2px solid #f7fafe;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #2474c0 0%, #0a2745 100%);
 }
