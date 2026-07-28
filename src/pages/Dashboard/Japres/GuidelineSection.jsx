@@ -1,11 +1,15 @@
-import { Check } from 'lucide-react';
-import Card from '../../../components/ui/Card.jsx';
-import Button from '../../../components/ui/Button.jsx';
-import IconView from '../../../assets/icons/IconView.svg';
+import { Check } from 'lucide-react'
+import Card from '../../../components/ui/Card.jsx'
+import Button from '../../../components/ui/Button.jsx'
+import IconView from '../../../assets/icons/IconView.svg'
 
-const GUIDELINE_URL = 'https://drive.google.com/file/d/1ijlECABgoRxsXFxZeiw_vXNQZ2-iesvl/view?usp=sharing';
+const GUIDELINE_URL =
+  'https://drive.google.com/file/d/1AhMMNivp4WNo8X88g2x1V7yfWEWUw2Nz/view?usp=sharing'
 
-export default function GuidelineSection({ hasReadGuideline, setHasReadGuideline }) {
+export default function GuidelineSection({
+  hasReadGuideline,
+  setHasReadGuideline,
+}) {
   return (
     <Card className="flex flex-col rounded-xl border-white border-[3px] gap-4 px-7 py-6 sm:px-14 sm:py-10 xl:px-16 xl:py-12 sm:gap-6">
       <div className="flex flex-col gap-3.5 sm:gap-5">
@@ -20,7 +24,9 @@ export default function GuidelineSection({ hasReadGuideline, setHasReadGuideline
       </div>
       <Button
         className="w-fit h-fit"
-        onClick={() => window.open(GUIDELINE_URL, '_blank', 'noopener,noreferrer')}
+        onClick={() =>
+          window.open(GUIDELINE_URL, '_blank', 'noopener,noreferrer')
+        }
       >
         <img src={IconView} alt="" className="w-4 sm:w-5" />
         View Guideline
@@ -50,5 +56,5 @@ export default function GuidelineSection({ hasReadGuideline, setHasReadGuideline
         </span>
       </label>
     </Card>
-  );
+  )
 }

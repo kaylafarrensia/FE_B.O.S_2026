@@ -47,7 +47,7 @@ export default function DocumentSubmission({
             <div className="flex items-center gap-2 md:gap-4">
               <img src={IconSchedule} alt="" className="size-4 sm:size-6" />
               <p className="text-xs sm:text-lg">
-                Due: August 23 2026 at 23:59 WIB
+                Due: August 23, 2026 at 23:59 WIB
               </p>
             </div>
           </div>

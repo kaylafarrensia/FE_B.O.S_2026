@@ -2,6 +2,7 @@ import Card from '../../components/ui/Card.jsx'
 import Button from '../../components/ui/Button.jsx'
 import IconDownload from '../../assets/icons/IconDownload.svg'
 import { useOutletContext } from 'react-router-dom'
+import { formatDate } from '../../utils/index.js'
 
 // ── DUMMY DATA ─────────────────────────────────────────────────────────────────
 const DUMMY_USER = {
@@ -27,18 +28,6 @@ const DUMMY_USER = {
   },
 }
 
-function formatDate(isoString) {
-  if (!isoString) return '-'
-  const d = new Date(isoString)
-  const formatted = d.toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    timeZone: 'UTC',
-  })
-  return formatted.replace(/,\s*(\d{4})/, ' $1')
-}
 
 function formatTime(startIso, endIso) {
   if (!startIso) return '-'

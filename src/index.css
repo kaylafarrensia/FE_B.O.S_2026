@@ -35,6 +35,12 @@ body {
   color: var(--color-persian-indigo, #251369);
 }
 
+@media (pointer: fine) {
+  * {
+    cursor: none !important;
+  }
+}
+
 h1,
 h2 {
   font-family: 'Outfit', sans-serif;

@@ -13,6 +13,7 @@ import BNCCBlue from '../../assets/images/BnccBlue.png';
 import Card from '../../components/ui/Card.jsx';
 import BubbleBackground from '../../components/ui/BubbleBackground.jsx';
 import PerspectiveGrid from '../../components/ui/PerspectiveGrid.jsx';
+import CustomCursor from '../../components/ui/CustomCursor.jsx';
 
 // Dummy user status - bisa diganti saat backend tersedia
 const DUMMY_STATUS = 'schedule'; // 'schedule' | 'payment' | 'registration'
@@ -80,12 +81,13 @@ function Dashboard() {
   }, [location.pathname, tabs]);
 
   return (
-    <div className="relative z-0 min-h-screen overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden">
+      <CustomCursor />
       <PerspectiveGrid className="opacity-85" />
       <BubbleBackground />
 
       {/* Mobile top bar */}
-      <div className="xl:hidden flex flex-row justify-between items-center px-8 py-3 border-white border-2">
+      <div className="xl:hidden fixed top-0 left-0 right-0 z-[1000] flex flex-row justify-between items-center px-8 py-3 border-white border-2 backdrop-blur-md bg-white/30">
         <img
           src={BNCCBlue}
           alt="BNCC Logo"
@@ -152,7 +154,7 @@ function Dashboard() {
       </motion.div>
 
       {/* Desktop Nav */}
-      <ul className="hidden xl:flex flex-row justify-between items-center px-[10vw] pt-10 relative">
+      <ul className="hidden xl:flex fixed top-0 left-0 right-0 z-[1000] flex-row justify-between items-center px-[10vw] pt-4 pb-4 backdrop-blur-md bg-white/30">
         <img
           src={BNCCBlue}
           alt="BNCC Logo"
@@ -197,7 +199,9 @@ function Dashboard() {
         </div>
       </ul>
 
-      <Outlet context={{ userSchedule, setUserSchedule }} />
+      <div className="pt-[60px] xl:pt-[90px]">
+        <Outlet context={{ userSchedule, setUserSchedule }} />
+      </div>
     </div>
   );
 }

@@ -7,27 +7,27 @@ import Glass from '../../../components/ui/Glass.jsx'
 const timelineEvents = [
   {
     compareDate: '2026-08-23',
-    displayDate: 'August 23 2026',
+    displayDate: 'August 23, 2026',
     description: 'Submission Deadline',
   },
   {
     compareDate: '2026-08-30',
-    displayDate: 'August 30 2026',
+    displayDate: 'August 30, 2026',
     description: 'Result Announcement',
   },
   {
     compareDate: '2026-09-01',
-    displayDate: 'September 1-2 2026',
+    displayDate: 'September 1–2, 2026',
     description: 'Interview',
   },
   {
     compareDate: '2026-09-05',
-    displayDate: 'September 5 2026',
+    displayDate: 'September 5, 2026',
     description: 'Final Result',
   },
   {
     compareDate: '2026-09-08',
-    displayDate: 'September 8 2026',
+    displayDate: 'September 8, 2026',
     description: 'Requirement Submission',
   },
 ]
