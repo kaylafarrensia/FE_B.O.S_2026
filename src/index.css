@@ -1,10 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Outfit:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap');
 @import 'tailwindcss';
 
 @theme {
+  --font-outfit: 'Outfit', sans-serif;
   --font-poppins: 'Poppins', sans-serif;
+  --font-montserrat: 'Montserrat', sans-serif;
+
+  --color-persianIndigo: #251369;
+  --color-persian-indigo: #251369;
+  --color-lavenderPurple: #9084CD;
+  --color-lavender-purple: #9084CD;
+  --color-lavenderPurpleLight: #AFA1E0;
+  --color-bright-lavender: #D59DE8;
+  --color-light-periwinkle: #C0B4FA;
+  --color-baby-blue: #99C4F4;
+  --color-sky-blue: #7FD8F9;
+  --color-pale-cyan: #9AFCF2;
+  --color-royal-purple: #814791;
+  --color-lavender-mist: #B8D8EF;
+  --color-lavender-white: #F6F5FF;
+  --color-error: #FF624C;
 }
 
 body {
   margin: 0;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Montserrat', 'Poppins', sans-serif;
+}
+
+.wave-bg {
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.wave-bg-1 { background-image: url('@/assets/images/Wave1.svg'); }
+.wave-bg-2 { background-image: url('@/assets/images/Wave2.svg'); }
+.wave-bg-3 { background-image: url('@/assets/images/Wave3.svg'); }
+.wave-bg-4 { background-image: url('@/assets/images/Wave4.svg'); }
+.wave-bg-5 { background-image: url('@/assets/images/Wave5.svg'); }
+.wave-bg-6 { background-image: url('@/assets/images/Wave6.svg'); }
+.wave-bg-7 { background-image: url('@/assets/images/Wave7.svg'); }
+.wave-bg-8 { background-image: url('@/assets/images/Wave8.svg'); }
+.wave-bg-9 { background-image: url('@/assets/images/Wave9.svg'); }
+.wave-bg-10 { background-image: url('@/assets/images/Wave10.svg'); }
+
+.background-blur-circles div, .ellipse-background, .bobbing {
+  will-change: transform, filter;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
