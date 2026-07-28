@@ -1,9 +1,14 @@
 export default function Card({ children, className = '' }) {
   return (
     <div
-      className={`rounded-[12px] border border-[#99C4F4] bg-gradient-to-br from-[#f7f7f5b4] via-[#f7f7f56f] to-[#7ed6f93d] p-4 backdrop-blur-md sm:p-8 md:py-4 md:px-10 ${className}`}
+      className={`glassmorphism rounded-[20px] p-8 sm:p-10 border-white/60 border shadow-md ${className}`}
+      style={{
+        '--glass-from': 'rgba(255, 255, 255, 0.45)',
+        '--glass-to': 'rgba(223, 239, 255, 0.35)',
+        '--glass-stroke': 'rgba(255, 255, 255, 0.6)',
+      }}
     >
       {children}
     </div>
-  );
+  )
 }

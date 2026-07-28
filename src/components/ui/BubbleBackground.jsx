@@ -74,16 +74,20 @@ export default function BubbleBackground() {
 
     const resize = () => {
       const parent = canvas.parentElement;
-      width = parent ? parent.clientWidth : canvas.clientWidth || window.innerWidth;
-      height = parent ? parent.clientHeight : canvas.clientHeight || window.innerHeight;
-      if (!width) width = window.innerWidth;
-      if (!height) height = window.innerHeight;
+      const newWidth = parent ? parent.clientWidth : canvas.clientWidth || window.innerWidth;
+      const newHeight = parent ? parent.clientHeight : canvas.clientHeight || window.innerHeight;
+      
+      const targetWidth = newWidth || window.innerWidth;
+      const targetHeight = newHeight || window.innerHeight;
 
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-      bubbles = getGridCells(width, height, BUBBLE_COUNT).map(createBubble);
+      if (width !== targetWidth || bubbles.length === 0) {
+        width = targetWidth;
+        height = targetHeight;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        bubbles = getGridCells(width, height, BUBBLE_COUNT).map(createBubble);
+      }
     };
 
     const drawFrame = (t) => {

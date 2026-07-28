@@ -1,38 +1,28 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
 import bnccLogo from '../../../public/images/img-BNCC.png'
 import icReregist from '../../../public/icons/ic-reregist.svg'
 import icJapres from '../../../public/icons/ic-japres.svg'
 import icProfile from '../../../public/icons/ic-profile.svg'
 
 const TABS = [
-  { key: 'reregist', label: 'Re-Regist', icon: icReregist, path: '/re-registration' },
-  { key: 'japres', label: 'Japres', icon: icJapres, path: '/dashboard/japres' },
-  { key: 'profile', label: 'Profile', icon: icProfile, path: '/dashboard/profile' },
+  { key: 'reregist', label: 'Re-Regist', icon: icReregist },
+  { key: 'japres', label: 'Japres', icon: icJapres },
+  { key: 'profile', label: 'Profile', icon: icProfile },
 ]
 
 export default function Navbar({ activeTab = 'reregist', onTabChange }) {
   const [menuOpen, setMenuOpen] = useState(false)
-  const navigate = useNavigate()
 
-  const handleTabClick = (key, path) => {
+  const handleTabClick = (key) => {
     onTabChange?.(key)
     setMenuOpen(false)
-    if (path) {
-      navigate(path)
-    }
   }
 
   return (
-    <nav className="flex w-full shrink-0 items-center justify-between bg-gradient-to-r from-[#99c3f456] via-[#f7f7f574] to-[#7ed6f956] px-6 py-4 md:px-10 md:py-6 lg:bg-none lg:px-30 lg:py-2">
-      <img
-        src={bnccLogo}
-        alt="BNCC"
-        className="h-12 sm:h-11 md:h-20 lg:h-35 cursor-pointer"
-        onClick={() => navigate('/')}
-      />
+    <nav className="flex w-full shrink-0 items-center justify-between bg-gradient-to-r from-[#99c3f456] via-[#f7f7f574] to-[#7ed6f956] px-6 py-0 md:px-10 md:py-0 lg:bg-none lg:px-30 lg:py-2">
+      <img src={bnccLogo} alt="BNCC" className="h-12 sm:h-11 md:h-20 lg:h-35" />
 
       {/* Desktop pill tabs */}
       <div className="hidden items-center gap-1 rounded-[10px] border border-[#99C4F4] bg-gradient-to-br from-[#F7F7F5] via-[#F7F7F5] to-[#7ed6f97a] p-0 shadow-[2px_4px_4px_0px_rgba(0,0,0,0.25)] backdrop-blur-md lg:flex lg:gap-2">
@@ -42,9 +32,9 @@ export default function Navbar({ activeTab = 'reregist', onTabChange }) {
             <button
               key={tab.key}
               type="button"
-              onClick={() => handleTabClick(tab.key, tab.path)}
+              onClick={() => handleTabClick(tab.key)}
               aria-current={isActive ? 'page' : undefined}
-              className={`relative flex items-center gap-2 overflow-hidden rounded-[10px] px-7 py-3.5 font-outfit text-xs font-regular tracking-[0.15em] ${
+              className={`relative flex items-center gap-2 overflow-hidden rounded-[10px] px-7 py-3.5 font-outfit text-xs font-normal tracking-[0.15em] cursor-pointer ${
                 isActive ? 'text-white' : 'text-slate-700'
               }`}
             >
@@ -67,8 +57,8 @@ export default function Navbar({ activeTab = 'reregist', onTabChange }) {
                   isActive
                     ? 'brightness-0 invert'
                     : tab.key === 'reregist'
-                    ? 'brightness-0 opacity-70'
-                    : ''
+                      ? 'brightness-0 opacity-70'
+                      : ''
                 }`}
               />
               <span className="relative z-10 hidden uppercase transition-colors duration-300 sm:inline">
@@ -84,7 +74,7 @@ export default function Navbar({ activeTab = 'reregist', onTabChange }) {
         type="button"
         onClick={() => setMenuOpen(true)}
         aria-label="Open menu"
-        className="flex h-7 w-7 flex-col items-center justify-center gap-[6px] sm:h-8 sm:w-8 md:h-11 md:w-11 md:gap-2 lg:hidden"
+        className="flex h-7 w-7 flex-col items-center justify-center gap-[6px] sm:h-8 sm:w-8 md:h-11 md:w-11 md:gap-2 lg:hidden cursor-pointer"
       >
         <span className="h-[3.5px] w-6 rounded-full bg-gradient-to-r from-[#0C4076] to-[#4489D4] sm:w-7 md:h-[4.5px] md:w-9" />
         <span className="h-[3.5px] w-6 rounded-full bg-gradient-to-r from-[#0C4076] to-[#4489D4] sm:w-7 md:h-[4.5px] md:w-9" />
@@ -122,7 +112,7 @@ export default function Navbar({ activeTab = 'reregist', onTabChange }) {
                 type="button"
                 onClick={() => setMenuOpen(false)}
                 aria-label="Close menu"
-                className="ml-auto flex h-12 w-12 items-center justify-center text-[#0A2745] md:h-14 md:w-14"
+                className="ml-auto flex h-12 w-12 items-center justify-center text-[#0A2745] md:h-14 md:w-14 cursor-pointer"
               >
                 <X size={34} className="md:h-10 md:w-10" />
               </button>
@@ -132,8 +122,8 @@ export default function Navbar({ activeTab = 'reregist', onTabChange }) {
                   <button
                     key={tab.key}
                     type="button"
-                    onClick={() => handleTabClick(tab.key, tab.path)}
-                    className="flex items-center gap-3 font-outfit text-base font-semibold uppercase tracking-[0.15em] md:gap-4 md:text-lg"
+                    onClick={() => handleTabClick(tab.key)}
+                    className="flex items-center gap-3 font-outfit text-base font-semibold uppercase tracking-[0.15em] md:gap-4 md:text-lg cursor-pointer"
                   >
                     <img
                       src={tab.icon}

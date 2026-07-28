@@ -15,7 +15,7 @@ export default function ReRegistration() {
   const formContent = (
     <main className="w-full px-6 sm:px-[10vw] py-8 flex flex-col lg:flex-row gap-6 sm:gap-8 items-start justify-center flex-1 overflow-y-auto">
       {isSubmitted ? (
-        <div className="w-full">
+        <div className="w-full max-w-4xl mx-auto">
           <SuccessCard />
         </div>
       ) : (

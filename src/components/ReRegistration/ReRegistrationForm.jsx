@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ChevronDown, Loader2 } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import Card from './Card'
 
 const LNT_COURSES = [
@@ -31,6 +32,7 @@ export default function ReRegistrationForm({ onSubmitSuccess }) {
   const [errors, setErrors] = useState({})
   const [generalError, setGeneralError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
   const handleChange = (field) => (e) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }))
@@ -140,7 +142,7 @@ export default function ReRegistrationForm({ onSubmitSuccess }) {
     }`
 
   return (
-    <Card className="w-full max-w-[520px] mx-auto p-3.5 md:p-4 lg:mx-0 lg:ml-30 lg:w-[80%] lg:max-w-[820px] lg:p-8">
+    <Card className="w-full p-8">
       <h1 className="inline-block py-0.5 text-[15px] font-bold leading-[1.3] bg-gradient-to-r from-[#0A2745] to-[#2474C0] bg-clip-text text-transparent md:text-[23px] lg:text-4xl">
         Re-Registration Form
       </h1>
@@ -189,26 +191,55 @@ export default function ReRegistrationForm({ onSubmitSuccess }) {
             LnT Course
           </label>
           <div className="relative">
-            <select
-              value={form.course}
-              onChange={handleChange('course')}
-              className={`${inputClass('course')} appearance-none pr-8 lg:pr-10 ${
-                form.course === '' ? 'text-slate-400' : 'text-[#0A2745]'
-              }`}
+            <button
+              type="button"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className={`${inputClass('course')} w-full flex items-center justify-between text-left pr-3 lg:pr-4 cursor-pointer ${
+                isDropdownOpen ? 'border-[#207CDB] ring-2 ring-[#207CDB]/20 outline-none' : ''
+              } ${form.course === '' ? 'text-slate-400' : 'text-[#0A2745] font-semibold'}`}
             >
-              <option value="" disabled>
-                Select your desired LnT Course
-              </option>
-              {LNT_COURSES.map((course) => (
-                <option key={course.id} value={course.id}>
-                  {course.name}
-                </option>
-              ))}
-            </select>
-            <ChevronDown
-              size={13}
-              className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 lg:right-3.5 lg:h-4 lg:w-4"
-            />
+              <span>
+                {form.course
+                  ? LNT_COURSES.find((c) => c.id === Number(form.course))?.name
+                  : 'Select your desired LnT Course'}
+              </span>
+              <ChevronDown
+                size={16}
+                className={`text-slate-500 transition-transform duration-200 ${
+                  isDropdownOpen ? 'transform rotate-180' : ''
+                }`}
+              />
+            </button>
+
+            {/* Custom In-Flow Dropdown Options */}
+            <AnimatePresence>
+              {isDropdownOpen && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
+                  className="mt-2 border border-[#99C4F4]/80 rounded-[5px] bg-[#DFEFFF]/20 flex flex-col overflow-hidden"
+                >
+                  {LNT_COURSES.map((course) => (
+                    <button
+                      key={course.id}
+                      type="button"
+                      onClick={() => {
+                        setForm((prev) => ({ ...prev, course: String(course.id) }))
+                        setIsDropdownOpen(false)
+                        if (errors.course) {
+                          setErrors((prev) => ({ ...prev, course: '' }))
+                        }
+                      }}
+                      className="w-full text-left px-4 py-2.5 text-xs sm:text-sm hover:bg-[#207CDB]/15 text-[#0A2745] font-semibold transition-colors cursor-pointer border-b border-[#99C4F4]/20 last:border-b-0"
+                    >
+                      {course.name}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
           {errors.course && (
             <p className="mt-0.5 text-[9px] text-red-500 lg:mt-1 lg:text-xs">{errors.course}</p>
