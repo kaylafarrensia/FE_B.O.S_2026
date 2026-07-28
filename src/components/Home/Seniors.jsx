@@ -90,7 +90,7 @@ export default function Seniors() {
         <motion.div
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: false, amount: 0.4 }}
+          viewport={{ once: true, amount: 0.4 }}
           variants={headingVariants}
         >
           <SectionHeading>Our Seniors</SectionHeading>
@@ -102,13 +102,12 @@ export default function Seniors() {
           nextLabel="Next seniors"
           navButtonVariants={navButtonVariants}
           cardVariants={carouselVariants}
-          prevButtonClassName="sm:-mr-6 md:-mr-9 lg:-mr-12"
-          nextButtonClassName="sm:-ml-6 md:-ml-9 lg:-ml-12"
-          overlayOnMobile
+          prevButtonClassName="lg:-mr-8"
+          nextButtonClassName="lg:-ml-8"
         >
           <GlassCard
             rounded="rounded-[20px] sm:rounded-[28px]"
-            className="w-full min-w-0 p-3 sm:px-20 sm:py-10"
+            className="w-full min-w-0 p-5 sm:px-20 sm:py-10"
           >
             <div className="relative overflow-hidden">
               <AnimatePresence mode="wait" initial={false} custom={direction}>
@@ -174,7 +173,7 @@ export default function Seniors() {
         <motion.p
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: false, amount: 0.5 }}
+          viewport={{ once: true, amount: 0.5 }}
           variants={footerTextVariants}
           className="mt-10 text-lg sm:text-2xl md:text-3xl font-semibold gradient-text"
         >

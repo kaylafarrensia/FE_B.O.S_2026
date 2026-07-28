@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import IcBnccWhitebg from '../../assets/icons/ic-bncc-whitebg.svg'
+import IconClose from '../../assets/icons/IconClose.svg'
 import {
   motion,
   AnimatePresence,
@@ -108,28 +109,7 @@ function Logo({ className = 'h-7.5 w-auto' }) {
 
 function DesktopNavLinks({ links, activeSection, headerHeight }) {
   const [hovered, setHovered] = useState(null)
-  const containerRef = useRef(null)
-  const [indicator, setIndicator] = useState({ left: 0, width: 0, opacity: 0 })
   const targetHref = hovered ?? activeSection
-
-  useEffect(() => {
-    if (!targetHref || !containerRef.current) {
-      setIndicator((prev) => ({ ...prev, opacity: 0 }))
-      return
-    }
-    const el = containerRef.current.querySelector(`[data-href="${targetHref}"]`)
-    if (!el) {
-      setIndicator((prev) => ({ ...prev, opacity: 0 }))
-      return
-    }
-    const containerBox = containerRef.current.getBoundingClientRect()
-    const box = el.getBoundingClientRect()
-    setIndicator({
-      left: box.left - containerBox.left,
-      width: box.width,
-      opacity: 1,
-    })
-  }, [targetHref])
 
   const handleClick = (event, href) => {
     event.preventDefault()
@@ -138,33 +118,29 @@ function DesktopNavLinks({ links, activeSection, headerHeight }) {
 
   return (
     <ul
-      ref={containerRef}
       onMouseLeave={() => setHovered(null)}
       className="relative hidden items-center gap-24 text-[15px] uppercase tracking-[2px] lg:flex"
     >
-      <motion.span
-        aria-hidden
-        animate={{
-          left: indicator.left,
-          width: indicator.width,
-          opacity: indicator.opacity,
-        }}
-        transition={{ type: 'spring', stiffness: 500, damping: 40, mass: 0.6 }}
-        className="pointer-events-none absolute -bottom-2.5 h-[2px] rounded-full bg-primary"
-      />
       {links.map((link) => {
         const isActive = activeSection === link.href
+        const isTarget = targetHref === link.href
         return (
           <li key={link.label}>
             <a
               href={link.href}
-              data-href={link.href}
               onMouseEnter={() => setHovered(link.href)}
               onClick={(event) => handleClick(event, link.href)}
               aria-current={isActive ? 'true' : undefined}
               className={`relative font-normal transition-colors duration-300 ${isActive ? 'font-semibold text-primary' : 'text-secondary/70 hover:text-primary'}`}
             >
               {link.label}
+              {isTarget && (
+                <motion.span
+                  layoutId="navbar-underline"
+                  className="pointer-events-none absolute -bottom-2.5 left-0 right-0 h-[2px] rounded-full bg-primary"
+                  transition={{ type: 'spring', stiffness: 500, damping: 40, mass: 0.6 }}
+                />
+              )}
             </a>
           </li>
         )
@@ -198,62 +174,25 @@ function HamburgerButton({ isOpen, onClick }) {
         variants={topVariants}
         animate={isOpen ? 'open' : 'closed'}
         transition={{ duration: 0.3, ease: [0.65, 0, 0.35, 1] }}
-        className="absolute h-[3px] w-6 origin-center rounded-full bg-primary"
+        className="absolute h-[3px] w-6 origin-center rounded-full bg-gradient-to-br from-[#0C4076] to-[#4489D4]"
       />
       <motion.span
         variants={middleVariants}
         animate={isOpen ? 'open' : 'closed'}
         transition={{ duration: 0.2, ease: 'easeOut' }}
-        className="absolute h-[3px] w-6 origin-center rounded-full bg-primary"
+        className="absolute h-[3px] w-6 origin-center rounded-full bg-gradient-to-br from-[#0C4076] to-[#4489D4]"
       />
       <motion.span
         variants={bottomVariants}
         animate={isOpen ? 'open' : 'closed'}
         transition={{ duration: 0.3, ease: [0.65, 0, 0.35, 1] }}
-        className="absolute h-[3px] w-6 origin-center rounded-full bg-primary"
+        className="absolute h-[3px] w-6 origin-center rounded-full bg-gradient-to-br from-[#0C4076] to-[#4489D4]"
       />
     </button>
   )
 }
 
-function MobileMenu({ isOpen, links, onClose, headerHeight }) {
-  const overlayVariants = {
-    hidden: {
-      clipPath: 'circle(0% at calc(100% - 35px) 36px)',
-      transition: { duration: 0.4, ease: [0.65, 0, 0.35, 1] },
-    },
-    visible: {
-      clipPath: 'circle(150% at calc(100% - 35px) 36px)',
-      transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] },
-    },
-    exit: {
-      clipPath: 'circle(0% at calc(100% - 35px) 36px)',
-      transition: { duration: 0.35, ease: [0.65, 0, 0.35, 1] },
-    },
-  }
-
-  const listVariants = {
-    hidden: {},
-    visible: { transition: { staggerChildren: 0.08, delayChildren: 0.25 } },
-    exit: { transition: { staggerChildren: 0.05, staggerDirection: -1 } },
-  }
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 24, filter: 'blur(6px)' },
-    visible: {
-      opacity: 1,
-      y: 0,
-      filter: 'blur(0px)',
-      transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] },
-    },
-    exit: {
-      opacity: 0,
-      y: -12,
-      filter: 'blur(4px)',
-      transition: { duration: 0.2, ease: 'easeIn' },
-    },
-  }
-
+function MobileMenu({ isOpen, links, onClose, headerHeight, activeSection }) {
   const handleClick = (event, href) => {
     event.preventDefault()
     onClose()
@@ -263,46 +202,63 @@ function MobileMenu({ isOpen, links, onClose, headerHeight }) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
-          key="mobile-menu"
-          variants={overlayVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-          className="fixed inset-0 z-50 flex flex-col border border-white/30 backdrop-blur-2xl"
-          style={{
-            background:
-              'radial-gradient(circle at 80% 10%, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.18) 55%, rgba(255,255,255,0.06) 100%)',
-          }}
-        >
+        <>
+          {/* Sidebar overlay */}
           <div
-            className="flex flex-1 flex-col items-center justify-center gap-10"
+            className="fixed inset-0 bg-transparent z-[998] lg:hidden"
             onClick={onClose}
+          />
+
+          {/* Mobile Sidebar */}
+          <motion.div
+            className="fixed top-0 right-0 h-full w-1/2 max-w-sm border-white border-1 backdrop-blur-md shadow-xl z-[999] lg:hidden bg-white/20 flex flex-col"
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           >
-            <motion.ul
-              variants={listVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              className="flex flex-col items-center gap-15"
-              onClick={(event) => event.stopPropagation()}
-            >
-              {links.map((link) => (
-                <motion.li key={link.label} variants={itemVariants}>
-                  <motion.a
-                    href={link.href}
+            <div className="flex justify-end items-center">
+              <button className="px-8 py-3 cursor-pointer" onClick={onClose}>
+                <img src={IconClose} alt="Close" className="w-8 h-8" />
+              </button>
+            </div>
+            
+            <nav className="flex flex-col py-6 px-3 space-y-4">
+              {links.map((link) => {
+                const isActive = activeSection === link.label
+                return (
+                  <motion.button
+                    key={link.label}
+                    className={`flex items-center justify-end gap-4 p-4 rounded-lg transition-all duration-200 ${
+                      isActive
+                        ? 'bg-gradient-to-r from-[#0C4076] to-[#2474C0] text-white shadow-md shadow-[#0C4076]/30'
+                        : 'text-[#0C4076] hover:bg-white/30'
+                    }`}
                     onClick={(event) => handleClick(event, link.href)}
-                    whileHover={{ scale: 1.06, color: '#2474C0' }}
-                    whileTap={{ scale: 0.96 }}
-                    className="inline-block text-[22px] font-medium uppercase tracking-[3px] text-[#0A2745]"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    {link.label}
-                  </motion.a>
-                </motion.li>
-              ))}
-            </motion.ul>
-          </div>
-        </motion.div>
+                    <span className="font-poppins text-left text-sm sm:text-lg font-bold tracking-[2.5px] uppercase">
+                      {link.label}
+                    </span>
+                  </motion.button>
+                )
+              })}
+
+              <motion.button
+                className="flex items-center justify-end p-4 rounded-lg transition-all duration-300 bg-gradient-to-r from-[#0C4076] to-[#2474C0] text-white font-bold tracking-[2.5px] uppercase text-sm sm:text-lg mt-4 cursor-pointer hover:from-[#062547] hover:to-[#164C82] shadow-md shadow-[#0C4076]/30"
+                onClick={() => {
+                  onClose()
+                  window.location.hash = '#signin'
+                }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <span>Sign In</span>
+              </motion.button>
+            </nav>
+          </motion.div>
+        </>
       )}
     </AnimatePresence>
   )
@@ -394,6 +350,7 @@ export default function Navbar() {
         links={NAV_LINKS}
         onClose={closeMenu}
         headerHeight={currentHeaderHeight}
+        activeSection={activeSection}
       />
     </>
   )

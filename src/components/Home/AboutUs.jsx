@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import SectionHeading from '../common/ui/SectionHeading.jsx'
 import GlassCard from '../common/ui/GlassCard.jsx'
 import SpotlightCard from '../common/ui/SpotlightCard.jsx'
+import cursorArrow from '../../assets/icons/ic-cursor-arrow.svg'
 import {
   useStaggerContainer,
   useScrollReveal,
@@ -20,7 +21,7 @@ export default function AboutUs() {
         className="max-w-6xl mx-auto text-center"
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: false, amount: 0.3 }}
+        viewport={{ once: true, amount: 0.3 }}
         variants={containerVariants}
       >
         <motion.div variants={itemVariants}>
@@ -34,7 +35,7 @@ export default function AboutUs() {
             <GlassCard
               bg="center"
               rounded="rounded-[16px] sm:rounded-[20px] md:rounded-[24px]"
-              className="p-8 sm:p-10 md:p-16 lg:p-20 text-left"
+              className="p-8 sm:p-10 md:p-16 lg:p-20 text-left relative"
             >
               <motion.p
                 variants={itemVariants}
@@ -56,6 +57,11 @@ export default function AboutUs() {
                 you to become a part of BNCC, where we will learn and grow
                 together, and achieve success side by side!
               </motion.p>
+              <img
+                src={cursorArrow}
+                alt=""
+                className="absolute -bottom-3 -right-3 sm:-bottom-5 sm:-right-5 md:-bottom-6 md:-right-6 lg:-bottom-7 lg:-right-7 w-8 h-7 sm:w-12 sm:h-11 md:w-16 md:h-14 lg:w-20 lg:h-18 select-none pointer-events-none z-20"
+              />
             </GlassCard>
           </SpotlightCard>
         </motion.div>

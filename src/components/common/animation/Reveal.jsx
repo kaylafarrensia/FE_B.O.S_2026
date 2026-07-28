@@ -1,7 +1,7 @@
 'use client'
 
+import { useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { useScrollDirection } from '../../../hooks/useScrollDirection'
 
 const buildVariants = (direction) => {
   const offset = {
@@ -29,12 +29,14 @@ export function Reveal({
   as = 'div',
 }) {
   const Component = motion[as] ?? motion.div
+  const variants = useMemo(() => buildVariants(direction), [direction])
+
   return (
     <Component
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: false, amount: 0.3 }}
-      variants={buildVariants(direction)}
+      viewport={{ once: true, amount: 0.3 }}
+      variants={variants}
       transition={{ delay }}
       className={className}
     >
@@ -44,22 +46,21 @@ export function Reveal({
 }
 
 export function RevealGroup({ children, stagger = 0.15, className = '' }) {
-  const scrollDirection = useScrollDirection()
+  const variants = useMemo(() => ({
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: stagger,
+      },
+    },
+  }), [stagger])
 
   return (
     <motion.div
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: false, amount: 0.2 }}
-      variants={{
-        hidden: {},
-        visible: {
-          transition: {
-            staggerChildren: stagger,
-            staggerDirection: scrollDirection === 'up' ? -1 : 1,
-          },
-        },
-      }}
+      viewport={{ once: true, amount: 0.2 }}
+      variants={variants}
       className={className}
     >
       {children}
@@ -68,8 +69,10 @@ export function RevealGroup({ children, stagger = 0.15, className = '' }) {
 }
 
 export function RevealItem({ children, direction = 'up', className = '' }) {
+  const variants = useMemo(() => buildVariants(direction), [direction])
+
   return (
-    <motion.div variants={buildVariants(direction)} className={className}>
+    <motion.div variants={variants} className={className}>
       {children}
     </motion.div>
   )

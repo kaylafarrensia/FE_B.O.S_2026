@@ -23,45 +23,64 @@ export default function CarouselShell({
 
   return (
     <div
-      className={`relative flex items-center justify-center ${wrapperClassName}`}
+      className={`relative flex flex-row items-center justify-center w-full ${wrapperClassName}`}
     >
+      {/* Desktop Left Button */}
       <motion.div
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: false, amount: 0.4 }}
+        viewport={{ once: true, amount: 0.4 }}
         variants={navButtonVariants}
-        className={navWrapperClass}
+        className={`hidden lg:block shrink-0 ${prevButtonClassName}`}
       >
         <NavButton
           direction="prev"
           onClick={onPrev}
           label={prevLabel}
-          className={prevButtonClassName}
         />
       </motion.div>
 
+      {/* Card wrapper container */}
       <motion.div
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: false, amount: 0.2 }}
+        viewport={{ once: true, amount: 0.2 }}
         variants={cardVariants}
-        className="w-full min-w-0"
+        className="relative w-full min-w-0"
       >
+        {/* Mobile/Tablet Left Button (Overlay on Card Border) */}
+        <div className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-20 lg:hidden ${prevButtonClassName}`}>
+          <NavButton
+            direction="prev"
+            onClick={onPrev}
+            label={prevLabel}
+          />
+        </div>
+
         {children}
+
+        {/* Mobile/Tablet Right Button (Overlay on Card Border) */}
+        <div className={`absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-20 lg:hidden ${nextButtonClassName}`}>
+          <NavButton
+            direction="next"
+            onClick={onNext}
+            label={nextLabel}
+          />
+        </div>
       </motion.div>
 
+      {/* Desktop Right Button */}
       <motion.div
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: false, amount: 0.4 }}
+        viewport={{ once: true, amount: 0.4 }}
         variants={navButtonVariants}
-        className={navWrapperClassRight}
+        className={`hidden lg:block shrink-0 ${nextButtonClassName}`}
       >
         <NavButton
           direction="next"
           onClick={onNext}
           label={nextLabel}
-          className={nextButtonClassName}
         />
       </motion.div>
     </div>

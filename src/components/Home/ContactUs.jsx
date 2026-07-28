@@ -16,21 +16,21 @@ const branches = [
     name: 'Alam Sutera',
     contacts: [
       { name: 'Keane Areliano', phone: '08113389929' },
-      { name: 'Keihaen A V', phone: '08989177830' },
+      { name: 'Keihaen A. V.', phone: '08989177830' },
     ],
   },
   {
     name: 'Bandung',
     contacts: [
-      { name: 'M. Abiyyu R. R', phone: '082128347298' },
-      { name: 'Gregory L', phone: '0895620061212' },
+      { name: 'M. Abiyyu R. R.', phone: '082128347298' },
+      { name: 'Gregory L.', phone: '0895620061212' },
     ],
   },
   {
     name: 'Malang',
     contacts: [
-      { name: 'Nariswari S H', phone: '089671706374' },
-      { name: 'Kadek K N V', phone: '081337354700' },
+      { name: 'Nariswari S. H.', phone: '089671706374' },
+      { name: 'Kadek K. N. V.', phone: '081337354700' },
     ],
   },
 ]
@@ -109,7 +109,7 @@ export default function ContactUs() {
         <motion.div
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: false, amount: 0.4 }}
+          viewport={{ once: true, amount: 0.4 }}
           variants={headingVariants}
         >
           <SectionHeading className="mb-12 sm:mb-8 md:mb-10">
@@ -120,7 +120,7 @@ export default function ContactUs() {
         <motion.div
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: false, amount: 0.2 }}
+          viewport={{ once: true, amount: 0.2 }}
           variants={gridVariants}
           className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6"
         >
@@ -134,7 +134,7 @@ export default function ContactUs() {
         <motion.div
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: false, amount: 0.5 }}
+          viewport={{ once: true, amount: 0.5 }}
           variants={socialVariants}
           className="mt-8 sm:mt-15"
         >

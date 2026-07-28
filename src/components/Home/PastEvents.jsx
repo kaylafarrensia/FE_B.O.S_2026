@@ -74,7 +74,7 @@ export default function PastEvents() {
         <motion.div
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: false, amount: 0.4 }}
+          viewport={{ once: true, amount: 0.4 }}
           variants={headingVariants}
         >
           <SectionHeading>Our Past Events</SectionHeading>
@@ -83,7 +83,7 @@ export default function PastEvents() {
         <motion.p
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: false, amount: 0.4 }}
+          viewport={{ once: true, amount: 0.4 }}
           variants={descVariants}
           className="font-poppins text-secondary mb-8 sm:mb-10 px-0 sm:px-16 md:px-32 text-xs sm:text-base md:text-lg lg:text-xl font-regular"
         >
@@ -101,8 +101,8 @@ export default function PastEvents() {
           nextLabel="Next event"
           navButtonVariants={navButtonVariants}
           cardVariants={cardVariants}
-          prevButtonClassName="-mr-2 sm:-mr-4 md:-mr-6 lg:-mr-8"
-          nextButtonClassName="-ml-2 sm:-ml-4 md:-ml-6 lg:-ml-8"
+          prevButtonClassName="lg:-mr-8"
+          nextButtonClassName="lg:-ml-8"
         >
           <GlassCard
             rounded="rounded-[16px] sm:rounded-[22px] lg:rounded-[28px]"
@@ -152,7 +152,7 @@ export default function PastEvents() {
         <motion.p
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: false, amount: 0.5 }}
+          viewport={{ once: true, amount: 0.5 }}
           variants={footerTextVariants}
           className="mt-10 text-lg sm:text-2xl md:text-3xl font-semibold gradient-text"
         >

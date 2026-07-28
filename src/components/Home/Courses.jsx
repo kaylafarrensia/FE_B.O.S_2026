@@ -96,15 +96,15 @@ const courses = [
         Build a solid foundation in software engineering. You will learn the
         core{' '}
         <strong>
-          yntax of Java, object oriented programming principles, and fundamental
-          data structures.
+          syntax of Java, object oriented programming principles, and
+          fundamental data structures.
         </strong>{' '}
         This course trains your{' '}
         <strong>logical thinking to solve complex algorithmic </strong> problems
         efficiently.
       </>
     ),
-    branches: ['Kemanggisan', 'Alam Sutera', 'Bandung', 'Malang'],
+    branches: ['Kemanggisan', 'Alam Sutera', 'Malang'],
   },
   {
     icon: icCprog,
@@ -121,7 +121,7 @@ const courses = [
         learning other complex computing systems.
       </>
     ),
-    branches: ['Alam Sutera'],
+    branches: ['Alam Sutera', 'Malang'],
   },
   {
     icon: icMobile,
@@ -156,7 +156,7 @@ const courses = [
         that learn from data.
       </>
     ),
-    branches: ['Kemanggisan'],
+    branches: ['Kemanggisan', 'Alam Sutera'],
   },
 ]
 
@@ -164,9 +164,9 @@ function BranchBadge({ label }) {
   return (
     <span
       style={BRANCH_BADGE_BACKGROUND}
-      className="inline-flex items-center justify-center rounded-sm px-[clamp(0.5rem,1.8vw,1.5rem)] py-[clamp(0.1rem,0.6vw,0.5rem)] whitespace-nowrap"
+      className="inline-flex items-center justify-center rounded-sm px-[clamp(0.5rem,1.8vw,1.5rem)] py-[clamp(3px,0.6vw,7px)] whitespace-nowrap"
     >
-      <span className="gradient-text leading-none text-[clamp(0.625rem,1.6vw,0.9rem)] font-semibold">
+      <span className="gradient-text leading-normal text-[clamp(0.625rem,1.6vw,0.9rem)] font-semibold">
         {label}
       </span>
     </span>
@@ -235,13 +235,11 @@ function NavButton({ course, variants, active, onClick }) {
       aria-label={course.title}
       aria-current={active}
       data-cursor-hover
-      animate={{ scale: active ? 1.12 : 1 }}
       whileTap={{ scale: 0.94 }}
-      transition={{ duration: 0.25, ease: 'easeInOut' }}
-      className={`flex aspect-square items-center justify-center rounded-md lg:rounded-xl transition-all shrink-0 ${
+      className={`flex aspect-square items-center justify-center rounded-md lg:rounded-xl transition-all duration-300 shrink-0 ${
         active
-          ? 'shadow-[0_4px_14px_rgba(16,94,169,0.35)]'
-          : 'bg-white hover:bg-primary/10'
+          ? 'scale-[1.12] shadow-[0_4px_14px_rgba(16,94,169,0.35)]'
+          : 'scale-100 bg-white hover:bg-primary/10 hover:scale-[1.02]'
       }`}
       style={{
         width: 'clamp(2.25rem, 6vw, 5rem)',
@@ -284,7 +282,7 @@ export default function Courses() {
         <motion.h2
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: false, amount: 0.4 }}
+          viewport={{ once: true, amount: 0.4 }}
           variants={headingVariants}
           className="mb-4 sm:mb-6 md:mb-8 leading-none tracking-normal font-outfit gradient-text text-[clamp(1.25rem,4.5vw,3rem)] font-semibold"
         >
@@ -294,7 +292,7 @@ export default function Courses() {
         <motion.div
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: false, amount: 0.25 }}
+          viewport={{ once: true, amount: 0.25 }}
           variants={cardWrapperVariants}
           layout
         >
@@ -312,7 +310,7 @@ export default function Courses() {
         <motion.div
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: false, amount: 0.3 }}
+          viewport={{ once: true, amount: 0.3 }}
           variants={navContainerVariants}
           className="mt-8 sm:mt-10 flex flex-wrap justify-center gap-2 sm:gap-3 md:gap-4"
         >

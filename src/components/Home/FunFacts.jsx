@@ -136,7 +136,7 @@ export default function FunFacts() {
         className="relative z-10 max-w-5xl mx-auto text-center"
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: false, amount: 0.3 }}
+        viewport={{ once: true, amount: 0.3 }}
         variants={containerVariants}
       >
         <motion.h2

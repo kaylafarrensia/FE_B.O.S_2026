@@ -77,7 +77,7 @@ const testimonials = [
   {
     name: 'Bambang',
     region: 'Bandung',
-    photo: '/images/img-testimoni-bdg-bambang.jpg',
+    photo: '/images/img-testimoni-bdg-bambang.jpeg',
     text: 'BNCC tempat berkembang organisasi pertama gw selama menempuh pendidikan. Dulu di sekolah, gw selalu nolak buat ikutan organisasi karena keliatannya capek mulai dari rapat, pulang malem, dan tugas sekolah kadang ga kekerjain. Tapi setelah gw masuk BNCC dengan 0 pengalaman, ngebuat gw belajar banyak. Mulai dari yang basic ngoding, leadership bahkan sampai ngurus berbagai event dengan jobdesc yang beda-beda. Mulai bahas dengan external, jadi bagian perlengkapan, sampai latihan jadi MC. Banyak insights yang gw dapetin dari pengalaman ini. Meskipun kesibukan yang dikasih itu capek, tapi worth it dengan ilmu yang didapetin. Ditambah lingkungan yang asik, supportive, dan fun membuat gw tidak pernah menyesal untuk menjadi bagian dari BNCC! Love Penuh \u{1F49C} buat BNCC.',
   },
   {
@@ -89,7 +89,7 @@ const testimonials = [
   {
     name: 'Gregory',
     region: 'Bandung',
-    photo: '/images/img-testimoni-bdg-greg.jpeg',
+    photo: '/images/img-testimoni-bdg-greg.jpg',
     text: 'Awal-awal saya masuk kuliah, saya merasa sangat ter-pressure karena banyak pilihan organisasi yang bisa saya daftarkan. Saya juga sama sekali tidak punya koneksi waktu masuk ke BINUS, jadi saya mencari segala hal yang berhubungan dengan komputer seperti BNCC (anak IT be like...). Tapi tanpa saya sadari, yang awalnya saya mendaftar BNCC untuk membangun skill-skill saya di bidang coding, malah saya juga dapat mengembangkan soft skills saya, a lot more than I expected. Akhir-akhirnya, di sini saya diberikan berbagai ilmu yang sangat beneficial dan tidak bisa diajarkan di kelas. Not only that, saya juga dapat bertemu dan berteman dengan beberapa orang yang sangat gacor, yang menjadi inspirasi saya untuk terus berjuang and be the best person I can be. Lov banget sm BNCC \u{1F497}',
   },
   {
@@ -125,29 +125,45 @@ const testimonials = [
   {
     name: 'Putra',
     region: 'Malang',
-    photo: '/images/img-testimoni-mlg-putra.jpg',
+    photo: '/images/img-testimoni-mlg-putra.jpeg',
     text: 'Sejak awal, aku tertarik bergabung dengan BNCC karena organisasi ini sangat sejalan dengan jurusanku, yaitu Computer Science. Awalnya aku mengira BNCC hanya berfokus pada pembelajaran teknologi dan pengembangan hard skills, tetapi setelah bergabung aku belajar lebih dari itu. BNCC mengajarkanku pentingnya work ethic yang profesional, bekerja dalam workflow yang cepat dan dinamis, mengelola waktu dengan baik, serta membangun relasi dengan teman-teman dari berbagai jurusan dan latar belakang. Melalui berbagai kegiatan, aku juga belajar bekerja sama dalam tim, berkomunikasi secara efektif, dan menghargai perbedaan sudut pandang. Buat kalian yang ingin berkembang tidak hanya di bidang teknologi, tetapi juga kemampuan profesional dan networking, BNCC adalah tempat yang tepat untuk belajar dan bertumbuh bersama.',
   },
 ]
 
 function renderText(text) {
   const paragraphs = text.split('\n\n')
-  return paragraphs.map((para, pIdx) => {
-    const parts = para.split(/\*(.+?)\*/g)
-    return (
-      <p key={pIdx} className={pIdx > 0 ? 'mt-4' : ''}>
-        {parts.map((part, i) =>
-          i % 2 === 1 ? (
-            <span key={i} className="font-semibold">
-              {part}
-            </span>
-          ) : (
-            part
-          ),
-        )}
-      </p>
-    )
-  })
+  return paragraphs.map((para, pIdx) => (
+    <p key={pIdx} className={pIdx > 0 ? 'mt-4' : ''}>
+      {para.replace(/\*/g, '')}
+    </p>
+  ))
+}
+
+function getPhotoStyle(name) {
+  if (name === 'Bambang') {
+    return {
+      objectPosition: 'center 50%',
+    }
+  }
+  if (name === 'Keith') {
+    return {
+      objectPosition: 'center 15%',
+      transform: 'scale(1.20)',
+    }
+  }
+  if (name === 'Gregory') {
+    return {
+      objectPosition: 'center 45%',
+    }
+  }
+  if (name === 'Putra') {
+    return {
+      objectPosition: 'center 55%',
+    }
+  }
+  return {
+    objectPosition: 'center top',
+  }
 }
 
 export default function Testimonials() {
@@ -172,7 +188,7 @@ export default function Testimonials() {
         <motion.div
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: false, amount: 0.4 }}
+          viewport={{ once: true, amount: 0.4 }}
           variants={headingVariants}
         >
           <SectionHeading>Testimonial</SectionHeading>
@@ -184,8 +200,8 @@ export default function Testimonials() {
           nextLabel="Next testimonial"
           navButtonVariants={navButtonVariants}
           cardVariants={cardVariants}
-          prevButtonClassName="-mr-2 sm:-mr-4 md:-mr-6 lg:-mr-8"
-          nextButtonClassName="-ml-2 sm:-ml-4 md:-ml-6 lg:-ml-8"
+          prevButtonClassName="lg:-mr-8"
+          nextButtonClassName="lg:-ml-8"
         >
           <GlassCard
             rounded="rounded-[20px] sm:rounded-[28px]"
@@ -205,7 +221,8 @@ export default function Testimonials() {
                   <img
                     src={current.photo}
                     alt={current.name}
-                    className="h-full w-full object-cover object-top"
+                    className="h-full w-full object-cover"
+                    style={getPhotoStyle(current.name)}
                   />
                 </div>
 

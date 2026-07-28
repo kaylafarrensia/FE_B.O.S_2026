@@ -1,5 +1,4 @@
-'use client'
-
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Badge from '../ComingSoon/Badge.jsx'
 import PatternTop from '../common/effects/PatternTop.jsx'
@@ -15,9 +14,21 @@ const dragTimes = [0, 0.15, 0.45, 0.6, 0.9, 1]
 const dragDuration = 6
 const dragRepeatDelay = 2.5
 
-const badgeDrag = {
+const badgeDragDesktop = {
   x: [0, 0, 18, 22, 8, 0],
   y: [0, 0, -12, -16, -6, 0],
+  transition: {
+    duration: dragDuration,
+    repeat: Infinity,
+    repeatDelay: dragRepeatDelay,
+    times: dragTimes,
+    ease: 'easeInOut',
+  },
+}
+
+const badgeDragMobile = {
+  x: [0, 0, -3, -5, -1, 0],
+  y: [0, 0, -4, -6, -2, 0],
   transition: {
     duration: dragDuration,
     repeat: Infinity,
@@ -63,6 +74,14 @@ function CornerHandle({ className, active = false }) {
 }
 
 export default function Hero() {
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
   return (
     <section className="relative min-h-screen overflow-hidden bg-[#F7FAFE] flex flex-col">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[32vh] sm:h-[36vh] lg:h-[40vh] overflow-hidden z-0">
@@ -119,7 +138,7 @@ export default function Hero() {
 
             <motion.div
               animate={floatIdle(0)}
-              className="pointer-events-none absolute left-[-100px] -top-4 -translate-y-1/2 scale-[0.55] origin-left sm:left-[-115px] sm:top-[-30px] sm:scale-[0.65] md:left-[-150px] md:top-[-30px] md:scale-75 lg:left-[-290px] lg:top-1/4 lg:scale-80 xl:left-[-320px]"
+              className="pointer-events-none absolute left-[-50px] min-[370px]:left-[-60px] min-[400px]:left-[-70px] top-[2px] sm:top-[-30px] -translate-y-1/2 scale-[0.48] min-[370px]:scale-[0.55] origin-left sm:left-[-115px] sm:scale-[0.65] md:left-[-150px] md:top-[-30px] md:scale-75 lg:left-[-290px] lg:top-1/4 lg:scale-80 xl:left-[-320px]"
             >
               <Badge
                 text="Networking & Community"
@@ -129,8 +148,8 @@ export default function Hero() {
             </motion.div>
 
             <motion.div
-              animate={badgeDrag}
-              className="pointer-events-none absolute right-[-100px] -top-4 -translate-y-1/2 scale-[0.55] origin-right sm:right-[-120px] sm:top-[-30px] sm:scale-[0.65] md:right-[-150px] md:top-[-30px] md:scale-75 lg:right-[-290px] lg:top-1/4 lg:scale-80 xl:right-[-320px]"
+              animate={isMobile ? badgeDragMobile : badgeDragDesktop}
+              className="pointer-events-none absolute right-[-50px] min-[370px]:right-[-60px] min-[400px]:right-[-70px] top-[-48px] sm:top-[-30px] -translate-y-1/2 scale-[0.48] min-[370px]:scale-[0.55] origin-right sm:right-[-120px] sm:scale-[0.65] md:right-[-150px] md:top-[-30px] md:scale-75 lg:right-[-290px] lg:top-1/4 lg:scale-80 xl:right-[-320px]"
             >
               <Badge text="Tech & Digital Exploration" color="yellow" />
             </motion.div>
@@ -166,7 +185,7 @@ export default function Hero() {
 
             <motion.div
               animate={floatIdle(1)}
-              className="pointer-events-none absolute left-1/2 -translate-x-[130%] top-[-100px] scale-[0.55] origin-center sm:left-[-180px] sm:translate-x-0 sm:top-[-15px] sm:scale-[0.65] md:left-[-250px] md:scale-75 lg:left-[-380px] lg:top-1/7 lg:scale-90 xl:left-[-450px]"
+              className="pointer-events-none absolute left-1/2 -translate-x-[125%] min-[370px]:-translate-x-[135%] min-[400px]:-translate-x-[140%] top-[-100px] scale-[0.48] min-[370px]:scale-[0.55] origin-center sm:left-[-180px] sm:translate-x-0 sm:top-[-15px] sm:scale-[0.65] md:left-[-250px] md:scale-75 lg:left-[-380px] lg:top-1/7 lg:scale-90 xl:left-[-450px]"
             >
               <Badge
                 text="Hands-on Experience"
@@ -177,7 +196,7 @@ export default function Hero() {
 
             <motion.div
               animate={floatIdle(1.5)}
-              className="pointer-events-none absolute left-1/2 translate-x-[50%] top-[-52px] scale-[0.55] origin-center sm:right-[-180px] sm:left-auto sm:translate-x-0 sm:top-[-15px] sm:scale-[0.65] md:right-[-250px] md:scale-75 lg:right-[-440px] lg:top-1/7 lg:scale-90 xl:right-[-450px]"
+              className="pointer-events-none absolute left-1/2 translate-x-[45%] min-[370px]:translate-x-[55%] min-[400px]:translate-x-[60%] top-[-52px] scale-[0.48] min-[370px]:scale-[0.55] origin-center sm:right-[-180px] sm:left-auto sm:translate-x-0 sm:top-[-15px] sm:scale-[0.65] md:right-[-250px] md:scale-75 lg:right-[-440px] lg:top-1/7 lg:scale-90 xl:right-[-450px]"
             >
               <Badge text="Skill Development" color="green" />
             </motion.div>

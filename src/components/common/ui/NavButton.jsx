@@ -18,11 +18,11 @@ export default function NavButton({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       aria-label={label}
-      className={`group relative z-10 flex h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 lg:h-[62px] lg:w-[62px] shrink-0 items-center justify-center ${className}`}
+      className={`group relative z-10 flex h-10 w-10 sm:h-12 sm:w-12 lg:h-[62px] lg:w-[62px] shrink-0 items-center justify-center ${className}`}
     >
       <motion.span
         aria-hidden
-        className="pointer-events-none absolute rounded-full backdrop-blur-xl w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-[90px] lg:h-[90px]"
+        className="pointer-events-none absolute rounded-full backdrop-blur-xl hidden lg:block lg:w-[90px] lg:h-[90px]"
         style={{
           background:
             'radial-gradient(circle, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.15) 60%, rgba(255,255,255,0) 100%)',
@@ -32,7 +32,7 @@ export default function NavButton({
       />
 
       <motion.span
-        className="relative flex h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 lg:h-[50px] lg:w-[50px] items-center justify-center rounded-full"
+        className="relative flex h-8 w-8 sm:h-10 sm:w-10 lg:h-[50px] lg:w-[50px] items-center justify-center rounded-full"
         animate={{
           backgroundColor: isHovered ? '#4489D4' : '#FFFFFF',
           scale: isHovered ? 1.05 : 1,
@@ -48,7 +48,7 @@ export default function NavButton({
         <img
           src={icArrow}
           alt=""
-          className="h-2 w-2 sm:h-4 sm:w-4 md:h-5 md:w-5"
+          className="h-3 w-3 sm:h-4 sm:w-4 lg:h-5 lg:w-5"
           style={{
             transform: `rotate(${ARROW_ROTATION[direction]}deg)`,
             filter: isHovered ? 'brightness(0) invert(1)' : 'none',

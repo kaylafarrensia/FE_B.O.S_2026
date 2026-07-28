@@ -42,7 +42,7 @@ function FAQItem({ item, isOpen, onClick, variants }) {
     <motion.div
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: false, amount: 0.3 }}
+      viewport={{ once: true, amount: 0.3 }}
       variants={variants}
       className="relative rounded-xl sm:rounded-2xl bg-[linear-gradient(135deg,rgba(153,196,244,0.28)_0%,rgba(153,196,244,0.12)_100%)] backdrop-blur-md overflow-hidden font-poppins font-medium"
     >

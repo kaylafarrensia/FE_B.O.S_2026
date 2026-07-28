@@ -107,7 +107,7 @@ export default function WhyBNCC() {
         <motion.h2
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.3 }}
+          viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.6 }}
           className="mb-6 sm:mb-8 lg:mb-10 leading-none tracking-normal font-outfit gradient-text text-3xl sm:text-4xl lg:text-6xl font-semibold text-center"
         >
