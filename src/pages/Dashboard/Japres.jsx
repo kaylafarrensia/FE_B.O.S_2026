@@ -35,10 +35,6 @@ export default function Japres() {
 
   const handleSubmit = () => {
     if (!japresUrl.trim()) return;
-    if (!hasReadGuideline) {
-      alert('Please read and check the JaPres guideline first!');
-      return;
-    }
     setCurrentStatus({ status: 'Pending', submittedAt: new Date().toISOString() });
     setJapresUrl('');
   };

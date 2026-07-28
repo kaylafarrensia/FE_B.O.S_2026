@@ -105,7 +105,7 @@ export default function DocumentSubmission({
         <div className="self-center">
           <Button
             onClick={onSubmit}
-            disabled={!japresUrl.trim()}
+            disabled={!japresUrl.trim() || !hasReadGuideline}
             className="px-8 py-2 sm:px-10 sm:py-3 mx-auto w-fit"
           >
             SUBMIT
