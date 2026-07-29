@@ -67,18 +67,17 @@ function Subscription() {
     };
   }, []);
 
-  const allData =
-    data?.map((item) => ({
-      ID: item.id ?? '-',
-      'Created At': item.createdAt
-        ? new Date(item.createdAt).toLocaleString('id-ID')
-        : '-',
-      Email: item.email ?? '-',
-      Status: item.blastStatus ?? '-',
-      'Blast Time': item.blastTime
-        ? new Date(item.blastTime).toLocaleString('id-ID')
-        : '-',
-    })) ?? [];
+  const allData = data?.data?.map((item) => ({
+    ID: item.id ?? '-',
+    'Created At': item.createdAt
+      ? new Date(item.createdAt).toLocaleString('id-ID')
+      : '-',
+    Email: item.email ?? '-',
+    Status: item.blastStatus ?? '-',
+    'Blast Time': item.blastTime
+      ? new Date(item.blastTime).toLocaleString('id-ID')
+      : '-',
+  })) ?? [];
 
 
   const filteredData = searchQuery
