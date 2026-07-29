@@ -224,7 +224,7 @@ export default function ReRegistrationForm({ onSubmitSuccess }) {
   }
 
   return (
-    <Card className="w-full max-w-[520px] mx-auto p-3.5 md:p-4 lg:mx-0 lg:ml-30 lg:w-[80%] lg:max-w-[820px] lg:p-8">
+    <Card className="w-full p-8">
       <h1 className="inline-block py-0.5 text-[15px] font-bold leading-[1.3] bg-gradient-to-r from-[#0A2745] to-[#2474C0] bg-clip-text text-transparent md:text-[23px] lg:text-4xl">
         Re-Registration Form
       </h1>

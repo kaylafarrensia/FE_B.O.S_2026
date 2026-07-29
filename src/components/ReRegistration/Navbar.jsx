@@ -34,7 +34,7 @@ export default function Navbar({ activeTab = 'reregist', onTabChange }) {
               type="button"
               onClick={() => handleTabClick(tab.key)}
               aria-current={isActive ? 'page' : undefined}
-              className={`relative flex items-center gap-2 overflow-hidden rounded-[10px] px-7 py-3.5 font-outfit text-xs font-regular tracking-[0.15em] ${
+              className={`relative flex items-center gap-2 overflow-hidden rounded-[10px] px-7 py-3.5 font-outfit text-xs font-normal tracking-[0.15em] cursor-pointer ${
                 isActive ? 'text-white' : 'text-slate-700'
               }`}
             >
@@ -57,8 +57,8 @@ export default function Navbar({ activeTab = 'reregist', onTabChange }) {
                   isActive
                     ? 'brightness-0 invert'
                     : tab.key === 'reregist'
-                    ? 'brightness-0 opacity-70'
-                    : ''
+                      ? 'brightness-0 opacity-70'
+                      : ''
                 }`}
               />
               <span className="relative z-10 hidden uppercase transition-colors duration-300 sm:inline">
@@ -74,7 +74,7 @@ export default function Navbar({ activeTab = 'reregist', onTabChange }) {
         type="button"
         onClick={() => setMenuOpen(true)}
         aria-label="Open menu"
-        className="flex h-7 w-7 flex-col items-center justify-center gap-[6px] sm:h-8 sm:w-8 md:h-11 md:w-11 md:gap-2 lg:hidden"
+        className="flex h-7 w-7 flex-col items-center justify-center gap-[6px] sm:h-8 sm:w-8 md:h-11 md:w-11 md:gap-2 lg:hidden cursor-pointer"
       >
         <span className="h-[3.5px] w-6 rounded-full bg-gradient-to-r from-[#0C4076] to-[#4489D4] sm:w-7 md:h-[4.5px] md:w-9" />
         <span className="h-[3.5px] w-6 rounded-full bg-gradient-to-r from-[#0C4076] to-[#4489D4] sm:w-7 md:h-[4.5px] md:w-9" />
@@ -112,7 +112,7 @@ export default function Navbar({ activeTab = 'reregist', onTabChange }) {
                 type="button"
                 onClick={() => setMenuOpen(false)}
                 aria-label="Close menu"
-                className="ml-auto flex h-12 w-12 items-center justify-center text-[#0A2745] md:h-14 md:w-14"
+                className="ml-auto flex h-12 w-12 items-center justify-center text-[#0A2745] md:h-14 md:w-14 cursor-pointer"
               >
                 <X size={34} className="md:h-10 md:w-10" />
               </button>
@@ -123,7 +123,7 @@ export default function Navbar({ activeTab = 'reregist', onTabChange }) {
                     key={tab.key}
                     type="button"
                     onClick={() => handleTabClick(tab.key)}
-                    className="flex items-center gap-3 font-outfit text-base font-semibold uppercase tracking-[0.15em] md:gap-4 md:text-lg"
+                    className="flex items-center gap-3 font-outfit text-base font-semibold uppercase tracking-[0.15em] md:gap-4 md:text-lg cursor-pointer"
                   >
                     <img
                       src={tab.icon}

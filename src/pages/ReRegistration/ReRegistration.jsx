@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import Navbar from '../../components/ReRegistration/Navbar'
 import ReRegistrationForm from '../../components/ReRegistration/ReRegistrationForm'
 import ContactPersonCard from '../../components/ReRegistration/ContactPersonCard'
@@ -8,6 +9,31 @@ import PerspectiveGrid from '../../components/ComingSoon/PerspectiveGrid'
 export default function ReRegistration() {
   const [activeTab, setActiveTab] = useState('reregist')
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const location = useLocation()
+  const isInsideDashboard = location.pathname.startsWith('/dashboard')
+
+  const formContent = (
+    <main className="w-full px-6 sm:px-[10vw] py-8 flex flex-col lg:flex-row gap-6 sm:gap-8 items-start justify-center flex-1 overflow-y-auto">
+      {isSubmitted ? (
+        <div className="w-full max-w-4xl mx-auto">
+          <SuccessCard />
+        </div>
+      ) : (
+        <>
+          <div className="w-full lg:flex-[1.3] min-w-0">
+            <ReRegistrationForm onSubmitSuccess={() => setIsSubmitted(true)} />
+          </div>
+          <div className="w-full lg:flex-1 min-w-0">
+            <ContactPersonCard />
+          </div>
+        </>
+      )}
+    </main>
+  )
+
+  if (isInsideDashboard) {
+    return formContent
+  }
 
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-gradient-to-b from-slate-50 to-blue-100">
