@@ -6,10 +6,12 @@ import CountdownTimer from '../../components/ComingSoon/CountdownTimer'
 import Footer from '../../components/ComingSoon/Footer'
 import PerspectiveGrid from '../../components/ComingSoon/PerspectiveGrid'
 import Typewriter from '../../components/ComingSoon/Typewriter'
+import CustomCursor from '../../components/ui/CustomCursor.jsx'
 
 export default function ComingSoon() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-50 to-blue-100 flex flex-col z-10">
+      <CustomCursor />
       <PerspectiveGrid className="absolute inset-x-0 -top-40 sm:-top-60 md:h-320 h-200" />
 
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-10 sm:py-16">

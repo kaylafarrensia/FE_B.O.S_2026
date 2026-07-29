@@ -23,12 +23,19 @@ function isValidUrl(value) {
   }
 }
 
-export default function ReRegistrationForm({ onSubmitSuccess }) {
-  const [form, setForm] = useState({
+export default function ReRegistrationForm({
+  onSubmitSuccess,
+  reRegistrationInputs,
+  setReRegistrationInputs,
+}) {
+  const [localForm, setLocalForm] = useState({
     linkedin: '',
     github: '',
     course: '',
   })
+
+  const form = reRegistrationInputs || localForm
+  const setForm = setReRegistrationInputs || setLocalForm
   const [errors, setErrors] = useState({})
   const [generalError, setGeneralError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -232,7 +239,7 @@ export default function ReRegistrationForm({ onSubmitSuccess }) {
                           setErrors((prev) => ({ ...prev, course: '' }))
                         }
                       }}
-                      className="w-full text-left px-4 py-2.5 text-xs sm:text-sm hover:bg-[#207CDB]/15 text-[#0A2745] font-semibold transition-colors cursor-pointer border-b border-[#99C4F4]/20 last:border-b-0"
+                      className="w-full text-left px-4 py-2 text-[10px] md:text-xs lg:text-sm hover:bg-[#207CDB]/15 text-[#0A2745] font-medium transition-colors cursor-pointer border-b border-[#99C4F4]/20 last:border-b-0"
                     >
                       {course.name}
                     </button>
@@ -248,8 +255,12 @@ export default function ReRegistrationForm({ onSubmitSuccess }) {
 
         <button
           type="submit"
-          disabled={isSubmitting}
-          className="mx-auto mt-0.5 flex items-center gap-1.5 rounded-[8px] bg-gradient-to-br from-[#0A2745] to-[#2474C0] px-5 py-2 text-[11px] font-medium text-white shadow-md transition hover:brightness-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer lg:mt-2 lg:px-10 lg:py-2.5 lg:text-lg md:text-[15px]"
+          disabled={isSubmitting || !form.linkedin.trim() || !form.github.trim() || !form.course}
+          className={
+            (!form.linkedin.trim() || !form.github.trim() || !form.course)
+              ? "mx-auto mt-6 flex items-center gap-1.5 rounded-[8px] bg-gradient-to-r from-[#84A4C9] to-[#A3C7EE] text-white px-5 py-2 text-[11px] font-medium shadow-sm cursor-not-allowed select-none lg:mt-8 lg:px-10 lg:py-2.5 lg:text-lg md:text-[15px]"
+              : "mx-auto mt-6 flex items-center gap-1.5 rounded-[8px] bg-gradient-to-br from-[#0A2745] to-[#2474C0] px-5 py-2 text-[11px] font-medium text-white shadow-md transition hover:brightness-110 active:scale-95 cursor-pointer lg:mt-8 lg:px-10 lg:py-2.5 lg:text-lg md:text-[15px]"
+          }
         >
           {isSubmitting && <Loader2 size={13} className="animate-spin" />}
           {isSubmitting ? 'Submitting...' : 'Submit'}

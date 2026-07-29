@@ -17,6 +17,12 @@
   text-decoration: none;
 }
 
+@media (pointer: fine) {
+  * {
+    cursor: none !important;
+  }
+}
+
 html {
   scroll-behavior: smooth;
 }

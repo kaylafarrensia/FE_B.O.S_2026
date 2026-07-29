@@ -64,7 +64,7 @@ export default function Schedule() {
       {popupOpen && <SavedPopup setIsOpen={setPopupOpen} />}
 
       <div className="relative">
-        <div className="flex flex-col xl:flex-row justify-center w-full py-5 xl:py-15 px-6 xl:px-[10vw] gap-4 xl:gap-5">
+        <div className="flex flex-col xl:flex-row justify-center w-full pt-3 pb-8 xl:py-15 px-6 xl:px-[10vw] gap-4 xl:gap-5">
           {/* ── Left Column ── */}
           <div className="flex flex-col w-full gap-4 xl:gap-5">
             {/* Current Schedule Info */}

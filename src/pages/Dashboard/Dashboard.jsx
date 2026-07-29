@@ -1,6 +1,7 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import CustomCursor from '../../components/ui/CustomCursor.jsx';
 import IconCalendar from '../../assets/icons/IconCalendar.svg';
 import IconCalendarWhite from '../../assets/icons/IconCalendarWhite.svg';
 import IconTrophy from '../../assets/icons/IconTrophy.svg';
@@ -26,6 +27,15 @@ function Dashboard() {
     id: 2,
     startTime: '2026-08-15T09:00:00Z',
     endTime: '2026-08-15T12:00:00Z',
+  });
+  const [registrationFiles, setRegistrationFiles] = useState({
+    binusianCard: null,
+    memberLetter: null,
+  });
+  const [reRegistrationInputs, setReRegistrationInputs] = useState({
+    linkedin: '',
+    github: '',
+    course: '',
   });
   const pillWidth = 180;
   const [pillStyle, setPillStyle] = useState({ left: 0 });
@@ -120,11 +130,12 @@ function Dashboard() {
 
   return (
     <div className="relative z-0 min-h-screen flex flex-col overflow-hidden">
+      <CustomCursor />
       <PerspectiveGrid className="opacity-85" />
       <BubbleBackground />
 
       {/* Mobile top bar */}
-      <div className="xl:hidden flex flex-row justify-between items-center px-8 py-3 border-white border-2">
+      <div className="xl:hidden fixed top-0 left-0 w-full z-50 flex flex-row justify-between items-center px-8 py-4 bg-white/5 backdrop-blur-lg border-b border-white/10">
         <img
           src={BNCCBlue}
           alt="BNCC Logo"
@@ -191,7 +202,7 @@ function Dashboard() {
       </motion.div>
 
       {/* Desktop Nav */}
-      <ul className="hidden xl:flex flex-row justify-between items-center px-[10vw] pt-10 relative">
+      <ul className="hidden xl:flex fixed top-0 left-0 w-full z-50 flex flex-row justify-between items-center px-[10vw] py-4 bg-white/5 backdrop-blur-lg border-b border-white/10">
         <img
           src={BNCCBlue}
           alt="BNCC Logo"
@@ -236,7 +247,18 @@ function Dashboard() {
         </div>
       </ul>
 
-      <Outlet context={{ userSchedule, setUserSchedule, userStatus, setUserStatus }} />
+      <div className="flex-grow flex flex-col pt-[72px] xl:pt-28 min-h-0 overflow-y-auto">
+        <Outlet context={{
+          userSchedule,
+          setUserSchedule,
+          userStatus,
+          setUserStatus,
+          registrationFiles,
+          setRegistrationFiles,
+          reRegistrationInputs,
+          setReRegistrationInputs
+        }} />
+      </div>
     </div>
   );
 }

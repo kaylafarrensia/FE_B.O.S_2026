@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Upload,
   Download,
@@ -9,6 +9,7 @@ import {
   ChevronRight,
 } from 'lucide-react'
 import { useOutletContext, useNavigate, useLocation } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import Card from '../../components/ReRegistration/Card'
 import ContactPersonCard from '../../components/ReRegistration/ContactPersonCard'
 
@@ -28,9 +29,41 @@ export default function Registration() {
   const context = useOutletContext()
   const setUserStatus = context?.setUserStatus
 
-  const outcome = new URLSearchParams(location.search).get('outcome') || 'initial'
-  const [binusianCard, setBinusianCard] = useState(null)
-  const [memberLetter, setMemberLetter] = useState(null)
+  const [outcome, setOutcome] = useState(() => {
+    const urlOutcome = new URLSearchParams(window.location.search).get('outcome')
+    if (urlOutcome) {
+      localStorage.setItem('registration_outcome', urlOutcome)
+      return urlOutcome
+    }
+    const saved = localStorage.getItem('registration_outcome')
+    if (saved) return saved
+    return 'initial'
+  })
+
+  useEffect(() => {
+    const urlOutcome = new URLSearchParams(location.search).get('outcome')
+    if (urlOutcome) {
+      localStorage.setItem('registration_outcome', urlOutcome)
+      setOutcome(urlOutcome)
+    } else {
+      const saved = localStorage.getItem('registration_outcome')
+      if (saved && saved !== outcome) {
+        setOutcome(saved)
+      }
+    }
+  }, [location.search])
+
+  const { registrationFiles, setRegistrationFiles } = useOutletContext()
+  const binusianCard = registrationFiles?.binusianCard
+  const memberLetter = registrationFiles?.memberLetter
+
+  const setBinusianCard = (file) => {
+    setRegistrationFiles((prev) => ({ ...prev, binusianCard: file }))
+  }
+
+  const setMemberLetter = (file) => {
+    setRegistrationFiles((prev) => ({ ...prev, memberLetter: file }))
+  }
 
   const handleDownload = () => {
     const link = document.createElement('a')
@@ -47,6 +80,9 @@ export default function Registration() {
       alert('Please upload both files before submitting.')
       return
     }
+    localStorage.setItem('registration_outcome', 'pending')
+    setOutcome('pending')
+    setRegistrationFiles({ binusianCard: null, memberLetter: null })
     navigate('?outcome=pending')
   }
 
@@ -75,15 +111,10 @@ export default function Registration() {
     const file = e.target.files[0]
     if (!file) return
 
-    // Validate type
-    const validTypes = [
-      'image/png',
-      'image/jpeg',
-      'image/jpg',
-      'application/pdf',
-    ]
+    // Validate type: ONLY PDF
+    const validTypes = ['application/pdf']
     if (!validTypes.includes(file.type)) {
-      alert('Invalid file format. Only JPG, PNG, and PDF files are allowed.')
+      alert('Invalid file format. Only PDF files are allowed.')
       e.target.value = ''
       setMemberLetter(null)
       return
@@ -132,7 +163,6 @@ export default function Registration() {
                     accept="image/png, image/jpeg, image/jpg"
                     className="hidden"
                     onChange={handleBinusianCardChange}
-                    required
                   />
                 </label>
               </div>
@@ -173,10 +203,9 @@ export default function Registration() {
                   <Upload size={18} className="text-slate-500" />
                   <input
                     type="file"
-                    accept="image/png, image/jpeg, image/jpg, application/pdf"
+                    accept="application/pdf"
                     className="hidden"
                     onChange={handleMemberLetterChange}
-                    required
                   />
                 </label>
                 <div className="mt-2 flex items-center gap-1.5 text-[10px] sm:text-xs text-slate-500">
@@ -191,11 +220,16 @@ export default function Registration() {
                 </div>
               </div>
             </div>
-
+ 
             <div className="self-center mt-4">
               <button
                 type="submit"
-                className="bg-[#1E5FA8] hover:bg-[#12376B] text-white px-10 py-2.5 rounded-lg text-sm sm:text-base font-semibold shadow-md transition-colors cursor-pointer"
+                disabled={!binusianCard || !memberLetter}
+                className={
+                  !binusianCard || !memberLetter
+                    ? "bg-gradient-to-r from-[#84A4C9] to-[#A3C7EE] text-white px-10 py-2.5 rounded-lg text-sm sm:text-base font-semibold shadow-sm cursor-not-allowed select-none"
+                    : "bg-[#1E5FA8] hover:bg-[#12376B] text-white px-10 py-2.5 rounded-lg text-sm sm:text-base font-semibold shadow-md transition-all hover:scale-[1.02] transform duration-300 cursor-pointer"
+                }
               >
                 Submit
               </button>
@@ -307,110 +341,123 @@ export default function Registration() {
 
   // Outcome 1: Verification Pending with exact design
   const renderPending = () => (
-    <Card className="w-full flex-1 flex flex-col items-center justify-center text-center p-8 sm:p-16 rounded-xl border-white border-[3px] bg-white/40 glassmorphism relative gap-6">
-      <div className="relative">
-        <div className="relative flex items-center justify-center w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#EBF5FF] text-[#2474C0] border-2 border-white shadow-sm">
-          <Clock size={48} className="animate-pulse" />
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="w-full flex justify-center"
+    >
+      <Card className="w-full max-w-4xl flex flex-col items-center justify-center text-center p-8 sm:p-16 rounded-xl border-white border-[3px] bg-white/40 glassmorphism relative gap-6">
+        <div className="relative">
+          <div className="relative flex items-center justify-center w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#EBF5FF] text-[#2474C0] border-2 border-white shadow-sm">
+            <Clock size={48} className="animate-pulse" />
+          </div>
         </div>
-      </div>
 
-      <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0A2745] font-poppins mt-4">
-        Your registration is being verified!
-      </h2>
-      <p className="text-sm sm:text-base text-slate-500 leading-relaxed max-w-2xl font-poppins font-medium">
-        Thank you for registering to be part of our family! Your registration is<br />
-        currently under review and will be verified within 24 hours. Please<br />
-        check back periodically for updates on your verification status.
-      </p>
-    </Card>
+        <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0A2745] font-poppins mt-4">
+          Your registration is being verified!
+        </h2>
+        <p className="text-sm sm:text-base text-slate-500 leading-relaxed max-w-2xl font-poppins font-medium">
+          Thank you for registering to be part of our family! Your registration is
+          currently under review and will be verified within 24 hours. Please
+          check back periodically for updates on your verification status.
+        </p>
+      </Card>
+    </motion.div>
   )
 
   // Outcome 2: Verification Error with contact design
   const renderError = () => (
-    <Card className="w-full flex-1 flex flex-col items-center justify-center text-center p-8 sm:p-16 rounded-xl border-white border-[3px] bg-white/40 glassmorphism relative gap-6">
-      <div className="relative">
-        <div className="relative flex items-center justify-center w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-red-100 text-red-500 border-2 border-white shadow-sm">
-          <AlertTriangle size={48} />
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="w-full flex justify-center"
+    >
+      <Card className="w-full max-w-4xl flex flex-col items-center justify-center text-center p-8 sm:p-16 rounded-xl border-white border-[3px] bg-white/40 glassmorphism relative gap-6">
+        <div className="relative">
+          <div className="relative flex items-center justify-center w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-red-100 text-red-500 border-2 border-white shadow-sm">
+            <AlertTriangle size={48} />
+          </div>
         </div>
-      </div>
 
-      <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0A2745] font-poppins mt-4">
-        There was an error verifying your registration!
-      </h2>
-      <p className="text-sm sm:text-base text-slate-500 leading-relaxed max-w-2xl font-poppins font-medium">
-        Please contact the person listed below for assistance with your <br />
-        registration verification.
-      </p>
+        <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0A2745] font-poppins mt-4">
+          There was an error verifying your registration!
+        </h2>
+        <p className="text-sm sm:text-base text-slate-500 leading-relaxed max-w-2xl font-poppins font-medium">
+          Please contact the person listed below for assistance with your
+          registration verification.
+        </p>
 
-      <div className="mt-6 flex flex-row items-start gap-4 text-left">
-        <img
-          src="/icons/ic-cp.svg"
-          alt="BNCC Team"
-          className="h-[92px] w-auto shrink-0 object-contain self-start mt-0.5"
-        />
-        <div className="flex-1 min-w-0">
-          <h4 className="text-xl font-bold text-[#0A2745] font-poppins">BNCC</h4>
-          <div className="mt-3 flex flex-col gap-2.5 text-xs sm:text-base font-semibold text-[#0A2745]/85">
-            <div className="flex items-center gap-3">
-              <img
-                src="/icons/ic-line.svg"
-                alt="LINE"
-                className="w-5 h-5 sm:w-7 sm:h-7 shrink-0"
-              />
-              <span>@yviluo (Yovi Gracia Lo)</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <svg viewBox="0 0 24 24" className="w-5 h-5 sm:w-7 sm:h-7 shrink-0">
-                <path
-                  d="M12.008.01a11.95 11.95 0 00-10.42 17.846L0 24l6.303-1.654A11.95 11.95 0 1012.008.01z"
-                  fill="#0A2745"
+        <div className="mt-6 flex flex-row items-start gap-4 text-left">
+          <img
+            src="/icons/ic-cp.svg"
+            alt="BNCC Team"
+            className="h-[92px] w-auto shrink-0 object-contain self-start mt-0.5"
+          />
+          <div className="flex-1 min-w-0">
+            <h4 className="text-xl font-bold text-[#0A2745] font-poppins">BNCC</h4>
+            <div className="mt-3 flex flex-col gap-2.5 text-xs sm:text-base font-semibold text-[#0A2745]/85">
+              <div className="flex items-center gap-3">
+                <img
+                  src="/icons/ic-line.svg"
+                  alt="LINE"
+                  className="w-5 h-5 sm:w-7 sm:h-7 shrink-0"
                 />
-                <path
-                  d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"
-                  fill="#FFFFFF"
-                />
-              </svg>
-              <span>085178100246</span>
+                <span>@yviluo (Yovi Gracia Lo)</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <svg viewBox="0 0 24 24" className="w-5 h-5 sm:w-7 sm:h-7 shrink-0">
+                  <path
+                    d="M12.008.01a11.95 11.95 0 00-10.42 17.846L0 24l6.303-1.654A11.95 11.95 0 1012.008.01z"
+                    fill="#0A2745"
+                  />
+                  <path
+                    d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"
+                    fill="#FFFFFF"
+                  />
+                </svg>
+                <span>085178100246</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </Card>
+      </Card>
+    </motion.div>
   )
 
   // Outcome 3: Verification Success
   const renderSuccess = () => (
-    <Card className="w-full flex-1 flex flex-col items-center justify-center text-center p-8 sm:p-16 rounded-xl border-white border-[3px] bg-white/40 glassmorphism relative gap-6">
-      <div className="relative flex items-center justify-center w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-green-100 text-green-500 border-2 border-white shadow-sm">
-        <CheckCircle size={48} />
-      </div>
-      <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0A2745] font-poppins">
-        Registration Successful!
-      </h2>
-      <p className="text-sm sm:text-base text-slate-500 leading-relaxed max-w-2xl font-poppins font-medium">
-        Thank you for registering and becoming part of our family! Let's move on<br />
-        to re-registration.
-      </p>
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="w-full flex justify-center"
+    >
+      <Card className="w-full max-w-4xl flex flex-col items-center justify-center text-center p-8 sm:p-16 rounded-xl border-white border-[3px] bg-white/40 glassmorphism relative gap-6">
+        <div className="relative flex items-center justify-center w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-green-100 text-green-500 border-2 border-white shadow-sm">
+          <CheckCircle size={48} />
+        </div>
+        <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0A2745] font-poppins">
+          Registration Successful!
+        </h2>
+        <p className="text-sm sm:text-base text-slate-500 leading-relaxed max-w-2xl font-poppins font-medium">
+          Thank you for registering and becoming part of our family! Let's move on
+          to re-registration.
+        </p>
 
-      <button
-        onClick={handleNavigateToReRegist}
-        className="mt-6 bg-[#1E5FA8] hover:bg-[#12376B] text-white px-8 py-3 rounded-lg text-sm sm:text-base font-bold shadow-md transition-colors flex items-center gap-2 cursor-pointer"
-      >
-        Re-Registration &rarr;
-      </button>
-    </Card>
+        <button
+          onClick={handleNavigateToReRegist}
+          className="mt-6 bg-[#1E5FA8] hover:bg-[#12376B] text-white px-8 py-3 rounded-lg text-sm sm:text-base font-bold shadow-md transition-colors flex items-center gap-2 cursor-pointer"
+        >
+          Re-Registration &rarr;
+        </button>
+      </Card>
+    </motion.div>
   )
 
-  const isOutcome = outcome !== 'initial'
-
   return (
-    <main
-      className={`w-full flex flex-col flex-1 min-h-0 ${
-        isOutcome
-          ? 'px-6 sm:px-[10vw] pt-6 pb-20'
-          : 'px-6 sm:px-[10vw] py-8 overflow-y-auto'
-      }`}
-    >
+    <main className="w-full flex flex-col flex-1 min-h-0 px-6 sm:px-[10vw] pt-3 pb-16 overflow-y-auto">
       {outcome === 'initial' && renderInitialForm()}
       {outcome === 'pending' && renderPending()}
       {outcome === 'error' && renderError()}

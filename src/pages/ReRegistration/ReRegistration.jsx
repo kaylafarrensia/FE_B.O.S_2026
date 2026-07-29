@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useOutletContext } from 'react-router-dom'
 import Navbar from '../../components/ReRegistration/Navbar'
 import ReRegistrationForm from '../../components/ReRegistration/ReRegistrationForm'
 import ContactPersonCard from '../../components/ReRegistration/ContactPersonCard'
@@ -12,8 +12,11 @@ export default function ReRegistration() {
   const location = useLocation()
   const isInsideDashboard = location.pathname.startsWith('/dashboard')
 
+  const outletContext = useOutletContext() || {}
+  const { reRegistrationInputs, setReRegistrationInputs } = outletContext
+
   const formContent = (
-    <main className="w-full px-6 sm:px-[10vw] py-8 flex flex-col lg:flex-row gap-6 sm:gap-8 items-start justify-center flex-1 overflow-y-auto">
+    <main className="w-full px-6 sm:px-[10vw] pt-3 pb-8 sm:py-8 flex flex-col lg:flex-row gap-6 sm:gap-8 items-start justify-start lg:justify-center flex-1 overflow-y-auto">
       {isSubmitted ? (
         <div className="w-full max-w-4xl mx-auto">
           <SuccessCard />
@@ -21,7 +24,11 @@ export default function ReRegistration() {
       ) : (
         <>
           <div className="w-full lg:flex-[1.3] min-w-0">
-            <ReRegistrationForm onSubmitSuccess={() => setIsSubmitted(true)} />
+            <ReRegistrationForm
+              onSubmitSuccess={() => setIsSubmitted(true)}
+              reRegistrationInputs={reRegistrationInputs}
+              setReRegistrationInputs={setReRegistrationInputs}
+            />
           </div>
           <div className="w-full lg:flex-1 min-w-0">
             <ContactPersonCard />
@@ -51,7 +58,11 @@ export default function ReRegistration() {
             ) : (
               <>
                 <div className="w-full max-w-[520px] md:max-w-3xl lg:min-h-0 lg:max-w-none lg:flex-[1.4]">
-                  <ReRegistrationForm onSubmitSuccess={() => setIsSubmitted(true)} />
+                  <ReRegistrationForm
+                    onSubmitSuccess={() => setIsSubmitted(true)}
+                    reRegistrationInputs={reRegistrationInputs}
+                    setReRegistrationInputs={setReRegistrationInputs}
+                  />
                 </div>
                 <div className="w-full max-w-[520px] md:max-w-3xl lg:min-h-0 lg:max-w-none lg:mr-30 lg:flex-1">
                   <ContactPersonCard />
