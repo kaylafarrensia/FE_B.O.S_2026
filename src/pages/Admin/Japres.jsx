@@ -2,6 +2,7 @@ import { Table, Pagination } from '@/components';
 import { useState, useEffect, useRef } from 'react';
 import { japresColumns } from './constants';
 import { useQuery, useMutation } from '@tanstack/react-query';
+import Select from '../../components/ui/Select.jsx';
 import {
   downloadJapresExcel,
   getJapres,
@@ -189,7 +190,7 @@ export default function Japres() {
   return (
     <div className={`py-6 space-y-7`}>
       {showErrorModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-lg shadow-xl text-center">
             <h3 className="text-xl font-bold mb-4">Error</h3>
             <p className="text-gray-600 mb-6">
@@ -216,7 +217,7 @@ export default function Japres() {
       )}
 
       {alert && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[70]">
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-[70]">
           <div className="bg-white p-8 rounded-lg shadow-xl text-center flex flex-col items-center">
             {alert.type === 'success' ? (
               <svg
@@ -309,7 +310,7 @@ export default function Japres() {
       </div>
 
       {showEditModal && editJapres && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100]">
           <form
             className="bg-white p-8 rounded-lg shadow-xl text-left min-w-[350px] max-w-[90vw]"
             onSubmit={handleEditSubmit}
@@ -346,24 +347,12 @@ export default function Japres() {
             </div>
             <div className="mb-4">
               <label className="block mb-2 font-medium">Japres Status</label>
-              <select
+              <Select
                 value={editValue !== null ? editValue : ''}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setEditValue(val === '' ? null : Number(val));
-                }}
-                className="border p-2 rounded w-full"
-                required
-              >
-                <option value="" disabled>
-                  Choose status
-                </option>
-                {getEditOptions().map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+                onChange={(val) => setEditValue(val === '' ? null : Number(val))}
+                options={getEditOptions()}
+                placeholder="Choose status"
+              />
               {editValue === null && (
                 <span className="text-red-500 text-xs mt-1 block">
                   Please select a status.
@@ -391,7 +380,7 @@ export default function Japres() {
       )}
 
       {showConfirmModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[101]">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[101]">
           <div className="bg-white p-8 rounded-lg shadow-xl text-center min-w-[350px]">
             <h3 className="text-xl font-bold mb-4">Confirm Edit</h3>
             <p className="mb-6">

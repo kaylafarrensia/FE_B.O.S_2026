@@ -19,32 +19,32 @@ import IconUsers from '../../assets/icons/IconUsers.svg';
 
 const navItems = [
     {
-        path: '/admin/overview',
+        path: '/viva/bncc/overview',
         name: 'Overview',
         icon: IconPieChart,
     },
     {
-        path: '/admin/users',
+        path: '/viva/bncc/users',
         name: 'User Details',
         icon: IconUsers,
     },
     {
-        path: '/admin/documents',
+        path: '/viva/bncc/documents',
         name: 'Documents',
         icon: IconMail,
     },
     {
-        path: '/admin/payment',
+        path: '/viva/bncc/payment',
         name: 'Payment',
         icon: IconCard,
     },
     {
-        path: '/admin/japres',
+        path: '/viva/bncc/japres',
         name: 'Jalur Prestasi',
         icon: IconTrophy,
     },
     {
-        path: '/admin/subscription',
+        path: '/viva/bncc/subscription',
         name: 'Subscription',
         icon: IconCheckList,
     },

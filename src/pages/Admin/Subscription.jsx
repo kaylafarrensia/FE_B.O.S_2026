@@ -118,7 +118,7 @@ function Subscription() {
   return (
     <div className={`py-6 space-y-7`}>
       {showErrorModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-lg shadow-xl text-center">
             <h3 className="text-xl font-bold mb-4">Error</h3>
             <p className="text-gray-600 mb-6">
@@ -145,7 +145,7 @@ function Subscription() {
       )}
 
       {alert && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[70]">
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-[70]">
           <div className="bg-white p-8 rounded-lg shadow-xl text-center flex flex-col items-center">
             {alert.type === 'success' ? (
               <svg
@@ -191,7 +191,7 @@ function Subscription() {
       )}
 
       {showBlastModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100]">
           <form
             className="bg-white p-8 rounded-lg shadow-xl text-center min-w-[350px]"
             onSubmit={handleBlastSubmit}
@@ -228,7 +228,7 @@ function Subscription() {
       )}
 
       {showConfirmModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[101]">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[101]">
           <div className="bg-white p-8 rounded-lg shadow-xl text-center min-w-[350px]">
             <h3 className="text-xl font-bold mb-4">Confirm Blast</h3>
             <p className="mb-6">

@@ -14,6 +14,7 @@ import {
 } from '@/services/admin'
 import { base64ToBlob, isDataUrl } from '@/lib/utils'
 import useLookupQuery from '@/hooks/queries/useLookupQuery'
+import Select from '../../components/ui/Select.jsx'
 
 export default function Users() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -28,6 +29,38 @@ export default function Users() {
   const [showViewModal, setShowViewModal] = useState(false)
   const [viewUser, setViewUser] = useState(null)
   const [viewLoading, setViewLoading] = useState(false)
+  const [previewOpen, setPreviewOpen] = useState(false)
+  const [previewUrl, setPreviewUrl] = useState(null)
+  const [previewTitle, setPreviewTitle] = useState('')
+
+  const openPreview = (v, title) => {
+    if (!v || v === '-') return
+    if (isDataUrl(v) || /^([A-Za-z0-9+/=\-_\s]+)$/.test(v)) {
+      try {
+        let blob
+        if (isDataUrl(v)) {
+          blob = base64ToBlob(v)
+        } else {
+          const normalized = v
+            .replace(/\s/g, '')
+            .replace(/-/g, '+')
+            .replace(/_/g, '/')
+          blob = base64ToBlob('data:application/octet-stream;base64,' + normalized)
+        }
+        const url = URL.createObjectURL(blob)
+        setPreviewUrl(url)
+        setPreviewTitle(title)
+        setPreviewOpen(true)
+      } catch (e) {
+        console.error('Failed to parse base64 document', e)
+        window.alert('Failed to open document preview')
+      }
+    } else {
+      setPreviewUrl(v)
+      setPreviewTitle(title)
+      setPreviewOpen(true)
+    }
+  }
   const [showEditModal, setShowEditModal] = useState(false)
   const [editForm, setEditForm] = useState({
     id: 0,
@@ -76,54 +109,63 @@ Panitia BNCC Launching`,
   const [tempWhatsAppMessage, setTempWhatsAppMessage] =
     useState(whatsAppMessage)
 
+  const watchedRegionId = editForm.regionId
+  const watchedFacultyId = editForm.facultyId
+
   const {
     regionQuery,
     facultyQuery,
     majorQuery,
     lntCourseQuery,
     scheduleQuery,
-  } = useLookupQuery()
-
-  const abortRef = useRef(null)
-
-  const watchedRegionId = editForm.regionId
-  const watchedFacultyId = editForm.facultyId
-
-  const regions = regionQuery.data || []
-  const faculties =
-    facultyQuery.data?.filter(
-      (faculty) => faculty.regionId === watchedRegionId,
-    ) || []
-  const majors =
-    majorQuery.data?.filter((major) => major.facultyId === watchedFacultyId) ||
-    []
-  const lntCourses =
-    lntCourseQuery.data?.filter(
-      (course) => course.regionId === watchedRegionId,
-    ) || []
-  const schedules =
-    scheduleQuery.data?.filter(
-      (schedule) => schedule.regionId === watchedRegionId,
-    ) || []
+  } = useLookupQuery(watchedRegionId, watchedFacultyId)
 
   const watchedCreateRegionId = createForm.regionId
   const watchedCreateFacultyId = createForm.facultyId
 
-  const createFaculties =
+  const {
+    regionQuery: createRegionQuery,
+    facultyQuery: createFacultyQuery,
+    majorQuery: createMajorQuery,
+    lntCourseQuery: createLntCourseQuery,
+    scheduleQuery: createScheduleQuery,
+  } = useLookupQuery(watchedCreateRegionId, watchedCreateFacultyId)
+
+  const abortRef = useRef(null)
+
+  const regions = regionQuery.data || []
+  const faculties =
     facultyQuery.data?.filter(
-      (faculty) => faculty.regionId === watchedCreateRegionId,
+      (faculty) => !faculty.regionId || Number(faculty.regionId) === Number(watchedRegionId),
+    ) || []
+  const majors =
+    majorQuery.data?.filter(
+      (major) => !major.facultyId || Number(major.facultyId) === Number(watchedFacultyId),
+    ) || []
+  const lntCourses =
+    lntCourseQuery.data?.filter(
+      (course) => !course.regionId || Number(course.regionId) === Number(watchedRegionId),
+    ) || []
+  const schedules =
+    scheduleQuery.data?.filter(
+      (schedule) => !schedule.regionId || Number(schedule.regionId) === Number(watchedRegionId),
+    ) || []
+
+  const createFaculties =
+    createFacultyQuery.data?.filter(
+      (faculty) => !faculty.regionId || Number(faculty.regionId) === Number(watchedCreateRegionId),
     ) || []
   const createMajors =
-    majorQuery.data?.filter(
-      (major) => major.facultyId === watchedCreateFacultyId,
+    createMajorQuery.data?.filter(
+      (major) => !major.facultyId || Number(major.facultyId) === Number(watchedCreateFacultyId),
     ) || []
   const createLntCourses =
-    lntCourseQuery.data?.filter(
-      (course) => course.regionId === watchedCreateRegionId,
+    createLntCourseQuery.data?.filter(
+      (course) => !course.regionId || Number(course.regionId) === Number(watchedCreateRegionId),
     ) || []
   const createSchedules =
-    scheduleQuery.data?.filter(
-      (schedule) => schedule.regionId === watchedCreateRegionId,
+    createScheduleQuery.data?.filter(
+      (schedule) => !schedule.regionId || Number(schedule.regionId) === Number(watchedCreateRegionId),
     ) || []
 
   const {
@@ -434,8 +476,45 @@ Panitia BNCC Launching`,
 
   return (
     <div className={`py-6 space-y-7 ${deleting ? 'pointer-events-none' : ''}`}>
+      {previewOpen && previewUrl && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[110]">
+          <div className="bg-white rounded-lg p-4 max-w-4xl w-[90%] max-h-[90%] flex flex-col">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-lg font-semibold">{previewTitle}</h3>
+              <button
+                className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 transition-colors cursor-pointer text-sm"
+                onClick={() => {
+                  setPreviewUrl(null)
+                  setPreviewOpen(false)
+                }}
+              >
+                Close
+              </button>
+            </div>
+            {/* Fallback link for embedding issues */}
+            <div className="text-xs text-gray-500 mb-2 text-center">
+              Can't see the document? <a href={previewUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline cursor-pointer">Click here to open in a new tab</a>
+            </div>
+            <div className="flex-1 overflow-auto flex justify-center items-center bg-gray-100 p-2 rounded">
+              {previewUrl.startsWith('data:image/') || /\.(jpg|jpeg|png|webp|gif)/i.test(previewUrl) ? (
+                <img
+                  src={previewUrl}
+                  alt={previewTitle}
+                  className="max-h-[70vh] object-contain"
+                />
+              ) : (
+                <iframe
+                  src={previewUrl}
+                  className="w-full h-[70vh]"
+                  title={previewTitle}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       {showErrorModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-lg shadow-xl text-center">
             <h3 className="text-xl font-bold mb-4">Error</h3>
             <p className="text-gray-600 mb-6">
@@ -462,7 +541,7 @@ Panitia BNCC Launching`,
       )}
 
       {showViewModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-lg shadow-xl text-left min-w-[350px] max-w-[90vw]">
             <h3 className="text-xl font-bold mb-4">User Details</h3>
             {viewLoading ? (
@@ -550,119 +629,29 @@ Panitia BNCC Launching`,
                     </div>
                     <div>
                       <b>Member Letter:</b>{' '}
-                      {reg.suratMember
-                        ? (() => {
-                            const v = reg.suratMember
-                            if (
-                              isDataUrl(v) ||
-                              /^([A-Za-z0-9+\/=\-_\s]+)$/.test(v)
-                            ) {
-                              return (
-                                <button
-                                  onClick={async () => {
-                                    try {
-                                      let blob
-                                      if (isDataUrl(v)) blob = base64ToBlob(v)
-                                      else {
-                                        const normalized = v
-                                          .replace(/\s/g, '')
-                                          .replace(/-/g, '+')
-                                          .replace(/_/g, '/')
-                                        blob = base64ToBlob(
-                                          'data:application/octet-stream;base64,' +
-                                            normalized,
-                                        )
-                                      }
-                                      const url = URL.createObjectURL(blob)
-                                      window.open(url, '_blank')
-                                      setTimeout(
-                                        () => URL.revokeObjectURL(url),
-                                        5000,
-                                      )
-                                    } catch (e) {
-                                      console.error(
-                                        'Failed to open member letter',
-                                        e,
-                                      )
-                                      window.alert('Failed to open file')
-                                    }
-                                  }}
-                                  className="text-blue-600 underline"
-                                >
-                                  Member Letter
-                                </button>
-                              )
-                            }
-                            return (
-                              <a
-                                href={v}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 underline"
-                              >
-                                Member Letter
-                              </a>
-                            )
-                          })()
-                        : '-'}
+                      {reg.suratMember && reg.suratMember !== '-' ? (
+                        <button
+                          onClick={() => openPreview(reg.suratMember, 'Member Letter')}
+                          className="text-blue-600 underline cursor-pointer"
+                        >
+                          Member Letter
+                        </button>
+                      ) : (
+                        '-'
+                      )}
                     </div>
                     <div>
                       <b>Binusian Card:</b>{' '}
-                      {reg.binusianCard
-                        ? (() => {
-                            const v = reg.binusianCard
-                            if (
-                              isDataUrl(v) ||
-                              /^([A-Za-z0-9+\/=\-_\s]+)$/.test(v)
-                            ) {
-                              return (
-                                <button
-                                  onClick={async () => {
-                                    try {
-                                      let blob
-                                      if (isDataUrl(v)) blob = base64ToBlob(v)
-                                      else {
-                                        const normalized = v
-                                          .replace(/\s/g, '')
-                                          .replace(/-/g, '+')
-                                          .replace(/_/g, '/')
-                                        blob = base64ToBlob(
-                                          'data:application/octet-stream;base64,' +
-                                            normalized,
-                                        )
-                                      }
-                                      const url = URL.createObjectURL(blob)
-                                      window.open(url, '_blank')
-                                      setTimeout(
-                                        () => URL.revokeObjectURL(url),
-                                        5000,
-                                      )
-                                    } catch (e) {
-                                      console.error(
-                                        'Failed to open binusian card',
-                                        e,
-                                      )
-                                      window.alert('Failed to open file')
-                                    }
-                                  }}
-                                  className="text-blue-600 underline"
-                                >
-                                  Binusian Card
-                                </button>
-                              )
-                            }
-                            return (
-                              <a
-                                href={v}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 underline"
-                              >
-                                Binusian Card
-                              </a>
-                            )
-                          })()
-                        : '-'}
+                      {reg.binusianCard && reg.binusianCard !== '-' ? (
+                        <button
+                          onClick={() => openPreview(reg.binusianCard, 'Binusian Card')}
+                          className="text-blue-600 underline cursor-pointer"
+                        >
+                          Binusian Card
+                        </button>
+                      ) : (
+                        '-'
+                      )}
                     </div>
                   </div>
                 ))}
@@ -686,7 +675,7 @@ Panitia BNCC Launching`,
       )}
 
       {showEditModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <form
             className="bg-white p-6 rounded-lg shadow-xl text-left min-w-[350px] max-w-[600px] w-full"
             onSubmit={handleEditSubmit}
@@ -733,127 +722,90 @@ Panitia BNCC Launching`,
                 placeholder="WhatsApp"
                 required
               />
-              <select
-                name="regionId"
+              <Select
                 value={editForm.regionId || ''}
-                onChange={(e) => {
+                onChange={(val) => {
                   setEditForm({
                     ...editForm,
-                    regionId: Number(e.target.value),
+                    regionId: val ? Number(val) : 0,
                     facultyId: 0,
                     majorId: 0,
                     lntCourseId: 0,
                     scheduleId: 0,
                   })
                 }}
-                className="border p-2 rounded w-full"
-                required
-              >
-                <option value="">Select Region</option>
-                {regions.map((r) => (
-                  <option key={r.id} value={r.id}>
-                    {r.name}
-                  </option>
-                ))}
-              </select>
-              <select
-                name="facultyId"
+                options={regions.map((r) => ({ value: r.id, label: r.name }))}
+                placeholder="Select Region"
+              />
+              <Select
                 value={editForm.facultyId || ''}
-                onChange={(e) => {
+                onChange={(val) => {
                   setEditForm({
                     ...editForm,
-                    facultyId: Number(e.target.value),
+                    facultyId: val ? Number(val) : 0,
                     majorId: 0,
                   })
                 }}
-                className="border p-2 rounded w-full"
-                required
+                options={faculties.map((f) => ({ value: f.id, label: f.name }))}
+                placeholder={!editForm.regionId ? 'Pilih region Anda terlebih dahulu' : 'Select Faculty'}
                 disabled={!editForm.regionId}
-              >
-                <option value="">Select Faculty</option>
-                {faculties.map((f) => (
-                  <option key={f.id} value={f.id}>
-                    {f.name}
-                  </option>
-                ))}
-              </select>
-              <select
-                name="majorId"
+              />
+              <Select
                 value={editForm.majorId || ''}
-                onChange={(e) => {
+                onChange={(val) => {
                   setEditForm({
                     ...editForm,
-                    majorId: Number(e.target.value),
+                    majorId: val ? Number(val) : 0,
                   })
                 }}
-                className="border p-2 rounded w-full"
-                required
+                options={majors.map((m) => ({ value: m.id, label: m.name }))}
+                placeholder={!editForm.facultyId ? 'Pilih fakultas Anda terlebih dahulu' : 'Select Major'}
                 disabled={!editForm.facultyId}
-              >
-                <option value="">Select Major</option>
-                {majors.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.name}
-                  </option>
-                ))}
-              </select>
-              <select
-                name="lntCourseId"
+              />
+              <Select
                 value={editForm.lntCourseId || ''}
-                onChange={(e) => {
+                onChange={(val) => {
                   setEditForm({
                     ...editForm,
-                    lntCourseId: Number(e.target.value),
+                    lntCourseId: val ? Number(val) : 0,
                   })
                 }}
-                className="border p-2 rounded w-full"
-                required
+                options={lntCourses.map((l) => ({ value: l.id, label: l.title || l.name }))}
+                placeholder={!editForm.regionId ? 'Pilih region Anda terlebih dahulu' : 'Select LnT Course'}
                 disabled={!editForm.regionId}
-              >
-                <option value="">Select LnT Course</option>
-                {lntCourses.map((l) => (
-                  <option key={l.id} value={l.id}>
-                    {l.title}
-                  </option>
-                ))}
-              </select>
-              <select
-                name="scheduleId"
+              />
+              <Select
                 value={editForm.scheduleId || ''}
-                onChange={(e) => {
+                onChange={(val) => {
                   setEditForm({
                     ...editForm,
-                    scheduleId: Number(e.target.value),
+                    scheduleId: val ? Number(val) : 0,
                   })
                 }}
-                className="border p-2 rounded w-full"
-                required
+                options={schedules.map((s) => ({ value: s.id, label: s.title }))}
+                placeholder={!editForm.regionId ? 'Pilih region Anda terlebih dahulu' : 'Select Schedule'}
                 disabled={!editForm.regionId}
-              >
-                <option value="">Select Schedule</option>
-                {schedules.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.title}
-                  </option>
-                ))}
-              </select>
-              <select
-                name="status"
+              />
+              <Select
                 value={editForm.status || ''}
-                onChange={handleEditChange}
-                className="border p-2 rounded w-full"
-                required
-              >
-                <option value="">Select Status</option>
-                <option value="email_verified">Email Verified</option>
-                <option value="email_unverified">Email Unverified</option>
-                <option value="done_launching">Done Launching</option>
-                <option value="confirm_launching">Confirm Launching</option>
-                <option value="letter_error">Letter Error</option>
-                <option value="letter_verified">Letter Verified</option>
-                <option value="done_reregist">Done Re-Registration</option>
-                <option value="closed">Closed</option>
-              </select>
+                onChange={(val) => {
+                  setEditForm({
+                    ...editForm,
+                    status: val,
+                  })
+                }}
+                options={[
+                  { value: 'email_verified', label: 'Email Verified' },
+                  { value: 'email_unverified', label: 'Email Unverified' },
+                  { value: 'done_launching', label: 'Done Launching' },
+                  { value: 'confirm_launching', label: 'Confirm Launching' },
+                  { value: 'letter_error', label: 'Letter Error' },
+                  { value: 'letter_verified', label: 'Letter Verified' },
+                  { value: 'done_reregist', label: 'Done Re-Registration' },
+                  { value: 'closed', label: 'Closed' },
+                ]}
+                placeholder="Select Status"
+              />
             </div>
             <div className="flex justify-end gap-2">
               <button
@@ -877,7 +829,7 @@ Panitia BNCC Launching`,
       )}
 
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <form
             className="bg-white p-6 rounded-lg shadow-xl text-left min-w-[350px] max-w-[600px] w-full"
             onSubmit={handleCreateSubmit}
@@ -933,132 +885,91 @@ Panitia BNCC Launching`,
                 placeholder="WhatsApp"
                 required
               />
-              <select
-                name="regionId"
+              <Select
                 value={createForm.regionId ?? ''}
-                onChange={(e) => {
+                onChange={(val) => {
                   setCreateForm({
                     ...createForm,
-                    regionId: Number(e.target.value),
+                    regionId: val ? Number(val) : undefined,
                     facultyId: undefined,
                     majorId: undefined,
                     lntCourseId: undefined,
                     scheduleId: undefined,
                   })
                 }}
-                className="border p-2 rounded w-full"
-                required
-              >
-                <option value="">Select Region</option>
-                {regions.map((r) => (
-                  <option key={r.id} value={r.id}>
-                    {r.name}
-                  </option>
-                ))}
-              </select>
-              <select
-                name="facultyId"
+                options={regions.map((r) => ({ value: r.id, label: r.name }))}
+                placeholder="Select Region"
+              />
+              <Select
                 value={createForm.facultyId ?? ''}
-                onChange={(e) => {
+                onChange={(val) => {
                   setCreateForm({
                     ...createForm,
-                    facultyId: Number(e.target.value),
+                    facultyId: val ? Number(val) : undefined,
                     majorId: undefined,
                   })
                 }}
-                className="border p-2 rounded w-full"
-                required
+                options={createFaculties.map((f) => ({ value: f.id, label: f.name }))}
+                placeholder={!createForm.regionId ? 'Pilih region Anda terlebih dahulu' : 'Select Faculty'}
                 disabled={!createForm.regionId}
-              >
-                <option value="">Select Faculty</option>
-                {createFaculties.map((f) => (
-                  <option key={f.id} value={f.id}>
-                    {f.name}
-                  </option>
-                ))}
-              </select>
-              <select
-                name="majorId"
+              />
+              <Select
                 value={createForm.majorId ?? ''}
-                onChange={(e) => {
+                onChange={(val) => {
                   setCreateForm({
                     ...createForm,
-                    majorId: Number(e.target.value),
+                    majorId: val ? Number(val) : undefined,
                   })
                 }}
-                className="border p-2 rounded w-full"
-                required
+                options={createMajors.map((m) => ({ value: m.id, label: m.name }))}
+                placeholder={!createForm.facultyId ? 'Pilih fakultas Anda terlebih dahulu' : 'Select Major'}
                 disabled={!createForm.facultyId}
-              >
-                <option value="">Select Major</option>
-                {createMajors.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.name}
-                  </option>
-                ))}
-              </select>
-              <select
-                name="lntCourseId"
+              />
+              <Select
                 value={createForm.lntCourseId ?? ''}
-                onChange={(e) => {
+                onChange={(val) => {
                   setCreateForm({
                     ...createForm,
-                    lntCourseId: Number(e.target.value),
+                    lntCourseId: val ? Number(val) : undefined,
                   })
                 }}
-                className="border p-2 rounded w-full"
-                required
+                options={createLntCourses.map((l) => ({ value: l.id, label: l.title || l.name }))}
+                placeholder={!createForm.regionId ? 'Pilih region Anda terlebih dahulu' : 'Select LnT Course'}
                 disabled={!createForm.regionId}
-              >
-                <option value="">Select LnT Course</option>
-                {createLntCourses.map((l) => (
-                  <option key={l.id} value={l.id}>
-                    {l.title}
-                  </option>
-                ))}
-              </select>
-              <select
-                name="scheduleId"
+              />
+              <Select
                 value={createForm.scheduleId ?? ''}
-                onChange={(e) => {
+                onChange={(val) => {
                   setCreateForm({
                     ...createForm,
-                    scheduleId: Number(e.target.value),
+                    scheduleId: val ? Number(val) : undefined,
                   })
                 }}
-                className="border p-2 rounded w-full"
-                required
+                options={createSchedules.map((s) => ({ value: s.id, label: s.title }))}
+                placeholder={!createForm.regionId ? 'Pilih region Anda terlebih dahulu' : 'Select Schedule'}
                 disabled={!createForm.regionId}
-              >
-                <option value="">Select Schedule</option>
-                {createSchedules.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.title}
-                  </option>
-                ))}
-              </select>
-              <select
-                name="isJapres"
+              />
+              <Select
                 value={
                   createForm.isJapres !== null
                     ? String(createForm.isJapres)
                     : ''
                 }
-                onChange={(e) => {
-                  const val = e.target.value
+                onChange={(val) => {
                   setCreateForm({
                     ...createForm,
                     isJapres: val === '' ? null : Number(val),
                   })
                 }}
-                className="border p-2 rounded w-full"
-              >
-                <option value="">None</option>
-                <option value={-1}>Pending</option>
-                <option value={0}>Rejected</option>
-                <option value={1}>Accepted Silver</option>
-                <option value={2}>Accepted Gold</option>
-              </select>
+                options={[
+                  { value: '', label: 'None' },
+                  { value: '-1', label: 'Pending' },
+                  { value: '0', label: 'Rejected' },
+                  { value: '1', label: 'Accepted Silver' },
+                  { value: '2', label: 'Accepted Gold' },
+                ]}
+                placeholder="Select Jalur Prestasi"
+              />
             </div>
             <div className="flex justify-end gap-2">
               <button
@@ -1082,7 +993,7 @@ Panitia BNCC Launching`,
       )}
 
       {showWhatsAppModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-lg shadow-xl text-left w-full max-w-lg">
             <h3 className="text-xl font-bold mb-2">
               Set WhatsApp Message Template
@@ -1116,7 +1027,7 @@ Panitia BNCC Launching`,
       )}
 
       {showViewMessageModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-lg shadow-xl text-left w-full max-w-lg">
             <h3 className="text-xl font-bold mb-4">
               Current WhatsApp Message Template
@@ -1139,7 +1050,7 @@ Panitia BNCC Launching`,
       )}
 
       {showDeleteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-lg shadow-xl text-center">
             <h3 className="text-xl font-bold mb-4">Delete User</h3>
             <p className="text-gray-600 mb-6">
@@ -1167,7 +1078,7 @@ Panitia BNCC Launching`,
       )}
 
       {deleting && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]">
           <div className="bg-white p-8 rounded-lg shadow-xl text-center flex flex-col items-center">
             <Loader />
             <span className="mt-4 text-gray-700">Deleting user...</span>
@@ -1176,7 +1087,7 @@ Panitia BNCC Launching`,
       )}
 
       {alert && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[70]">
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-[70]">
           <div className="bg-white p-8 rounded-lg shadow-xl text-center flex flex-col items-center">
             {alert.type === 'success' ? (
               <svg
