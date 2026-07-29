@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
-import { FaArrowLeft, FaUsers } from 'react-icons/fa'
-import { IoEye, IoEyeOff, IoCheckmarkCircle } from 'react-icons/io5'
+import { FaUsers } from 'react-icons/fa'
+import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { usePopup, useLookupQuery, useLinkQuery, useAuthMutation } from '@/hooks'
-import { heardFromOptions } from '@/lib/types'
 import { formatScheduleDisplay } from '@/lib/utils'
 import AuthBackground from '@/components/AuthBackground'
 
@@ -54,31 +53,18 @@ function BoundingBox({ children }) {
   )
 }
 
-const FIELD_STYLE = {
-  background: 'rgba(224, 237, 252, 0.70)',
-  border: '1.5px solid #9EC3E8',
-}
-const FIELD_FOCUS = {
-  borderColor: '#3B82F6',
-  background: 'rgba(224, 237, 252, 0.95)',
-}
-const FIELD_BLUR = {
-  borderColor: '#9EC3E8',
-  background: 'rgba(224, 237, 252, 0.70)',
-}
-
 const inputClass =
-  'w-full rounded-lg px-4 py-2.5 text-sm text-[#0D2A4E] placeholder-[#81A8CE] outline-none transition-all'
-const labelClass = 'block font-semibold text-[#0D2A4E] text-sm mb-1.5'
+  'w-full rounded-lg px-3.5 py-2 text-xs sm:text-sm text-[#0A2745] placeholder-[#81A8CE]/80 outline-none transition-all bg-[#EBF5FF]/50 border border-[#99C4F4] focus:bg-[#EBF5FF]/70 focus:border-[#207CDB] focus:ring-2 focus:ring-[#207CDB]/20'
+const labelClass = 'block text-[11px] sm:text-xs font-semibold text-[#0A2745] font-poppins mb-1.5'
 const selectClass =
-  'w-full rounded-lg px-4 py-2.5 text-sm text-[#0D2A4E] outline-none transition-all appearance-none cursor-pointer'
+  'w-full rounded-lg px-3.5 py-2 text-xs sm:text-sm outline-none transition-all appearance-none cursor-pointer bg-[#EBF5FF]/50 border border-[#99C4F4] focus:bg-[#EBF5FF]/70 focus:border-[#207CDB] focus:ring-2 focus:ring-[#207CDB]/20'
 
 const TOTAL_STEPS = 4
 
 /* ═══════════════════════════════════════════════════════════════ */
 export default function SignUp() {
   const navigate = useNavigate()
-  const { isOpen, config, showPopup, hidePopup, handleButtonClick } = usePopup()
+  const { isOpen, config, showPopup, hidePopup } = usePopup()
 
   const {
     register,
@@ -100,8 +86,6 @@ export default function SignUp() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
   const [waChecked, setWaChecked] = useState(false)
-  const [heardFrom, setHeardFrom] = useState('')
-  const [heardFromOther, setHeardFromOther] = useState('')
   const [successVisible, setSuccessVisible] = useState(false)
   const [expoCode, setExpoCode] = useState('')
   const [showExpoCode, setShowExpoCode] = useState(false)
@@ -162,7 +146,10 @@ export default function SignUp() {
       setSuccessVisible(true)
       return
     }
-    if (currentStep < 3) { onNext(); return }
+    if (currentStep < 3) {
+      onNext()
+      return
+    }
     if (!waChecked) {
       showPopup({ type: 'error', heading: 'Confirmation Required', message: 'Please confirm you have joined the WhatsApp group.' })
       return
@@ -211,17 +198,15 @@ export default function SignUp() {
 
   /* ── step titles ── */
   const stepTitle = currentStep === 1
-    ? <>Personal <span style={{ color: '#2368C4' }}>Information</span></>
+    ? <>Personal <span className="text-[#2474C0]">Information</span></>
     : currentStep === 2
-    ? <>BNCC <span style={{ color: '#2368C4' }}>Registration</span></>
+    ? <>BNCC <span className="text-[#2474C0]">Registration</span></>
     : currentStep === 3
-    ? <>BNCC <span style={{ color: '#2368C4' }}>Community</span></>
-    : <>Get your <span style={{ color: '#2368C4' }}>Expo Code</span></>
+    ? <>BNCC <span className="text-[#2474C0]">Community</span></>
+    : <>Get your <span className="text-[#2474C0]">Expo Code</span></>
 
   const progressPct = (currentStep / TOTAL_STEPS) * 100
 
-  /* ══════════════════════════ RENDER ═══════════════════════════ */
-  /* ══════════════════════════ RENDER ═══════════════════════════ */
   return (
     <AuthBackground>
       {/* Back button */}
@@ -235,22 +220,21 @@ export default function SignUp() {
       </button>
 
       <section
-        className="relative z-1 mx-auto flex min-h-svh w-full max-w-[52rem] flex-col items-center px-4 pt-4 sm:pt-8 lg:pt-12 pb-4 lg:pb-16 justify-between"
+        className="relative z-1 mx-auto flex min-h-svh w-full max-w-[52rem] flex-col items-center px-4 pt-14 sm:pt-16 lg:pt-20 pb-4 lg:pb-16 justify-between"
         aria-labelledby="sign-up-title"
       >
         <div className="w-full flex flex-col items-center flex-1 justify-center lg:justify-start">
           {/* Header Badge */}
-          <header className="relative z-[3] flex items-center justify-center whitespace-nowrap rounded-[5px] border-2 border-white/85 border-b-white/40 bg-[rgb(249_252_255_/_58%)] px-3.5 sm:px-5 py-1.5 sm:py-2 text-center font-outfit text-xs sm:text-lg leading-tight font-semibold tracking-[-0.035em] shadow-[inset_0_1px_0_rgb(255_255_255_/_72%),0_2px_8px_rgb(20_76_130_/_10%)] backdrop-blur-[8px]">
-            <span className="bg-gradient-to-r from-20% to-80% from-[#0A2745] to-[#2474C0] bg-clip-text text-transparent">
-              BNCC OPENING&nbsp;<strong className="font-bold">SEASON 2026</strong>
-            </span>
+          <header className="relative z-[3] flex items-center justify-center whitespace-nowrap rounded-[5px] border-2 border-white/85 border-b-white/40 bg-[rgb(249_252_255_/_58%)] px-3.5 sm:px-5 py-1.5 sm:py-2 text-center font-outfit text-xs sm:text-sm leading-tight font-semibold tracking-[-0.02em] shadow-[inset_0_1px_0_rgb(255_255_255_/_72%),0_2px_8px_rgb(20_76_130_/_10%)] backdrop-blur-[8px]">
+            <span className="text-[#0A2745]">BNCC OPENING&nbsp;</span>
+            <strong className="font-bold text-[#2474C0]">SEASON 2026</strong>
           </header>
 
           {/* Title Box with Bounding Box & Selection Handles */}
-          <div className="relative z-0 mt-3 sm:mt-4 lg:mt-2.5 flex items-center justify-center">
+          <div className="relative z-0 mt-3 sm:mt-4 flex items-center justify-center w-full">
             <BoundingBox>
               <h1
-                className="font-outfit font-bold tracking-[0.04rem] leading-none whitespace-nowrap px-4 sm:px-6 py-1.5 sm:py-2 bg-gradient-to-b from-[#4489D4] to-[#EAF5FF] bg-clip-text text-transparent text-[clamp(3.5rem,14vw,8.5rem)]"
+                className="font-outfit font-bold tracking-[0.04rem] leading-none whitespace-nowrap px-3 sm:px-6 py-1 sm:py-2 bg-gradient-to-b from-[#4489D4] to-[#EAF5FF] bg-clip-text text-transparent text-[clamp(3.8rem,16vw,10rem)]"
                 id="sign-up-title"
               >
                 REGIST
@@ -260,7 +244,7 @@ export default function SignUp() {
 
           {/* ══ Glassmorphism Card ══ */}
           <div
-            className="relative z-2 -mt-6 min-[400px]:-mt-8 sm:-mt-9 lg:-mt-7 flex w-full max-w-[22rem] min-[400px]:max-w-[26rem] sm:max-w-[32rem] lg:max-w-[36rem] flex flex-col rounded-[15px] border-[3px] border-white/90 bg-white/30 backdrop-blur-lg px-5 min-[400px]:px-7 sm:px-10 pt-6 sm:pt-8 lg:pt-9 pb-5 sm:pb-6 text-[#0A2745]"
+            className="relative z-2 -mt-5 min-[400px]:-mt-7 sm:-mt-8 w-[82%] max-w-[19rem] min-[400px]:max-w-[21rem] sm:max-w-[24rem] lg:max-w-[26rem] flex flex-col rounded-[15px] border-[2.5px] border-white/90 bg-white/35 backdrop-blur-lg px-5 sm:px-8 pt-5 sm:pt-7 pb-5 sm:pb-6 text-[#0A2745]"
           >
             {/* Card heading */}
             <h2 className="font-bold text-lg sm:text-xl text-center text-[#0D2A4E] mb-5">
@@ -268,78 +252,65 @@ export default function SignUp() {
             </h2>
 
             {/* ─── FORM ─── */}
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5">
-
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
               {/* ══ STEP 1: Personal Info ══ */}
               {currentStep === 1 && (
                 <>
                   {/* Full Name */}
                   <div>
-                    <label className={labelClass}>Full Name <span className="text-red-400">*</span></label>
+                    <label className={labelClass}>Full Name</label>
                     <input
                       {...register('fullName', {
                         required: 'Full name is required',
                         minLength: { value: 3, message: 'Full name length must be at least 3 characters long' },
                       })}
                       type="text"
-                      placeholder="Enter your full name"
+                      placeholder="Enter your name"
                       className={inputClass}
-                      style={FIELD_STYLE}
-                      onFocus={e => Object.assign(e.target.style, FIELD_FOCUS)}
-                      onBlur={e => Object.assign(e.target.style, FIELD_BLUR)}
                     />
-                    {errors.fullName && <p className="text-xs text-red-500 mt-1">{errors.fullName.message}</p>}
+                    {errors.fullName && <p className="text-[10px] text-red-500 mt-1">{errors.fullName.message}</p>}
                   </div>
 
                   {/* Line ID */}
                   <div>
-                    <label className={labelClass}>Line ID <span className="text-red-400">*</span></label>
+                    <label className={labelClass}>Line ID</label>
                     <input
                       {...register('lineId', { required: 'Line ID is required' })}
                       type="text"
                       placeholder="Enter your Line ID"
                       className={inputClass}
-                      style={FIELD_STYLE}
-                      onFocus={e => Object.assign(e.target.style, FIELD_FOCUS)}
-                      onBlur={e => Object.assign(e.target.style, FIELD_BLUR)}
                     />
-                    {errors.lineId && <p className="text-xs text-red-500 mt-1">{errors.lineId.message}</p>}
+                    {errors.lineId && <p className="text-[10px] text-red-500 mt-1">{errors.lineId.message}</p>}
                   </div>
 
                   {/* WhatsApp */}
                   <div>
-                    <label className={labelClass}>WhatsApp Number <span className="text-red-400">*</span></label>
+                    <label className={labelClass}>WhatsApp Number</label>
                     <input
                       {...register('whatsappNumber', {
                         required: 'WhatsApp number is required',
                         validate: (v) => (v && v.length >= 9 && v.length <= 12 && /^\d+$/.test(v)) || 'WhatsApp number must be 9–12 digits',
                       })}
                       type="text"
-                      placeholder="e.g. 087723780836"
+                      placeholder="Enter your WhatsApp number"
                       className={inputClass}
-                      style={FIELD_STYLE}
-                      onFocus={e => Object.assign(e.target.style, FIELD_FOCUS)}
-                      onBlur={e => Object.assign(e.target.style, FIELD_BLUR)}
                     />
-                    {errors.whatsappNumber && <p className="text-xs text-red-500 mt-1">{errors.whatsappNumber.message}</p>}
+                    {errors.whatsappNumber && <p className="text-[10px] text-red-500 mt-1">{errors.whatsappNumber.message}</p>}
                   </div>
 
                   {/* NIM */}
                   <div>
-                    <label className={labelClass}>NIM <span className="text-red-400">*</span></label>
+                    <label className={labelClass}>NIM</label>
                     <input
                       {...register('nim', {
                         required: 'NIM is required',
                         validate: (v) => /^\d{10}$/.test(v) || 'NIM harus 10 angka',
                       })}
                       type="text"
-                      placeholder="Masukkan NIM Anda"
+                      placeholder="Enter your NIM"
                       className={inputClass}
-                      style={FIELD_STYLE}
-                      onFocus={e => Object.assign(e.target.style, FIELD_FOCUS)}
-                      onBlur={e => Object.assign(e.target.style, FIELD_BLUR)}
                     />
-                    {errors.nim && <p className="text-xs text-red-500 mt-1">{errors.nim.message}</p>}
+                    {errors.nim && <p className="text-[10px] text-red-500 mt-1">{errors.nim.message}</p>}
                   </div>
 
                   {/* Region Kampus */}
@@ -349,7 +320,7 @@ export default function SignUp() {
                     rules={{ required: 'Region Kampus is required' }}
                     render={({ field }) => (
                       <div>
-                        <label className={labelClass}>Region Kampus <span className="text-red-400">*</span></label>
+                        <label className={labelClass}>Campus Region</label>
                         <div className="relative">
                           <select
                             value={field.value || ''}
@@ -361,15 +332,14 @@ export default function SignUp() {
                               setValue('lntCourseId', '', { shouldValidate: true })
                               setValue('scheduleId', '', { shouldValidate: true })
                             }}
-                            className={selectClass}
-                            style={FIELD_STYLE}
+                            className={`${selectClass} ${!field.value ? 'text-[#81A8CE]' : 'text-[#0A2745] font-semibold'}`}
                           >
-                            <option value="" disabled>Pilih region kampus Anda</option>
-                            {regions.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
+                            <option value="" disabled className="text-[#81A8CE]">Select your campus region</option>
+                            {regions.map((r) => <option key={r.id} value={r.id} className="text-[#0A2745] font-normal">{r.name}</option>)}
                           </select>
-                          <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#4C88C7]">▾</div>
+                          <div className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#4C88C7]">▾</div>
                         </div>
-                        {errors.regionId && <p className="text-xs text-red-500 mt-1">{errors.regionId.message}</p>}
+                        {errors.regionId && <p className="text-[10px] text-red-500 mt-1">{errors.regionId.message}</p>}
                       </div>
                     )}
                   />
@@ -381,7 +351,7 @@ export default function SignUp() {
                     rules={{ required: 'Fakultas is required' }}
                     render={({ field }) => (
                       <div>
-                        <label className={labelClass}>Fakultas <span className="text-red-400">*</span></label>
+                        <label className={labelClass}>Faculty</label>
                         <div className="relative">
                           <select
                             value={field.value || ''}
@@ -391,15 +361,15 @@ export default function SignUp() {
                               field.onChange(val)
                               setValue('majorId', '', { shouldValidate: true })
                             }}
-                            className={selectClass}
-                            style={{ ...FIELD_STYLE, opacity: !watchedRegionId ? 0.6 : 1 }}
+                            className={`${selectClass} ${!field.value ? 'text-[#81A8CE]' : 'text-[#0A2745] font-semibold'}`}
+                            style={{ opacity: !watchedRegionId ? 0.6 : 1 }}
                           >
-                            <option value="" disabled>{!watchedRegionId ? 'Pilih region kampus Anda terlebih dahulu' : 'Pilih fakultas Anda'}</option>
-                            {faculties.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
+                            <option value="" disabled className="text-[#81A8CE]">{!watchedRegionId ? 'Please select your campus region first' : 'Select your faculty'}</option>
+                            {faculties.map((f) => <option key={f.id} value={f.id} className="text-[#0A2745] font-normal">{f.name}</option>)}
                           </select>
-                          <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#4C88C7]">▾</div>
+                          <div className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#4C88C7]">▾</div>
                         </div>
-                        {errors.facultyId && <p className="text-xs text-red-500 mt-1">{errors.facultyId.message}</p>}
+                        {errors.facultyId && <p className="text-[10px] text-red-500 mt-1">{errors.facultyId.message}</p>}
                       </div>
                     )}
                   />
@@ -411,21 +381,21 @@ export default function SignUp() {
                     rules={{ required: 'Jurusan is required' }}
                     render={({ field }) => (
                       <div>
-                        <label className={labelClass}>Jurusan <span className="text-red-400">*</span></label>
+                        <label className={labelClass}>Major</label>
                         <div className="relative">
                           <select
                             value={field.value || ''}
                             disabled={!watchedFacultyId}
                             onChange={(e) => field.onChange(Number(e.target.value))}
-                            className={selectClass}
-                            style={{ ...FIELD_STYLE, opacity: !watchedFacultyId ? 0.6 : 1 }}
+                            className={`${selectClass} ${!field.value ? 'text-[#81A8CE]' : 'text-[#0A2745] font-semibold'}`}
+                            style={{ opacity: !watchedFacultyId ? 0.6 : 1 }}
                           >
-                            <option value="" disabled>{!watchedFacultyId ? 'Pilih fakultas Anda terlebih dahulu' : 'Pilih jurusan Anda'}</option>
-                            {majors.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
+                            <option value="" disabled className="text-[#81A8CE]">{!watchedFacultyId ? 'Please select your faculty first' : 'Select your major'}</option>
+                            {majors.map((m) => <option key={m.id} value={m.id} className="text-[#0A2745] font-normal">{m.name}</option>)}
                           </select>
-                          <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#4C88C7]">▾</div>
+                          <div className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#4C88C7]">▾</div>
                         </div>
-                        {errors.majorId && <p className="text-xs text-red-500 mt-1">{errors.majorId.message}</p>}
+                        {errors.majorId && <p className="text-[10px] text-red-500 mt-1">{errors.majorId.message}</p>}
                       </div>
                     )}
                   />
@@ -437,7 +407,7 @@ export default function SignUp() {
                 <>
                   {/* Email */}
                   <div>
-                    <label className={labelClass}>Email <span className="text-red-400">*</span></label>
+                    <label className={labelClass}>Email</label>
                     <input
                       {...register('email', {
                         required: 'Email is required',
@@ -446,16 +416,13 @@ export default function SignUp() {
                       type="text"
                       placeholder="Enter your email"
                       className={inputClass}
-                      style={FIELD_STYLE}
-                      onFocus={e => Object.assign(e.target.style, FIELD_FOCUS)}
-                      onBlur={e => Object.assign(e.target.style, FIELD_BLUR)}
                     />
-                    {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>}
+                    {errors.email && <p className="text-[10px] text-red-500 mt-1">{errors.email.message}</p>}
                   </div>
 
                   {/* BINUS Email */}
                   <div>
-                    <label className={labelClass}>Email (@binus.ac.id) <span className="text-red-400">*</span></label>
+                    <label className={labelClass}>Email (@binus.ac.id)</label>
                     <input
                       {...register('binusEmail', {
                         required: 'BINUS email is required',
@@ -464,16 +431,13 @@ export default function SignUp() {
                       type="text"
                       placeholder="Enter your BINUS email"
                       className={inputClass}
-                      style={FIELD_STYLE}
-                      onFocus={e => Object.assign(e.target.style, FIELD_FOCUS)}
-                      onBlur={e => Object.assign(e.target.style, FIELD_BLUR)}
                     />
-                    {errors.binusEmail && <p className="text-xs text-red-500 mt-1">{errors.binusEmail.message}</p>}
+                    {errors.binusEmail && <p className="text-[10px] text-red-500 mt-1">{errors.binusEmail.message}</p>}
                   </div>
 
                   {/* Password */}
                   <div>
-                    <label className={labelClass}>Password <span className="text-red-400">*</span></label>
+                    <label className={labelClass}>Password</label>
                     <div className="relative">
                       <input
                         {...register('password', {
@@ -485,24 +449,21 @@ export default function SignUp() {
                         type={showPassword ? 'text' : 'password'}
                         placeholder="Enter your password"
                         className={`${inputClass} pr-11`}
-                        style={FIELD_STYLE}
-                        onFocus={e => Object.assign(e.target.style, FIELD_FOCUS)}
-                        onBlur={e => Object.assign(e.target.style, FIELD_BLUR)}
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#4C88C7] hover:text-[#0D2A4E] transition-colors cursor-pointer"
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#4C88C7] hover:text-[#0D2A4E] transition-colors cursor-pointer"
                       >
-                        {showPassword ? <IoEyeOff className="w-4 h-4" /> : <IoEye className="w-4 h-4" />}
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
-                    {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>}
+                    {errors.password && <p className="text-[10px] text-red-500 mt-1">{errors.password.message}</p>}
                   </div>
 
                   {/* Confirm Password */}
                   <div>
-                    <label className={labelClass}>Confirm Password <span className="text-red-400">*</span></label>
+                    <label className={labelClass}>Confirm Password</label>
                     <div className="relative">
                       <input
                         {...register('confirmPassword', {
@@ -512,19 +473,16 @@ export default function SignUp() {
                         type={showConfirmPassword ? 'text' : 'password'}
                         placeholder="Confirm your password"
                         className={`${inputClass} pr-11`}
-                        style={FIELD_STYLE}
-                        onFocus={e => Object.assign(e.target.style, FIELD_FOCUS)}
-                        onBlur={e => Object.assign(e.target.style, FIELD_BLUR)}
                       />
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#4C88C7] hover:text-[#0D2A4E] transition-colors cursor-pointer"
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#4C88C7] hover:text-[#0D2A4E] transition-colors cursor-pointer"
                       >
-                        {showConfirmPassword ? <IoEyeOff className="w-4 h-4" /> : <IoEye className="w-4 h-4" />}
+                        {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
-                    {errors.confirmPassword && <p className="text-xs text-red-500 mt-1">{errors.confirmPassword.message}</p>}
+                    {errors.confirmPassword && <p className="text-[10px] text-red-500 mt-1">{errors.confirmPassword.message}</p>}
                   </div>
 
                   {/* LnT Course */}
@@ -534,20 +492,19 @@ export default function SignUp() {
                     rules={{ required: 'LnT Course is required' }}
                     render={({ field }) => (
                       <div>
-                        <label className={labelClass}>LnT Course <span className="text-red-400">*</span></label>
+                        <label className={labelClass}>LnT Course</label>
                         <div className="relative">
                           <select
                             value={field.value || ''}
                             onChange={(e) => field.onChange(Number(e.target.value))}
-                            className={selectClass}
-                            style={FIELD_STYLE}
+                            className={`${selectClass} ${!field.value ? 'text-[#81A8CE]' : 'text-[#0A2745] font-semibold'}`}
                           >
-                            <option value="" disabled>Pilih LnT Course yang Anda inginkan</option>
-                            {lntCourses.map((c) => <option key={c.id} value={c.id}>{c.title || c.name}</option>)}
+                            <option value="" disabled className="text-[#81A8CE]">Select your LnT Course</option>
+                            {lntCourses.map((c) => <option key={c.id} value={c.id} className="text-[#0A2745] font-normal">{c.title || c.name}</option>)}
                           </select>
-                          <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#4C88C7]">▾</div>
+                          <div className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#4C88C7]">▾</div>
                         </div>
-                        {errors.lntCourseId && <p className="text-xs text-red-500 mt-1">{errors.lntCourseId.message}</p>}
+                        {errors.lntCourseId && <p className="text-[10px] text-red-500 mt-1">{errors.lntCourseId.message}</p>}
                       </div>
                     )}
                   />
@@ -559,20 +516,19 @@ export default function SignUp() {
                     rules={{ required: 'Jadwal BNCC Launching is required' }}
                     render={({ field }) => (
                       <div>
-                        <label className={labelClass}>Jadwal BNCC Launching <span className="text-red-400">*</span></label>
+                        <label className={labelClass}>Jadwal BNCC Launching</label>
                         <div className="relative">
                           <select
                             value={field.value || ''}
                             onChange={(e) => field.onChange(Number(e.target.value))}
-                            className={selectClass}
-                            style={FIELD_STYLE}
+                            className={`${selectClass} ${!field.value ? 'text-[#81A8CE]' : 'text-[#0A2745] font-semibold'}`}
                           >
-                            <option value="" disabled>Pilih jadwal yang dapat kamu hadiri</option>
-                            {schedules.map((s) => <option key={s.id} value={s.id}>{formatScheduleDisplay(s)}</option>)}
+                            <option value="" disabled className="text-[#81A8CE]">Select your Launch Schedule</option>
+                            {schedules.map((s) => <option key={s.id} value={s.id} className="text-[#0A2745] font-normal">{formatScheduleDisplay(s)}</option>)}
                           </select>
-                          <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#4C88C7]">▾</div>
+                          <div className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#4C88C7]">▾</div>
                         </div>
-                        {errors.scheduleId && <p className="text-xs text-red-500 mt-1">{errors.scheduleId.message}</p>}
+                        {errors.scheduleId && <p className="text-[10px] text-red-500 mt-1">{errors.scheduleId.message}</p>}
                       </div>
                     )}
                   />
@@ -633,7 +589,7 @@ export default function SignUp() {
                       className="px-3.5 py-2 rounded-lg text-white font-medium text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer shadow transition-all hover:opacity-90"
                       style={{ background: 'linear-gradient(135deg, #1B5198 0%, #2A6DC2 100%)' }}
                     >
-                      {showExpoCode ? <IoEyeOff className="text-base" /> : <IoEye className="text-base" />}
+                      {showExpoCode ? <EyeOff size={16} /> : <Eye size={16} />}
                       <span>{showExpoCode ? 'Hide Code' : 'Show Code'}</span>
                     </button>
                   </div>
@@ -643,40 +599,18 @@ export default function SignUp() {
                 </div>
               )}
 
-              {/* ── Progress Bar ── */}
-              <div className="pt-2 pb-1">
-                <div className="w-full h-1.5 rounded-full" style={{ background: 'rgba(180,210,240,0.55)' }}>
-                  <div
-                    className="h-full rounded-full transition-all duration-500"
-                    style={{
-                      width: `${progressPct}%`,
-                      background: 'linear-gradient(90deg, #1B5198, #3B82F6)',
-                    }}
-                  />
-                </div>
-              </div>
-
               {/* ── Buttons ── */}
-              <div className="flex items-center justify-center gap-3 pt-1">
-                {currentStep < 4 && (
-                  <button
-                    type="button"
-                    onClick={onBack}
-                    className="flex-1 max-w-[140px] py-2.5 rounded-xl border-2 font-semibold text-sm transition-all cursor-pointer hover:opacity-80"
-                    style={{ borderColor: '#1B5198', color: '#1B5198' }}
-                  >
-                    Back
-                  </button>
-                )}
+              <div className="flex justify-center pt-2">
                 <button
-                  type={currentStep === 3 ? 'submit' : 'button'}
-                  onClick={currentStep !== 3 ? handleSubmit(onSubmit) : undefined}
+                  type="submit"
                   disabled={currentStep === 3 && (registerMutation.isPending || !waChecked)}
-                  className="flex-1 max-w-[140px] py-2.5 rounded-xl text-white font-semibold text-sm shadow-md transition-all cursor-pointer disabled:opacity-50"
-                  style={{ background: 'linear-gradient(135deg, #1B5198 0%, #2A6DC2 100%)' }}
+                  className="w-32 py-2 sm:py-2.5 rounded-lg bg-[#1E5FA8] hover:bg-[#12376B] text-white font-bold text-xs sm:text-sm shadow-md transition cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
                 >
+                  {registerMutation.isPending && <Loader2 size={13} className="animate-spin" />}
                   {currentStep === 3
                     ? (registerMutation.isPending ? 'Submitting...' : 'Submit')
+                    : currentStep === 4
+                    ? 'Done'
                     : 'Next'}
                 </button>
               </div>
@@ -693,6 +627,18 @@ export default function SignUp() {
               </span>
             </div>
           </div>
+
+          {/* ── Progress Bar (Outside Card) ── */}
+          {currentStep < 4 && (
+            <div className="w-[82%] max-w-[19rem] min-[400px]:max-w-[21rem] sm:max-w-[24rem] lg:max-w-[26rem] mt-6">
+              <div className="relative w-full h-7 rounded-[8px] border border-white bg-white/20">
+                <div
+                  className="absolute -top-[1px] -bottom-[1px] -left-[1px] bg-gradient-to-r from-[#5B94D0] to-[#295A8D] rounded-[8px] transition-all duration-500"
+                  style={{ width: `calc(${progressPct}% + 2px)` }}
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* BNCC Logo — relative bottom in scroll flow */}

@@ -6,4 +6,24 @@
 <stop offset="1" stop-color="#F9FCFF"/>
 </radialGradient>
 </defs>
+<g transform="translate(960, 192)" opacity="0.45">
+  <polygon points="0,-24 24,0 0,24 -24,0" stroke="#9EC3E8" stroke-width="1.5" />
+  <polygon points="0,-11 11,0 0,11 -11,0" fill="#9EC3E8" />
+</g>
+<g transform="translate(960, 384)" opacity="0.45">
+  <polygon points="0,-24 24,0 0,24 -24,0" stroke="#9EC3E8" stroke-width="1.5" />
+  <polygon points="0,-11 11,0 0,11 -11,0" fill="#9EC3E8" />
+</g>
+<g transform="translate(576, 384)" opacity="0.45">
+  <polygon points="0,-24 24,0 0,24 -24,0" stroke="#9EC3E8" stroke-width="1.5" />
+  <polygon points="0,-11 11,0 0,11 -11,0" fill="#9EC3E8" />
+</g>
+<g transform="translate(1344, 384)" opacity="0.45">
+  <polygon points="0,-24 24,0 0,24 -24,0" stroke="#9EC3E8" stroke-width="1.5" />
+  <polygon points="0,-11 11,0 0,11 -11,0" fill="#9EC3E8" />
+</g>
+<g transform="translate(1152, 192)" opacity="0.45">
+  <polygon points="0,-24 24,0 0,24 -24,0" stroke="#9EC3E8" stroke-width="1.5" />
+  <polygon points="0,-11 11,0 0,11 -11,0" fill="#9EC3E8" />
+</g>
 </svg>
