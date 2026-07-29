@@ -21,14 +21,14 @@ const DUEDATE_REGISTRATION_STYLE = {
   background: 'linear-gradient(to right, #992C3D 0%, #FF2A4A 100%)',
 };
 const EARLY_BIRD_DATES = [
-  '2026-09-11',
+  '2026-09-02',
 ];
 
 const REGISTRATION_DATES = [
   '2026-09-18',
 ];
 
-export default function Calendar({ schedules, userScheduleId }) {
+export default function Calendar({ schedules }) {
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const today = new Date();

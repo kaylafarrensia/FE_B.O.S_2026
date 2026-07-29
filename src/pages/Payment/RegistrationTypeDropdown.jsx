@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { formatDate, formatStartEndTime } from '@/utils/index.js';
 
-const DATE_LABEL_CLASS = 'font-semibold text-xs sm:text-lg text-[#251369]';
+const DATE_LABEL_CLASS = 'font-semibold text-xs sm:text-lg text-[#0A2745]/50';
 const TIME_LABEL_CLASS = 'text-xs sm:text-lg text-gray-500';
 
 export default function RegistrationTypeDropdown({ types, onSelect }) {

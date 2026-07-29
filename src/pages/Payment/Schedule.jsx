@@ -8,7 +8,6 @@ import Calendar from './Calendar.jsx';
 import RegistrationTypeDropdown from './RegistrationTypeDropdown.jsx';
 import ContactPerson from '@/pages/Dashboard/Japres/ContactPerson.jsx';
 import IndividualForm from './IndividualForm.jsx';
-import GroupCode from './GroupCode.jsx';
 import IconSad from '@/assets/icons/IconSad.svg';
 import { useNavigate } from 'react-router-dom';
 
@@ -32,10 +31,6 @@ const DUMMY_SCHEDULES = [
 const REGISTRATION_TYPES = [
   {
     id: 1,
-    type: 'Group (3 People)'
-  },
-  {
-    id: 2,
     type: 'Individual'
   }
 ]
@@ -148,7 +143,7 @@ export default function Schedule() {
 
             {/* ── Right Column ── */}
             <div className="flex flex-col w-full gap-4 xl:gap-5">
-              <Calendar schedules={DUMMY_SCHEDULES} userScheduleId={userType?.id} />
+              <Calendar schedules={DUMMY_SCHEDULES} />
 
               {/* Contact Person */}
               <ContactPerson />
