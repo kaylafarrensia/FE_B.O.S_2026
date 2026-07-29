@@ -84,6 +84,30 @@ export const getName = async () => {
 
 // Get Overview
 export const getAdminOverview = async () => {
+  // return {
+  //   "success": true,
+  //   "data": {
+  //     "totalPendaftar": 100,
+  //     "angkatan": {
+  //       "B29": { "count": 40, "percentage": 40 },
+  //       "B30": { "count": 60, "percentage": 60 }
+  //     },
+  //     "lntClasses": [
+  //       { "className": "Kelas A", "count": 30, "percentage": 30 },
+  //       { "className": "Kelas B", "count": 20, "percentage": 20 }
+  //     ],
+  //     "jurusan": {
+  //       "totalJurusan": 10,
+  //       "top3": [
+  //         { "name": "Teknik Informatika", "count": 30 },
+  //         { "name": "Sistem Informasi", "count": 20 },
+  //         { "name": "Manajemen", "count": 15 }
+  //       ]
+  //     },
+  //     "statusLaunching": { "count": 50, "percentage": 50 },
+  //     "statusMember": { "count": 30, "percentage": 30 }
+  //   }
+  // }
   try {
     const response = await api.get('/admin/overview');
     return response.data;
@@ -94,6 +118,26 @@ export const getAdminOverview = async () => {
 
 // Get User Details
 export const getUsersDetails = async () => {
+  // return {
+  //   "success": true,
+  //   "message": "Users retrieved successfully",
+  //   "data": [
+  //     {
+  //       "id": 1,
+  //       "name": "User Name",
+  //       "email": "user@example.com",
+  //       "status": "email_verified",
+  //       "role": 0,
+  //       "registrations": [{ "region": { "name": "Kemanggisan" } }]
+  //     }
+  //   ],
+  //   "pagination": {
+  //     "page": 1,
+  //     "limit": 10,
+  //     "total": 50,
+  //     "totalPages": 5
+  //   }
+  // }
   try {
     const response = await api.get(`/admin/users?limit=0`);
     return response.data;
@@ -168,6 +212,28 @@ export const downloadUsersExcel = async () => {
 
 // Get Payment Details
 export const getPaymentDetails = async () => {
+  // return {
+  //   "success": true,
+  //   "message": "Payment list retrieved",
+  //   "data": [
+  //     {
+  //       "userId": 1,
+  //       "name": "User Name",
+  //       "region": "Kemanggisan",
+  //       "bnccId": "BNCC26101",
+  //       "is_japres": "Not Submitted",
+  //       "payment_status": "PENDING",
+  //       "order_id": null,
+  //       "amount": 650000
+  //     }
+  //   ],
+  //   "pagination": {
+  //     "page": 1,
+  //     "limit": 20,
+  //     "total": 50,
+  //     "totalPages": 3
+  //   }
+  // }
   try {
     const response = await api.get('/admin/payments');
     return response.data;
@@ -205,6 +271,22 @@ export const updatePaymentStatus = async (userId, payload) => {
 
 // Get Japres
 export const getJapres = async () => {
+  // return {
+  //   "success": true,
+  //   "message": "Japres details retrieved successfully",
+  //   "data": [
+  //     {
+  //       "userId": 1,
+  //       "email": "user@example.com",
+  //       "name": "User Name",
+  //       "region": "Kemanggisan",
+  //       "japresUrl": "https://s3.bncc.net/...",
+  //       "isJapres": null,
+  //       "status": "Not Submitted",
+  //       "submittedAt": null
+  //     }
+  //   ]
+  // }
   try {
     const response = await api.get('/admin/japres');
     return response.data;
@@ -250,6 +332,17 @@ export const downloadJapresExcel = async () => {
 
 // Get All Subscribers
 export const getAllSubscribers = async () => {
+  // return {
+  //   "success": true,
+  //   "data": [
+  //     {
+  //       "id": 1,
+  //       "email": "user@example.com",
+  //       "blastStatus": "SUCCESS",
+  //       "blastTime": "2026-07-28T12:00:00.000Z"
+  //     }
+  //   ]
+  // }
   try {
     const response = await api.get('/admin/subscribers');
     return response.data;
@@ -260,6 +353,11 @@ export const getAllSubscribers = async () => {
 
 // Blast Email
 export const blastEmail = async (delayMs) => {
+  // return {
+  //   "success": true,
+  //   "message": "Blast started",
+  //   "jobId": "blast-1712345678"
+  // }
   try {
     const response = await api.post('/admin/blast-email', { delayMs });
     return response.data;
