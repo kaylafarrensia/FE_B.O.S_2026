@@ -12,30 +12,72 @@ const MOCK_REGIONS = [
 ];
 
 const MOCK_FACULTIES = [
-  { id: 1, name: 'School of Computer Science', regionId: 1 },
-  { id: 2, name: 'School of Information Systems', regionId: 1 },
-  { id: 3, name: 'School of Design', regionId: 1 },
-  { id: 4, name: 'School of Computer Science', regionId: 2 },
-  { id: 5, name: 'School of Information Systems', regionId: 2 },
-  { id: 6, name: 'School of Computer Science', regionId: 3 },
-  { id: 7, name: 'School of Computer Science', regionId: 4 },
-  { id: 8, name: 'School of Computer Science', regionId: 5 },
-  { id: 9, name: 'School of Computer Science', regionId: 6 },
+  // Kemanggisan (regionId 1)
+  { id: 1, name: 'Binus Business School Undergraduate Programs', regionId: 1 },
+  { id: 2, name: 'Faculty of Engineering', regionId: 1 },
+  { id: 3, name: 'Faculty of Humanities', regionId: 1 },
+  { id: 4, name: 'School of Computer Science', regionId: 1 },
+  { id: 5, name: 'School of Design', regionId: 1 },
+  { id: 6, name: 'School of Information Systems', regionId: 1 },
+  { id: 7, name: 'School of Accounting', regionId: 1 },
+  { id: 8, name: 'Faculty of Digital Communication and Hotel & Tourism', regionId: 1 },
+  { id: 9, name: 'Double Programs', regionId: 1 },
+  { id: 10, name: 'Master Track Programs', regionId: 1 },
+
+  // Alam Sutera (regionId 2)
+  { id: 11, name: 'Binus Business School Undergraduate Programs', regionId: 2 },
+  { id: 12, name: 'Faculty of Digital Communication and Hotel & Tourism', regionId: 2 },
+  { id: 13, name: 'Faculty of Engineering', regionId: 2 },
+  { id: 14, name: 'Faculty of Humanities', regionId: 2 },
+  { id: 15, name: 'School of Computer Science', regionId: 2 },
+  { id: 16, name: 'School of Design', regionId: 2 },
+  { id: 17, name: 'School of Information Systems', regionId: 2 },
+  { id: 18, name: 'School of Accounting', regionId: 2 },
+  { id: 19, name: 'Master Track Programs', regionId: 2 },
+  { id: 20, name: 'Global Class Programs', regionId: 2 },
+
+  // Bandung (regionId 4)
+  { id: 21, name: 'Binus Business School Undergraduate Programs', regionId: 4 },
+  { id: 22, name: 'School of Computer Science', regionId: 4 },
+  { id: 23, name: 'School of Design', regionId: 4 },
+  { id: 24, name: 'Double Programs', regionId: 4 },
+
+  // Malang (regionId 5)
+  { id: 25, name: 'Binus Business School Undergraduate Programs', regionId: 5 },
+  { id: 26, name: 'School of Computer Science', regionId: 5 },
+  { id: 27, name: 'School of Design', regionId: 5 },
+  { id: 28, name: 'Faculty of Digital Communication and Hotel & Tourism', regionId: 5 },
+  { id: 29, name: 'Double Programs', regionId: 5 },
 ];
 
 const MOCK_MAJORS = [
-  { id: 1, name: 'Computer Science', facultyId: 1 },
-  { id: 2, name: 'Cyber Security', facultyId: 1 },
-  { id: 3, name: 'Game Application and Technology', facultyId: 1 },
-  { id: 4, name: 'Information Systems', facultyId: 2 },
-  { id: 5, name: 'Business Information Technology', facultyId: 2 },
-  { id: 6, name: 'Interactive Design & Technology', facultyId: 3 },
-  { id: 7, name: 'Computer Science', facultyId: 4 },
-  { id: 8, name: 'Information Systems', facultyId: 5 },
-  { id: 9, name: 'Computer Science', facultyId: 6 },
-  { id: 10, name: 'Computer Science', facultyId: 7 },
-  { id: 11, name: 'Computer Science', facultyId: 8 },
-  { id: 12, name: 'Computer Science', facultyId: 9 },
+  // Kemanggisan - School of Computer Science (facultyId: 4)
+  { id: 1, name: 'Computer Science', facultyId: 4 },
+  { id: 2, name: 'Cyber Security', facultyId: 4 },
+  { id: 3, name: 'Artificial Intelligence', facultyId: 4 },
+  { id: 4, name: 'Data Science', facultyId: 4 },
+  { id: 5, name: 'Game Application and Technology', facultyId: 4 },
+
+  // Kemanggisan - School of Information Systems (facultyId: 6)
+  { id: 6, name: 'Information Systems', facultyId: 6 },
+  { id: 7, name: 'Business Analytics', facultyId: 6 },
+
+  // Alam Sutera - School of Computer Science (facultyId: 15)
+  { id: 8, name: 'Computer Science', facultyId: 15 },
+  { id: 9, name: 'CS - Global Class', facultyId: 15 },
+  { id: 10, name: 'Cyber Security', facultyId: 15 },
+  { id: 11, name: 'Artificial Intelligence', facultyId: 15 },
+
+  // Alam Sutera - School of Information Systems (facultyId: 17)
+  { id: 12, name: 'Information Systems', facultyId: 17 },
+
+  // Bandung - School of Computer Science (facultyId: 22)
+  { id: 13, name: 'Computer Science', facultyId: 22 },
+  { id: 14, name: 'Artificial Intelligence', facultyId: 22 },
+
+  // Malang - School of Computer Science (facultyId: 26)
+  { id: 15, name: 'Computer Science', facultyId: 26 },
+  { id: 16, name: 'Artificial Intelligence', facultyId: 26 },
 ];
 
 const MOCK_LNT_COURSES = [
@@ -95,7 +137,7 @@ const MOCK_SCHEDULES = [
   },
 ];
 
-export default function useLookupQuery() {
+export default function useLookupQuery(regionId, facultyId) {
   const regionQuery = useQuery({
     queryKey: [QUERY_KEYS.REGIONS],
     queryFn: async () => {
@@ -110,10 +152,11 @@ export default function useLookupQuery() {
   });
 
   const facultyQuery = useQuery({
-    queryKey: [QUERY_KEYS.FACULTIES],
+    queryKey: [QUERY_KEYS.FACULTIES, regionId],
     queryFn: async () => {
       try {
-        const res = await API.get('/lookup/faculties');
+        const url = regionId ? `/lookup/faculties?regionId=${regionId}` : '/lookup/faculties';
+        const res = await API.get(url);
         return res.data;
       } catch (err) {
         console.warn('API error, using fallback mock faculties:', err);
@@ -123,10 +166,11 @@ export default function useLookupQuery() {
   });
 
   const majorQuery = useQuery({
-    queryKey: [QUERY_KEYS.MAJORS],
+    queryKey: [QUERY_KEYS.MAJORS, facultyId],
     queryFn: async () => {
       try {
-        const res = await API.get('/lookup/majors');
+        const url = facultyId ? `/lookup/majors?facultyId=${facultyId}` : '/lookup/majors';
+        const res = await API.get(url);
         return res.data;
       } catch (err) {
         console.warn('API error, using fallback mock majors:', err);
@@ -136,10 +180,11 @@ export default function useLookupQuery() {
   });
 
   const lntCourseQuery = useQuery({
-    queryKey: [QUERY_KEYS.LNT_COURSES],
+    queryKey: [QUERY_KEYS.LNT_COURSES, regionId],
     queryFn: async () => {
       try {
-        const res = await API.get('/lookup/lnt-courses');
+        const url = regionId ? `/lookup/courses?regionId=${regionId}` : '/lookup/courses';
+        const res = await API.get(url);
         return res.data;
       } catch (err) {
         console.warn('API error, using fallback mock lnt courses:', err);
@@ -149,10 +194,11 @@ export default function useLookupQuery() {
   });
 
   const scheduleQuery = useQuery({
-    queryKey: [QUERY_KEYS.SCHEDULES],
+    queryKey: [QUERY_KEYS.SCHEDULES, regionId],
     queryFn: async () => {
       try {
-        const res = await API.get('/lookup/schedules');
+        const url = regionId ? `/lookup/schedules?regionId=${regionId}` : '/lookup/schedules';
+        const res = await API.get(url);
         return res.data;
       } catch (err) {
         console.warn('API error, using fallback mock schedules:', err);
@@ -161,11 +207,17 @@ export default function useLookupQuery() {
     },
   });
 
+  const extractData = (resData, fallback) => {
+    if (Array.isArray(resData)) return resData;
+    if (Array.isArray(resData?.data)) return resData.data;
+    return fallback;
+  };
+
   return {
-    regionQuery: { ...regionQuery, data: regionQuery.data?.data || MOCK_REGIONS },
-    facultyQuery: { ...facultyQuery, data: facultyQuery.data?.data || MOCK_FACULTIES },
-    majorQuery: { ...majorQuery, data: majorQuery.data?.data || MOCK_MAJORS },
-    lntCourseQuery: { ...lntCourseQuery, data: lntCourseQuery.data?.data || MOCK_LNT_COURSES },
-    scheduleQuery: { ...scheduleQuery, data: scheduleQuery.data?.data || MOCK_SCHEDULES },
+    regionQuery: { ...regionQuery, data: extractData(regionQuery.data, MOCK_REGIONS) },
+    facultyQuery: { ...facultyQuery, data: extractData(facultyQuery.data, MOCK_FACULTIES) },
+    majorQuery: { ...majorQuery, data: extractData(majorQuery.data, MOCK_MAJORS) },
+    lntCourseQuery: { ...lntCourseQuery, data: extractData(lntCourseQuery.data, MOCK_LNT_COURSES) },
+    scheduleQuery: { ...scheduleQuery, data: extractData(scheduleQuery.data, MOCK_SCHEDULES) },
   };
 }

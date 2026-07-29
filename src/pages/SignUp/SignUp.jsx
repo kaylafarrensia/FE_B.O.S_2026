@@ -73,7 +73,7 @@ const labelClass = 'block font-semibold text-[#0D2A4E] text-sm mb-1.5'
 const selectClass =
   'w-full rounded-lg px-4 py-2.5 text-sm text-[#0D2A4E] outline-none transition-all appearance-none cursor-pointer'
 
-const TOTAL_STEPS = 3
+const TOTAL_STEPS = 4
 
 /* ═══════════════════════════════════════════════════════════════ */
 export default function SignUp() {
@@ -103,14 +103,16 @@ export default function SignUp() {
   const [heardFrom, setHeardFrom] = useState('')
   const [heardFromOther, setHeardFromOther] = useState('')
   const [successVisible, setSuccessVisible] = useState(false)
-
-  const { regionQuery, facultyQuery, majorQuery, lntCourseQuery, scheduleQuery } =
-    useLookupQuery()
-  const { registerMutation } = useAuthMutation()
+  const [expoCode, setExpoCode] = useState('')
+  const [showExpoCode, setShowExpoCode] = useState(false)
 
   const watchedPassword = watch('password', '')
   const watchedRegionId = watch('regionId')
   const watchedFacultyId = watch('facultyId')
+
+  const { regionQuery, facultyQuery, majorQuery, lntCourseQuery, scheduleQuery } =
+    useLookupQuery(watchedRegionId, watchedFacultyId)
+  const { registerMutation } = useAuthMutation()
 
   const { linkQuery } = useLinkQuery(watchedRegionId)
 
@@ -120,22 +122,18 @@ export default function SignUp() {
     /[a-z]/.test(watchedPassword)
 
   const regions = regionQuery.data || []
-  const faculties =
-    facultyQuery.data?.filter(
-      (f) => Number(f.regionId) === Number(watchedRegionId)
-    ) || []
-  const majors =
-    majorQuery.data?.filter(
-      (m) => Number(m.facultyId) === Number(watchedFacultyId)
-    ) || []
-  const lntCourses =
-    lntCourseQuery.data?.filter(
-      (c) => Number(c.regionId) === Number(watchedRegionId)
-    ) || []
-  const schedules =
-    scheduleQuery.data?.filter(
-      (s) => Number(s.regionId) === Number(watchedRegionId)
-    ) || []
+  const faculties = (facultyQuery.data || []).filter(
+    (f) => !f.regionId || Number(f.regionId) === Number(watchedRegionId)
+  )
+  const majors = (majorQuery.data || []).filter(
+    (m) => !m.facultyId || Number(m.facultyId) === Number(watchedFacultyId)
+  )
+  const lntCourses = (lntCourseQuery.data || []).filter(
+    (c) => !c.regionId || Number(c.regionId) === Number(watchedRegionId)
+  )
+  const schedules = (scheduleQuery.data || []).filter(
+    (s) => !s.regionId || Number(s.regionId) === Number(watchedRegionId)
+  )
 
   const selectedRegion = regions.find(
     (r) => Number(r.id) === Number(watchedRegionId)
@@ -160,6 +158,10 @@ export default function SignUp() {
 
   /* ── submit ── */
   const onSubmit = (data) => {
+    if (currentStep === 4) {
+      setSuccessVisible(true)
+      return
+    }
     if (currentStep < 3) { onNext(); return }
     if (!waChecked) {
       showPopup({ type: 'error', heading: 'Confirmation Required', message: 'Please confirm you have joined the WhatsApp group.' })
@@ -169,8 +171,6 @@ export default function SignUp() {
       showPopup({ type: 'error', heading: 'Invalid Password', message: 'Password must be at least 8 chars with 1 uppercase and 1 lowercase letter.' })
       return
     }
-    let heardFromValue = heardFrom
-    if (heardFrom === 'OTHER' && heardFromOther) heardFromValue = `OTHER: ${heardFromOther}`
     const payload = {
       fullName: String(data.fullName || '').trim(),
       lineId: String(data.lineId || '').trim(),
@@ -185,11 +185,15 @@ export default function SignUp() {
       confirmPassword: String(data.confirmPassword || ''),
       lntCourseId: Number(data.lntCourseId),
       scheduleId: Number(data.scheduleId),
-      isJapres: false,
-      heardFrom: '',
+      isJapres: 0,
+      heardFrom: null,
     }
     registerMutation.mutate(payload, {
-      onSuccess: () => setSuccessVisible(true),
+      onSuccess: (res) => {
+        const code = res?.expoId || res?.data?.expoId || 'EXBC01001'
+        setExpoCode(code)
+        setCurrentStep(4)
+      },
       onError: (err) => {
         const errorMsg =
           err?.response?.data?.error ||
@@ -210,7 +214,9 @@ export default function SignUp() {
     ? <>Personal <span style={{ color: '#2368C4' }}>Information</span></>
     : currentStep === 2
     ? <>BNCC <span style={{ color: '#2368C4' }}>Registration</span></>
-    : <>BNCC <span style={{ color: '#2368C4' }}>Community</span></>
+    : currentStep === 3
+    ? <>BNCC <span style={{ color: '#2368C4' }}>Community</span></>
+    : <>Get your <span style={{ color: '#2368C4' }}>Expo Code</span></>
 
   const progressPct = (currentStep / TOTAL_STEPS) * 100
 
@@ -348,11 +354,12 @@ export default function SignUp() {
                           <select
                             value={field.value || ''}
                             onChange={(e) => {
-                              field.onChange(Number(e.target.value))
-                              setValue('facultyId', undefined)
-                              setValue('majorId', undefined)
-                              setValue('lntCourseId', undefined)
-                              setValue('scheduleId', undefined)
+                              const val = Number(e.target.value)
+                              field.onChange(val)
+                              setValue('facultyId', '', { shouldValidate: true })
+                              setValue('majorId', '', { shouldValidate: true })
+                              setValue('lntCourseId', '', { shouldValidate: true })
+                              setValue('scheduleId', '', { shouldValidate: true })
                             }}
                             className={selectClass}
                             style={FIELD_STYLE}
@@ -379,7 +386,11 @@ export default function SignUp() {
                           <select
                             value={field.value || ''}
                             disabled={!watchedRegionId}
-                            onChange={(e) => { field.onChange(Number(e.target.value)); setValue('majorId', undefined) }}
+                            onChange={(e) => {
+                              const val = Number(e.target.value)
+                              field.onChange(val)
+                              setValue('majorId', '', { shouldValidate: true })
+                            }}
                             className={selectClass}
                             style={{ ...FIELD_STYLE, opacity: !watchedRegionId ? 0.6 : 1 }}
                           >
@@ -532,7 +543,7 @@ export default function SignUp() {
                             style={FIELD_STYLE}
                           >
                             <option value="" disabled>Pilih LnT Course yang Anda inginkan</option>
-                            {lntCourses.map((c) => <option key={c.id} value={c.id}>{c.title}</option>)}
+                            {lntCourses.map((c) => <option key={c.id} value={c.id}>{c.title || c.name}</option>)}
                           </select>
                           <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#4C88C7]">▾</div>
                         </div>
@@ -609,6 +620,29 @@ export default function SignUp() {
                 </>
               )}
 
+              {/* ══ STEP 4: Get your Expo Code ══ */}
+              {currentStep === 4 && (
+                <div className="flex flex-col items-center text-center py-2">
+                  <div className="w-full flex items-center justify-between gap-2 p-2 sm:p-2.5 rounded-xl border-2 border-[#94BEE7] bg-[#E8F2FD] mb-4">
+                    <span className="font-mono text-base sm:text-lg font-bold text-[#0D2A4E] tracking-widest pl-3">
+                      {showExpoCode ? (expoCode || 'EXBC01001') : 'XXXXXXXXX'}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowExpoCode(!showExpoCode)}
+                      className="px-3.5 py-2 rounded-lg text-white font-medium text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer shadow transition-all hover:opacity-90"
+                      style={{ background: 'linear-gradient(135deg, #1B5198 0%, #2A6DC2 100%)' }}
+                    >
+                      {showExpoCode ? <IoEyeOff className="text-base" /> : <IoEye className="text-base" />}
+                      <span>{showExpoCode ? 'Hide Code' : 'Show Code'}</span>
+                    </button>
+                  </div>
+                  <p className="text-xs sm:text-sm text-[#386496] leading-snug px-2 mb-2">
+                    This <strong className="font-bold text-[#0D2A4E]">Expo Code</strong> will be required on the official BINUS University website during registration.
+                  </p>
+                </div>
+              )}
+
               {/* ── Progress Bar ── */}
               <div className="pt-2 pb-1">
                 <div className="w-full h-1.5 rounded-full" style={{ background: 'rgba(180,210,240,0.55)' }}>
@@ -624,17 +658,19 @@ export default function SignUp() {
 
               {/* ── Buttons ── */}
               <div className="flex items-center justify-center gap-3 pt-1">
-                <button
-                  type="button"
-                  onClick={onBack}
-                  className="flex-1 max-w-[140px] py-2.5 rounded-xl border-2 font-semibold text-sm transition-all cursor-pointer hover:opacity-80"
-                  style={{ borderColor: '#1B5198', color: '#1B5198' }}
-                >
-                  Back
-                </button>
+                {currentStep < 4 && (
+                  <button
+                    type="button"
+                    onClick={onBack}
+                    className="flex-1 max-w-[140px] py-2.5 rounded-xl border-2 font-semibold text-sm transition-all cursor-pointer hover:opacity-80"
+                    style={{ borderColor: '#1B5198', color: '#1B5198' }}
+                  >
+                    Back
+                  </button>
+                )}
                 <button
                   type={currentStep === 3 ? 'submit' : 'button'}
-                  onClick={currentStep < 3 ? onNext : undefined}
+                  onClick={currentStep !== 3 ? handleSubmit(onSubmit) : undefined}
                   disabled={currentStep === 3 && (registerMutation.isPending || !waChecked)}
                   className="flex-1 max-w-[140px] py-2.5 rounded-xl text-white font-semibold text-sm shadow-md transition-all cursor-pointer disabled:opacity-50"
                   style={{ background: 'linear-gradient(135deg, #1B5198 0%, #2A6DC2 100%)' }}
@@ -674,38 +710,30 @@ export default function SignUp() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           {/* Blurred overlay */}
           <div
-            className="absolute inset-0"
-            style={{ background: 'rgba(180,210,245,0.35)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)' }}
+            className="absolute inset-0 transition-opacity duration-300"
+            style={{ background: 'rgba(15, 35, 65, 0.30)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
           />
-          {/* Popup Card */}
+          {/* Glassmorphism Popup Card */}
           <div
-            className="relative z-10 w-full max-w-sm rounded-2xl px-8 py-10 flex flex-col items-center text-center"
-            style={{
-              background: 'rgba(255,255,255,0.80)',
-              backdropFilter: 'blur(18px)',
-              WebkitBackdropFilter: 'blur(18px)',
-              border: '2px dashed #3B82F6',
-              boxShadow: '0 10px 40px rgba(15,45,95,0.15)',
-            }}
+            className="relative z-10 w-full max-w-[22rem] sm:max-w-[26rem] rounded-[22px] border border-white/90 bg-white/40 backdrop-blur-2xl px-6 sm:px-9 py-8 sm:py-10 flex flex-col items-center text-center shadow-[0_20px_50px_rgba(10,39,69,0.25)]"
           >
-            {/* Green checkmark */}
-            <div
-              className="w-16 h-16 rounded-full flex items-center justify-center mb-5 shadow-lg"
-              style={{ background: 'linear-gradient(135deg, #22C55E, #16A34A)' }}
-            >
-              <IoCheckmarkCircle className="w-10 h-10 text-white" />
+            {/* Green Checkmark Badge */}
+            <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-full bg-[#22C55E] flex items-center justify-center mb-6 shadow-[0_8px_20px_rgba(34,197,94,0.35)]">
+              <svg className="w-10 h-10 text-white stroke-current stroke-[3.5] fill-none" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
             </div>
 
-            <h3 className="text-lg sm:text-xl font-bold text-[#0D2A4E] mb-2">
+            <h3 className="text-xl sm:text-2xl font-bold text-[#0A2745] mb-2.5 tracking-tight">
               Registration successful!
             </h3>
-            <p className="text-sm text-[#3D6080] mb-7">
+            <p className="text-xs sm:text-sm font-semibold text-[#386496] leading-relaxed mb-8">
               Please check your email for verification.
             </p>
 
             <button
               onClick={() => navigate('/signin')}
-              className="px-10 py-2.5 rounded-xl text-white font-semibold text-sm shadow-md transition-all cursor-pointer"
+              className="w-full max-w-[170px] py-3 rounded-xl text-white font-bold text-sm sm:text-base shadow-md transition-all cursor-pointer hover:opacity-90 active:scale-[0.98]"
               style={{ background: 'linear-gradient(135deg, #1B5198 0%, #2A6DC2 100%)' }}
             >
               Sign In

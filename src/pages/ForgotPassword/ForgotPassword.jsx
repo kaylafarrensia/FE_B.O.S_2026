@@ -219,27 +219,35 @@ export default function ForgotPassword() {
       {successVisible && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
-            className="absolute inset-0 bg-[#0B2C4E]/25 backdrop-blur-md"
+            className="absolute inset-0 transition-opacity duration-300"
+            style={{ background: 'rgba(15, 35, 65, 0.30)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
             onClick={() => setSuccessVisible(false)}
           />
-          <div className="relative z-10 w-full max-w-[28rem] flex flex-col items-center text-center rounded-[15px] border-[3px] border-white/90 bg-white/80 backdrop-blur-xl px-6 sm:px-8 py-8 shadow-2xl">
-            <div className="size-14 sm:size-16 rounded-full bg-[#23C45E] flex items-center justify-center mb-4 shadow-md">
-              <CheckIcon />
+          <div
+            className="relative z-10 w-full max-w-[22rem] sm:max-w-[26rem] rounded-[22px] border border-white/90 bg-white/40 backdrop-blur-2xl px-6 sm:px-9 py-8 sm:py-10 flex flex-col items-center text-center shadow-[0_20px_50px_rgba(10,39,69,0.25)]"
+          >
+            <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-full bg-[#22C55E] flex items-center justify-center mb-6 shadow-[0_8px_20px_rgba(34,197,94,0.35)]">
+              <svg className="w-10 h-10 text-white stroke-current stroke-[3.5] fill-none" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
             </div>
-            <h3 className="font-outfit text-lg sm:text-xl font-bold text-[#0A2745] mb-2 leading-snug">
+
+            <h3 className="text-xl sm:text-2xl font-bold text-[#0A2745] mb-2.5 tracking-tight">
               Instructions have been sent to your email!
             </h3>
-            <p className="font-outfit text-xs sm:text-sm text-[#0A2745]/80 mb-6 leading-relaxed">
+            <p className="text-xs sm:text-sm font-semibold text-[#386496] leading-relaxed mb-8">
               Please check your email and click the verification link.
               <br />
               If you didn't receive the email, please try again.
             </p>
+
             <button
               onClick={() => navigate('/signin')}
-              className={`min-h-[2.8rem] w-[9rem] sm:w-[10rem] cursor-pointer rounded-[10px] border-0 bg-gradient-to-br from-20% from-[#0C4076] to-[#4489D4] font-outfit text-base font-semibold text-white transition-[filter,transform] duration-200 ease-out hover:brightness-108 active:translate-y-px motion-reduce:transition-none ${focusRingClasses}`}
+              className="w-full max-w-[170px] py-3 rounded-xl text-white font-bold text-sm sm:text-base shadow-md transition-all cursor-pointer hover:opacity-90 active:scale-[0.98]"
+              style={{ background: 'linear-gradient(135deg, #1B5198 0%, #2A6DC2 100%)' }}
               type="button"
             >
-              Ok
+              Sign In
             </button>
           </div>
         </div>
