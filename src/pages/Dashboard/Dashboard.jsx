@@ -37,6 +37,8 @@ function Dashboard() {
     github: '',
     course: '',
   });
+  const [registrationOutcome, setRegistrationOutcome] = useState('initial');
+  const [reRegistrationSubmitted, setReRegistrationSubmitted] = useState(false);
   const pillWidth = 180;
   const [pillStyle, setPillStyle] = useState({ left: 0 });
   const tabRefs = useRef([]);
@@ -256,7 +258,11 @@ function Dashboard() {
           registrationFiles,
           setRegistrationFiles,
           reRegistrationInputs,
-          setReRegistrationInputs
+          setReRegistrationInputs,
+          registrationOutcome,
+          setRegistrationOutcome,
+          reRegistrationSubmitted,
+          setReRegistrationSubmitted
         }} />
       </div>
     </div>

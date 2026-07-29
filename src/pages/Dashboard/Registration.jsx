@@ -29,31 +29,13 @@ export default function Registration() {
   const context = useOutletContext()
   const setUserStatus = context?.setUserStatus
 
-  const [outcome, setOutcome] = useState(() => {
-    const urlOutcome = new URLSearchParams(window.location.search).get('outcome')
-    if (urlOutcome) {
-      localStorage.setItem('registration_outcome', urlOutcome)
-      return urlOutcome
-    }
-    const saved = localStorage.getItem('registration_outcome')
-    if (saved) return saved
-    return 'initial'
-  })
+  const {
+    registrationFiles,
+    setRegistrationFiles,
+    registrationOutcome: outcome,
+    setRegistrationOutcome: setOutcome
+  } = context
 
-  useEffect(() => {
-    const urlOutcome = new URLSearchParams(location.search).get('outcome')
-    if (urlOutcome) {
-      localStorage.setItem('registration_outcome', urlOutcome)
-      setOutcome(urlOutcome)
-    } else {
-      const saved = localStorage.getItem('registration_outcome')
-      if (saved && saved !== outcome) {
-        setOutcome(saved)
-      }
-    }
-  }, [location.search])
-
-  const { registrationFiles, setRegistrationFiles } = useOutletContext()
   const binusianCard = registrationFiles?.binusianCard
   const memberLetter = registrationFiles?.memberLetter
 
@@ -80,10 +62,8 @@ export default function Registration() {
       alert('Please upload both files before submitting.')
       return
     }
-    localStorage.setItem('registration_outcome', 'pending')
     setOutcome('pending')
     setRegistrationFiles({ binusianCard: null, memberLetter: null })
-    navigate('?outcome=pending')
   }
 
   const handleNavigateToReRegist = () => {

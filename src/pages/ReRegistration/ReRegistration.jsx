@@ -8,12 +8,20 @@ import PerspectiveGrid from '../../components/ComingSoon/PerspectiveGrid'
 
 export default function ReRegistration() {
   const [activeTab, setActiveTab] = useState('reregist')
-  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [localSubmitted, setLocalSubmitted] = useState(false)
   const location = useLocation()
   const isInsideDashboard = location.pathname.startsWith('/dashboard')
 
   const outletContext = useOutletContext() || {}
-  const { reRegistrationInputs, setReRegistrationInputs } = outletContext
+  const { 
+    reRegistrationInputs, 
+    setReRegistrationInputs,
+    reRegistrationSubmitted,
+    setReRegistrationSubmitted
+  } = outletContext
+
+  const isSubmitted = reRegistrationSubmitted !== undefined ? reRegistrationSubmitted : localSubmitted
+  const setIsSubmitted = setReRegistrationSubmitted !== undefined ? setReRegistrationSubmitted : setLocalSubmitted
 
   const formContent = (
     <main className="w-full px-6 sm:px-[10vw] pt-3 pb-8 sm:py-8 flex flex-col lg:flex-row gap-6 sm:gap-8 items-start justify-start lg:justify-center flex-1 overflow-y-auto">

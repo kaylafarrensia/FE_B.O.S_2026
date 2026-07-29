@@ -48,25 +48,6 @@ export default function ContactPersonCard({
                 </span>
               </a>
             </div>
-            <div className="mt-2 flex items-center gap-1.5 sm:mt-3 lg:mt-5 lg:gap-2.5">
-              <a
-                href={waUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 lg:gap-2.5"
-              >
-                <span className="flex w-3.5 shrink-0 items-center justify-center sm:w-4 lg:w-6">
-                  <img
-                    src={waIcon}
-                    alt="WhatsApp"
-                    className="h-4.5 w-4.5 shrink-0 sm:h-5 sm:w-5 lg:h-7 lg:w-7"
-                  />
-                </span>
-                <span className="text-[8px] font-medium text-slate-700 sm:text-[10px] lg:text-sm hover:underline">
-                  {usernameWa}
-                </span>
-              </a>
-            </div>
           </div>
 
           <button
