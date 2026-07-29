@@ -1,16 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ChevronDown, Loader2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Card from './Card'
-
-const LNT_COURSES = [
-  { id: 1, name: 'UI/UX Design' },
-  { id: 2, name: 'Front-End Development' },
-  { id: 3, name: 'Back-End Development' },
-  { id: 4, name: 'Java Programming' },
-  { id: 5, name: 'Mobile Application Development' },
-  { id: 6, name: 'Machine Learning' },
-]
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'
 
@@ -40,6 +31,77 @@ export default function ReRegistrationForm({
   const [generalError, setGeneralError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+
+  const [setRegion] = useState(null)
+  const [courses, setCourses] = useState([])
+  const [isLoadingInit, setIsLoadingInit] = useState(true)
+  const [initError, setInitError] = useState('')
+
+  useEffect(() => {
+    const loadData = async () => {
+      const token = localStorage.getItem('accessToken')
+
+      if (!token) {
+        setInitError('You must be logged in to continue.')
+        setIsLoadingInit(false)
+        return
+      }
+
+      try {
+        const profileRes = await fetch(`${API_BASE_URL}/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        const profileJson = await profileRes.json()
+
+        if (!profileRes.ok) {
+          if (profileRes.status === 401) {
+            setInitError('Your session has expired. Please log in again.')
+          } else {
+            setInitError(profileJson?.error || 'Failed to load your profile.')
+          }
+          setIsLoadingInit(false)
+          return
+        }
+
+        const registration = profileJson?.data?.registration
+        const userRegion = registration?.region
+
+        if (!userRegion?.id) {
+          setInitError('No region found on your account. Please contact the admin.')
+          setIsLoadingInit(false)
+          return
+        }
+
+        setRegion(userRegion)
+
+        setForm((prev) => ({
+          ...prev,
+          linkedin: registration.linkedinUrl || '',
+          github: registration.githubUrl || '',
+          course: registration.lntCourse?.id ? String(registration.lntCourse.id) : '',
+        }))
+
+        const coursesRes = await fetch(
+          `${API_BASE_URL}/lookup/courses?regionId=${userRegion.id}`
+        )
+        const coursesJson = await coursesRes.json()
+
+        if (!coursesRes.ok) {
+          setInitError('Failed to load available courses for your region.')
+          setIsLoadingInit(false)
+          return
+        }
+
+        setCourses(coursesJson || [])
+      } catch {
+        setInitError('Failed to connect to the server. Please check your connection.')
+      } finally {
+        setIsLoadingInit(false)
+      }
+    }
+
+    loadData()
+  }, [])
 
   const handleChange = (field) => (e) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }))
@@ -148,6 +210,28 @@ export default function ReRegistrationForm({
         : 'border-[#99C4F4] focus:border-[#207CDB]'
     }`
 
+  // --- Loading / hard-error states before the form is usable ---
+  if (isLoadingInit) {
+    return (
+      <Card className="w-full max-w-[520px] mx-auto p-3.5 md:p-4 lg:mx-0 lg:ml-30 lg:w-[80%] lg:max-w-[820px] lg:p-8">
+        <div className="flex items-center justify-center gap-2 py-10 text-[#0A2745]">
+          <Loader2 size={16} className="animate-spin" />
+          <span className="text-[12px] lg:text-sm">Loading your registration data...</span>
+        </div>
+      </Card>
+    )
+  }
+
+  if (initError) {
+    return (
+      <Card className="w-full max-w-[520px] mx-auto p-3.5 md:p-4 lg:mx-0 lg:ml-30 lg:w-[80%] lg:max-w-[820px] lg:p-8">
+        <div className="rounded-[8px] border border-red-300 bg-red-50 px-2.5 py-2 text-[11px] text-red-600 lg:px-4 lg:py-2.5 lg:text-sm">
+          {initError}
+        </div>
+      </Card>
+    )
+  }
+
   return (
     <Card className="w-full p-8">
       <h1 className="inline-block py-0.5 text-[15px] font-bold leading-[1.3] bg-gradient-to-r from-[#0A2745] to-[#2474C0] bg-clip-text text-transparent md:text-[23px] lg:text-4xl">
@@ -200,15 +284,18 @@ export default function ReRegistrationForm({
           <div className="relative">
             <button
               type="button"
+              disabled={courses.length === 0}
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className={`${inputClass('course')} w-full flex items-center justify-between text-left pr-3 lg:pr-4 cursor-pointer ${
                 isDropdownOpen ? 'border-[#207CDB] ring-2 ring-[#207CDB]/20 outline-none' : ''
-              } ${form.course === '' ? 'text-slate-400' : 'text-[#0A2745] font-semibold'}`}
+              } ${form.course === '' ? 'text-slate-400' : 'text-[#0A2745] font-semibold'} disabled:opacity-60`}
             >
               <span>
                 {form.course
-                  ? LNT_COURSES.find((c) => c.id === Number(form.course))?.name
-                  : 'Select your desired LnT Course'}
+                  ? courses.find((c) => String(c.id) === form.course)?.name
+                  : courses.length === 0
+                    ? 'No courses available for your region'
+                    : 'Select your desired LnT Course'}
               </span>
               <ChevronDown
                 size={16}
@@ -218,7 +305,7 @@ export default function ReRegistrationForm({
               />
             </button>
 
-            {/* Custom In-Flow Dropdown Options */}
+            {/* Custom In-Flow Dropdown Options mapping the backend API courses */}
             <AnimatePresence>
               {isDropdownOpen && (
                 <motion.div
@@ -228,7 +315,7 @@ export default function ReRegistrationForm({
                   transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
                   className="mt-2 border border-[#99C4F4]/80 rounded-[5px] bg-[#DFEFFF]/20 flex flex-col overflow-hidden"
                 >
-                  {LNT_COURSES.map((course) => (
+                  {courses.map((course) => (
                     <button
                       key={course.id}
                       type="button"
