@@ -23,8 +23,8 @@ const DUMMY_USER = {
     region: { name: 'Jakarta' },
     suratMember: 'null',
     binusianCard: 'null',
-    linkedinUrl: 'https://linkedin.com/in/john-doe',
-    githubUrl: 'https://github.com/johndoe',
+    linkedinUrl: '',
+    githubUrl: '',
   },
 }
 
@@ -173,55 +173,116 @@ function Profile() {
                 </div>
               </Card>
 
-              {/* Re-Registration (only shown when files available) */}
-              {user.registration.suratMember &&
-                user.registration.binusianCard && (
-                  <Card className="border-white border-2 rounded-2xl px-6 sm:px-10 py-10">
-                    <h1 className="font-bold pb-10 text-lg sm:text-2xl text-center">
-                      RE-REGISTRATION
-                    </h1>
-                    <div className="flex flex-col gap-5 justify-start w-full">
-                      <div className="flex flex-col gap-2">
-                        <p className="text-sm text-gray-500">LinkedIn URL</p>
-                        <p className="text-sm sm:text-lg font-semibold">
-                          {user.registration.linkedinUrl || 'https://'}
+              {/* Re-Registration */}
+              <Card className="border-white border-2 rounded-2xl px-6 sm:px-10 py-10">
+                <h1 className="font-bold pb-10 text-lg sm:text-2xl text-center">
+                  RE-REGISTRATION
+                </h1>
+                <div className="flex flex-col gap-5 justify-start w-full">
+                  <div className="flex flex-col gap-2">
+                    <p className="text-sm text-gray-500">LinkedIn URL</p>
+                    <p className="text-sm sm:text-lg font-semibold">
+                      {user.registration.linkedinUrl &&
+                      user.registration.linkedinUrl !== 'https://' &&
+                      user.registration.linkedinUrl !== 'null' &&
+                      user.registration.linkedinUrl.trim() !== ''
+                        ? user.registration.linkedinUrl
+                        : '-'}
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <p className="text-sm text-gray-500">Github URL</p>
+                    <p className="text-sm sm:text-lg font-semibold">
+                      {user.registration.githubUrl &&
+                      user.registration.githubUrl !== 'https://' &&
+                      user.registration.githubUrl !== 'null' &&
+                      user.registration.githubUrl.trim() !== ''
+                        ? user.registration.githubUrl
+                        : '-'}
+                    </p>
+                  </div>
+                  <div className="gap-2 flex flex-col w-full">
+                    <p className="text-sm text-gray-500">Member Letter</p>
+                    {user.registration.suratMember &&
+                    user.registration.suratMember !== 'null' &&
+                    user.registration.suratMember.trim() !== '' ? (
+                      <Button
+                        className="w-full"
+                        onClick={() =>
+                          window.open(
+                            user.registration.suratMember,
+                            '_blank',
+                            'noopener,noreferrer'
+                          )
+                        }
+                      >
+                        <img
+                          src={IconDownload}
+                          alt="Download"
+                          className="w-6 h-6 mr-2"
+                        />
+                        <p className="text-xs sm:text-sm">
+                          Download Latest Submission
                         </p>
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        <p className="text-sm text-gray-500">Github URL</p>
-                        <p className="text-sm sm:text-lg font-semibold">
-                          {user.registration.githubUrl || 'https://'}
+                      </Button>
+                    ) : (
+                      <button
+                        disabled
+                        className="w-full flex items-center justify-center gap-2 rounded-lg py-2.5 sm:py-3 px-8 text-sm sm:text-base font-semibold bg-gradient-to-r from-[#84A4C9] to-[#A3C7EE] text-white cursor-not-allowed select-none shadow-sm"
+                      >
+                        <img
+                          src={IconDownload}
+                          alt="Download"
+                          className="w-6 h-6 mr-2 text-white"
+                        />
+                        <p className="text-xs sm:text-sm">
+                          Download Latest Submission
                         </p>
-                      </div>
-                      <div className="gap-2 flex flex-col w-full">
-                        <p className="text-sm text-gray-500">Member Letter</p>
-                        <Button className="w-full">
-                          <img
-                            src={IconDownload}
-                            alt="Download"
-                            className="w-6 h-6 mr-2"
-                          />
-                          <p className="text-xs sm:text-sm">
-                            Download Latest Submission
-                          </p>
-                        </Button>
-                      </div>
-                      <div className="gap-2 flex flex-col w-full">
-                        <p className="text-sm text-gray-500">Binusian Card</p>
-                        <Button className="w-full">
-                          <img
-                            src={IconDownload}
-                            alt="Download"
-                            className="w-6 h-6 mr-2"
-                          />
-                          <p className="text-xs sm:text-sm">
-                            Download Binusian Card
-                          </p>
-                        </Button>
-                      </div>
-                    </div>
-                  </Card>
-                )}
+                      </button>
+                    )}
+                  </div>
+                  <div className="gap-2 flex flex-col w-full">
+                    <p className="text-sm text-gray-500">Binusian Card</p>
+                    {user.registration.binusianCard &&
+                    user.registration.binusianCard !== 'null' &&
+                    user.registration.binusianCard.trim() !== '' ? (
+                      <Button
+                        className="w-full"
+                        onClick={() =>
+                          window.open(
+                            user.registration.binusianCard,
+                            '_blank',
+                            'noopener,noreferrer'
+                          )
+                        }
+                      >
+                        <img
+                          src={IconDownload}
+                          alt="Download"
+                          className="w-6 h-6 mr-2"
+                        />
+                        <p className="text-xs sm:text-sm">
+                          Download Binusian Card
+                        </p>
+                      </Button>
+                    ) : (
+                      <button
+                        disabled
+                        className="w-full flex items-center justify-center gap-2 rounded-lg py-2.5 sm:py-3 px-8 text-sm sm:text-base font-semibold bg-gradient-to-r from-[#84A4C9] to-[#A3C7EE] text-white cursor-not-allowed select-none shadow-sm"
+                      >
+                        <img
+                          src={IconDownload}
+                          alt="Download"
+                          className="w-6 h-6 mr-2 text-white"
+                        />
+                        <p className="text-xs sm:text-sm">
+                          Download Binusian Card
+                        </p>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </Card>
             </div>
           </div>
         </div>
