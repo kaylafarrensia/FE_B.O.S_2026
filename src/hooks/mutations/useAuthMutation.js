@@ -40,7 +40,7 @@ export default function useAuthMutation() {
 
   const forgotPasswordMutation = useMutation({
     mutationFn: async (payload) => {
-      const res = await API.post('/admin/forgot-password', payload);
+      const res = await API.post('/auth/forgot-password', payload);
       return res.data;
     },
     onError: (err) => {
