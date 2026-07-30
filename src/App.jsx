@@ -11,6 +11,7 @@ import SignIn from './pages/SignIn/SignIn.jsx'
 import SignUp from './pages/SignUp/SignUp.jsx'
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword.jsx'
 import ResetPassword from './pages/ResetPassword/ResetPassword.jsx'
+import CustomCursor from './components/ui/CustomCursor.jsx'
 
 // Admin Pages
 import AdminDashboard from './pages/Admin/Dashboard.jsx'
@@ -24,7 +25,9 @@ import Subscription from './pages/Admin/Subscription.jsx'
 
 function App() {
   return (
-    <Routes>
+    <>
+      <CustomCursor />
+      <Routes>
       {/* User / Landing routes */}
       <Route path="/comingsoon" element={<ComingSoon />} />
       <Route path="/" element={<Home />} />
@@ -56,6 +59,7 @@ function App() {
         <Route path="subscription" element={<Subscription />} />
       </Route>
     </Routes>
+    </>
   )
 }
 

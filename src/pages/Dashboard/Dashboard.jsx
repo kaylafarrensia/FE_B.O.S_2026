@@ -1,7 +1,6 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import CustomCursor from '../../components/ui/CustomCursor.jsx';
 import IconCalendar from '../../assets/icons/IconCalendar.svg';
 import IconCalendarWhite from '../../assets/icons/IconCalendarWhite.svg';
 import IconTrophy from '../../assets/icons/IconTrophy.svg';
@@ -139,7 +138,6 @@ function Dashboard() {
 
   return (
     <div className="dashboard-page relative z-0 min-h-screen flex flex-col overflow-hidden">
-      <CustomCursor />
       <PerspectiveGrid className="opacity-85" />
       <BubbleBackground />
 

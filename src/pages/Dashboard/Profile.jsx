@@ -64,12 +64,12 @@ function Profile() {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('token') || localStorage.getItem('accessToken')
       if (!token) return
 
       setLoading(true)
       try {
-        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
         const res = await fetch(`${apiUrl}/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         })

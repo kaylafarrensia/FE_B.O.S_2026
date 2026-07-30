@@ -17,7 +17,6 @@ import patternMid1Landing from '../../assets/patterns/pattern-mid1-landing.svg'
 import patternMid2Landing from '../../assets/patterns/pattern-mid2-landing.svg'
 import patternBottomLanding from '../../assets/patterns/pattern-bottom-landing.svg'
 import { useState, useEffect } from 'react'
-import CustomCursor from '../../components/common/ui/CustomCursor'
 import SmoothScrollProvider from '../../components/common/animation/SmoothScrollProvider'
 import ScrollToTop from '../../components/common/animation/ScrollToTop'
 
@@ -149,7 +148,6 @@ export default function Home() {
   return (
     <SmoothScrollProvider>
       <div className="bg-landing">
-        <CustomCursor />
         <ScrollToTop />
         <Navbar />
         <Hero />
