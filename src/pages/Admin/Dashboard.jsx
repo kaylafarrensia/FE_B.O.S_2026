@@ -66,7 +66,7 @@ export default function Dashboard() {
     useEffect(() => {
         const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
         if (import.meta.env.PROD && !token) {
-            navigate('/signin', { replace: true });
+            navigate('/admin/signin', { replace: true });
         }
     }, [navigate]);
 

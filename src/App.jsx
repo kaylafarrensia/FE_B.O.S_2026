@@ -14,6 +14,7 @@ import ResetPassword from './pages/ResetPassword/ResetPassword.jsx'
 
 // Admin Pages
 import AdminDashboard from './pages/Admin/Dashboard.jsx'
+import AdminSignIn from './pages/Admin/SignIn.jsx'
 import Overview from './pages/Admin/Overview.jsx'
 import AdminJapres from './pages/Admin/Japres.jsx'
 import User from './pages/Admin/Users.jsx'
@@ -42,6 +43,7 @@ function App() {
       <Route path="/register" element={<SignUp />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/admin/signin" element={<AdminSignIn />} />
 
       {/* Admin routes */}
       <Route path="/admin" element={<AdminDashboard />}>
