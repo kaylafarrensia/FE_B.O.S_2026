@@ -17,10 +17,6 @@ import useLookupQuery from '@/hooks/queries/useLookupQuery'
 
 export default function Users() {
   const [searchQuery, setSearchQuery] = useState('')
-  const [facultyFilter, setFacultyFilter] = useState('')
-  const [majorFilter, setMajorFilter] = useState('')
-  const [lntFilter, setLntFilter] = useState('')
-
   const [pageIndex, setPageIndex] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
   const [showErrorModal, setShowErrorModal] = useState(false)
@@ -71,19 +67,17 @@ export default function Users() {
   const [bulkLoading, setBulkLoading] = useState(false)
 
   const [whatsAppMessage, setWhatsAppMessage] = useState(
-    `Halo, {nama}!\n\nJangan lewatkan codesign BNCC 2025 untuk mendapatkan materi yang dapat mempersiapkan kamu sebagai seorang developers!\n\nhttps://www.instagram.com/bnccbinus/\n\nBest Regards,\nPanitia BNCC Launching`,
+    `Halo, {nama}!
+
+Jangan lewatkan codesign BNCC 2025 untuk mendapatkan materi yang dapat mempersiapkan kamu sebagai seorang developers!
+
+https://www.instagram.com/bnccbinus/
+
+Best Regards,
+Panitia BNCC Launching`,
   )
   const [tempWhatsAppMessage, setTempWhatsAppMessage] =
     useState(whatsAppMessage)
-
-  // Helper function to safely render text (prevents React crashes from objects)
-  const safeRender = (val) => {
-    if (val === null || val === undefined) return '-'
-    if (typeof val === 'object') {
-      return val.name || val.title || JSON.stringify(val)
-    }
-    return String(val)
-  }
 
   // Separate lookup query instances for edit form and create form
   const {
@@ -376,33 +370,13 @@ export default function Users() {
       }
     }) ?? []
 
-  // Get unique options for filters from allData
-  const uniqueFaculties = Array.from(
-    new Set(
-      allData.map((item) => item['Faculty']).filter((f) => f && f !== '-'),
-    ),
-  )
-  const uniqueMajors = Array.from(
-    new Set(allData.map((item) => item['Major']).filter((m) => m && m !== '-')),
-  )
-  const uniqueLnts = Array.from(
-    new Set(
-      allData.map((item) => item['LnT Course']).filter((l) => l && l !== '-'),
-    ),
-  )
-
-  const filteredData = allData.filter((row) => {
-    const matchSearch = searchQuery
-      ? (row['Full Name'] || '')
+  const filteredData = searchQuery
+    ? allData.filter((row) =>
+        (row['Full Name'] || '')
           .toLowerCase()
-          .includes(searchQuery.toLowerCase())
-      : true
-    const matchFaculty = facultyFilter ? row['Faculty'] === facultyFilter : true
-    const matchMajor = majorFilter ? row['Major'] === majorFilter : true
-    const matchLnt = lntFilter ? row['LnT Course'] === lntFilter : true
-
-    return matchSearch && matchFaculty && matchMajor && matchLnt
-  })
+          .includes(searchQuery.toLowerCase()),
+      )
+    : allData
 
   const pagedData = filteredData.slice(
     (pageIndex - 1) * itemsPerPage,
@@ -540,10 +514,9 @@ export default function Users() {
 
   return (
     <div className={`py-6 space-y-7 ${deleting ? 'pointer-events-none' : ''}`}>
-      {/* ══ ERROR MODAL ══ */}
       {showErrorModal && (
-        <div className="fixed inset-0 z-[100] bg-black/60 flex items-start justify-center pt-20 pb-8 overflow-y-auto">
-          <div className="bg-white p-8 rounded-xl shadow-2xl text-center border border-gray-200 max-w-md w-full mx-4">
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20">
+          <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl text-center border border-gray-200 max-w-md w-full mx-4">
             <h3 className="text-xl font-bold mb-4">Error</h3>
             <p className="text-gray-600 mb-6">
               {error?.response?.data?.error ||
@@ -568,10 +541,9 @@ export default function Users() {
         </div>
       )}
 
-      {/* ══ VIEW MODAL ══ */}
       {showViewModal && (
-        <div className="fixed inset-0 z-[100] bg-black/60 flex items-start justify-center pt-20 pb-8 overflow-y-auto">
-          <div className="bg-white p-8 rounded-xl shadow-2xl text-left min-w-[350px] max-w-[90vw] border border-gray-200">
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20 pb-8 overflow-y-auto">
+          <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl text-left min-w-[350px] max-w-[90vw] border border-gray-200">
             <h3 className="text-xl font-bold mb-4">User Details</h3>
             {viewLoading ? (
               <div className="flex items-center justify-center py-8">
@@ -580,210 +552,200 @@ export default function Users() {
             ) : viewUser ? (
               <div className="space-y-2 mb-6">
                 <div>
-                  <b>Name:</b> {safeRender(viewUser.name)}
+                  <b>Name:</b> {viewUser.name}
                 </div>
                 <div>
-                  <b>Email:</b> {safeRender(viewUser.email)}
+                  <b>Email:</b> {viewUser.email}
                 </div>
                 <div>
-                  <b>Status:</b> {safeRender(viewUser.status)}
+                  <b>Status:</b> {viewUser.status}
                 </div>
                 <div>
-                  <b>Role:</b> {safeRender(viewUser.role)}
+                  <b>Role:</b> {viewUser.role}
                 </div>
                 <div>
-                  <b>Created At:</b> {safeRender(viewUser.createdAt)}
+                  <b>Created At:</b> {viewUser.createdAt}
                 </div>
                 <div>
-                  <b>Updated At:</b> {safeRender(viewUser.updatedAt)}
+                  <b>Updated At:</b> {viewUser.updatedAt}
                 </div>
-                {Array.isArray(viewUser.registrations) ? (
-                  viewUser.registrations.map((reg, idx) => (
-                    <div key={idx} className="border-t pt-2 mt-2">
-                      <div>
-                        <b>NIM:</b> {safeRender(reg.nim)}
-                      </div>
-                      <div>
-                        <b>BNCC ID:</b> {safeRender(reg.bnccId)}
-                      </div>
-                      <div>
-                        <b>LINE:</b> {safeRender(reg.lineId)}
-                      </div>
-                      <div>
-                        <b>WhatsApp:</b> {safeRender(reg.whatsappNumber)}
-                      </div>
-                      <div>
-                        <b>Region:</b> {safeRender(reg.region?.name)}
-                      </div>
-                      <div>
-                        <b>Faculty:</b> {safeRender(reg.faculty?.name)}
-                      </div>
-                      <div>
-                        <b>Major:</b> {safeRender(reg.major?.name)}
-                      </div>
-                      <div>
-                        <b>LnT Course:</b> {safeRender(reg.lntCourse?.title)}
-                      </div>
-                      <div>
-                        <b>Schedule:</b> {safeRender(reg.schedule?.title)}
-                      </div>
-                      <div>
-                        <b>LinkedIn:</b>{' '}
-                        {reg.linkedinUrl ? (
-                          <a
-                            href={reg.linkedinUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 underline"
-                          >
-                            LinkedIn
-                          </a>
-                        ) : (
-                          '-'
-                        )}
-                      </div>
-                      <div>
-                        <b>Github:</b>{' '}
-                        {reg.githubUrl ? (
-                          <a
-                            href={reg.githubUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 underline"
-                          >
-                            Github
-                          </a>
-                        ) : (
-                          '-'
-                        )}
-                      </div>
-                      <div>
-                        <b>Member Letter:</b>{' '}
-                        {reg.suratMember
-                          ? (() => {
-                              const v = reg.suratMember
-                              if (typeof v !== 'string')
-                                return <span>{safeRender(v)}</span>
-                              if (
-                                isDataUrl(v) ||
-                                /^([A-Za-z0-9+\/=\-_\s]+)$/.test(v)
-                              ) {
-                                return (
-                                  <button
-                                    onClick={async () => {
-                                      try {
-                                        let blob
-                                        if (isDataUrl(v)) blob = base64ToBlob(v)
-                                        else {
-                                          const normalized = v
-                                            .replace(/\s/g, '')
-                                            .replace(/-/g, '+')
-                                            .replace(/_/g, '/')
-                                          blob = base64ToBlob(
-                                            'data:application/octet-stream;base64,' +
-                                              normalized,
-                                          )
-                                        }
-                                        const url = URL.createObjectURL(blob)
-                                        window.open(url, '_blank')
-                                        setTimeout(
-                                          () => URL.revokeObjectURL(url),
-                                          5000,
-                                        )
-                                      } catch (e) {
-                                        console.error(
-                                          'Failed to open member letter',
-                                          e,
-                                        )
-                                        window.alert('Failed to open file')
-                                      }
-                                    }}
-                                    className="text-blue-600 underline"
-                                  >
-                                    Member Letter
-                                  </button>
-                                )
-                              }
+                {viewUser.registrations?.map((reg, idx) => (
+                  <div key={idx} className="border-t pt-2 mt-2">
+                    <div>
+                      <b>NIM:</b> {reg.nim}
+                    </div>
+                    <div>
+                      <b>BNCC ID:</b> {reg.bnccId}
+                    </div>
+                    <div>
+                      <b>LINE:</b> {reg.lineId}
+                    </div>
+                    <div>
+                      <b>WhatsApp:</b> {reg.whatsappNumber}
+                    </div>
+                    <div>
+                      <b>Region:</b> {reg.region?.name}
+                    </div>
+                    <div>
+                      <b>Faculty:</b> {reg.faculty?.name}
+                    </div>
+                    <div>
+                      <b>Major:</b> {reg.major?.name}
+                    </div>
+                    <div>
+                      <b>LnT Course:</b> {reg.lntCourse?.title}
+                    </div>
+                    <div>
+                      <b>Schedule:</b> {reg.schedule?.title}
+                    </div>
+                    <div>
+                      <b>LinkedIn:</b>{' '}
+                      {reg.linkedinUrl ? (
+                        <a
+                          href={reg.linkedinUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 underline"
+                        >
+                          LinkedIn
+                        </a>
+                      ) : (
+                        '-'
+                      )}
+                    </div>
+                    <div>
+                      <b>Github:</b>{' '}
+                      {reg.githubUrl ? (
+                        <a
+                          href={reg.githubUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 underline"
+                        >
+                          Github
+                        </a>
+                      ) : (
+                        '-'
+                      )}
+                    </div>
+                    <div>
+                      <b>Member Letter:</b>{' '}
+                      {reg.suratMember
+                        ? (() => {
+                            const v = reg.suratMember
+                            if (
+                              isDataUrl(v) ||
+                              /^([A-Za-z0-9+\/=\-_\s]+)$/.test(v)
+                            ) {
                               return (
-                                <a
-                                  href={v}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
+                                <button
+                                  onClick={async () => {
+                                    try {
+                                      let blob
+                                      if (isDataUrl(v)) blob = base64ToBlob(v)
+                                      else {
+                                        const normalized = v
+                                          .replace(/\s/g, '')
+                                          .replace(/-/g, '+')
+                                          .replace(/_/g, '/')
+                                        blob = base64ToBlob(
+                                          'data:application/octet-stream;base64,' +
+                                            normalized,
+                                        )
+                                      }
+                                      const url = URL.createObjectURL(blob)
+                                      window.open(url, '_blank')
+                                      setTimeout(
+                                        () => URL.revokeObjectURL(url),
+                                        5000,
+                                      )
+                                    } catch (e) {
+                                      console.error(
+                                        'Failed to open member letter',
+                                        e,
+                                      )
+                                      window.alert('Failed to open file')
+                                    }
+                                  }}
                                   className="text-blue-600 underline"
                                 >
                                   Member Letter
-                                </a>
+                                </button>
                               )
-                            })()
-                          : '-'}
-                      </div>
-                      <div>
-                        <b>Binusian Card:</b>{' '}
-                        {reg.binusianCard
-                          ? (() => {
-                              const v = reg.binusianCard
-                              if (typeof v !== 'string')
-                                return <span>{safeRender(v)}</span>
-                              if (
-                                isDataUrl(v) ||
-                                /^([A-Za-z0-9+\/=\-_\s]+)$/.test(v)
-                              ) {
-                                return (
-                                  <button
-                                    onClick={async () => {
-                                      try {
-                                        let blob
-                                        if (isDataUrl(v)) blob = base64ToBlob(v)
-                                        else {
-                                          const normalized = v
-                                            .replace(/\s/g, '')
-                                            .replace(/-/g, '+')
-                                            .replace(/_/g, '/')
-                                          blob = base64ToBlob(
-                                            'data:application/octet-stream;base64,' +
-                                              normalized,
-                                          )
-                                        }
-                                        const url = URL.createObjectURL(blob)
-                                        window.open(url, '_blank')
-                                        setTimeout(
-                                          () => URL.revokeObjectURL(url),
-                                          5000,
-                                        )
-                                      } catch (e) {
-                                        console.error(
-                                          'Failed to open binusian card',
-                                          e,
-                                        )
-                                        window.alert('Failed to open file')
-                                      }
-                                    }}
-                                    className="text-blue-600 underline"
-                                  >
-                                    Binusian Card
-                                  </button>
-                                )
-                              }
+                            }
+                            return (
+                              <a
+                                href={v}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 underline"
+                              >
+                                Member Letter
+                              </a>
+                            )
+                          })()
+                        : '-'}
+                    </div>
+                    <div>
+                      <b>Binusian Card:</b>{' '}
+                      {reg.binusianCard
+                        ? (() => {
+                            const v = reg.binusianCard
+                            if (
+                              isDataUrl(v) ||
+                              /^([A-Za-z0-9+\/=\-_\s]+)$/.test(v)
+                            ) {
                               return (
-                                <a
-                                  href={v}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
+                                <button
+                                  onClick={async () => {
+                                    try {
+                                      let blob
+                                      if (isDataUrl(v)) blob = base64ToBlob(v)
+                                      else {
+                                        const normalized = v
+                                          .replace(/\s/g, '')
+                                          .replace(/-/g, '+')
+                                          .replace(/_/g, '/')
+                                        blob = base64ToBlob(
+                                          'data:application/octet-stream;base64,' +
+                                            normalized,
+                                        )
+                                      }
+                                      const url = URL.createObjectURL(blob)
+                                      window.open(url, '_blank')
+                                      setTimeout(
+                                        () => URL.revokeObjectURL(url),
+                                        5000,
+                                      )
+                                    } catch (e) {
+                                      console.error(
+                                        'Failed to open binusian card',
+                                        e,
+                                      )
+                                      window.alert('Failed to open file')
+                                    }
+                                  }}
                                   className="text-blue-600 underline"
                                 >
                                   Binusian Card
-                                </a>
+                                </button>
                               )
-                            })()
-                          : '-'}
-                      </div>
+                            }
+                            return (
+                              <a
+                                href={v}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 underline"
+                              >
+                                Binusian Card
+                              </a>
+                            )
+                          })()
+                        : '-'}
                     </div>
-                  ))
-                ) : (
-                  <div className="border-t border-gray-200 pt-3 mt-3 text-sm text-gray-500 italic">
-                    No registrations found.
                   </div>
-                )}
+                ))}
               </div>
             ) : (
               <p>Could not load user details.</p>
@@ -803,11 +765,10 @@ export default function Users() {
         </div>
       )}
 
-      {/* ══ EDIT MODAL ══ */}
       {showEditModal && (
-        <div className="fixed inset-0 z-[100] bg-black/60 flex items-start justify-center pt-20 pb-8 overflow-y-auto">
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20 pb-8 overflow-y-auto">
           <form
-            className="bg-white p-6 rounded-xl shadow-2xl text-left min-w-[350px] max-w-[600px] w-full mx-4 border border-gray-200"
+            className="pointer-events-auto bg-white p-6 rounded-xl shadow-2xl text-left min-w-[350px] max-w-[600px] w-full mx-4 border border-gray-200"
             onSubmit={handleEditSubmit}
           >
             <h3 className="text-xl font-bold mb-4">Edit User</h3>
@@ -995,11 +956,10 @@ export default function Users() {
         </div>
       )}
 
-      {/* ══ CREATE MODAL ══ */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-[100] bg-black/60 flex items-start justify-center pt-20 pb-8 overflow-y-auto">
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20 pb-8 overflow-y-auto">
           <form
-            className="bg-white p-6 rounded-xl shadow-2xl text-left min-w-[350px] max-w-[600px] w-full mx-4 border border-gray-200"
+            className="pointer-events-auto bg-white p-6 rounded-xl shadow-2xl text-left min-w-[350px] max-w-[600px] w-full mx-4 border border-gray-200"
             onSubmit={handleCreateSubmit}
           >
             <h3 className="text-xl font-bold mb-4">Create User</h3>
@@ -1201,10 +1161,9 @@ export default function Users() {
         </div>
       )}
 
-      {/* ══ WHATSAPP SETTINGS MODAL ══ */}
       {showWhatsAppModal && (
-        <div className="fixed inset-0 z-[100] bg-black/60 flex items-start justify-center pt-20 pb-8 overflow-y-auto">
-          <div className="bg-white p-8 rounded-xl shadow-2xl text-left w-full max-w-lg mx-4 border border-gray-200">
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20">
+          <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl text-left w-full max-w-lg mx-4 border border-gray-200">
             <h3 className="text-xl font-bold mb-2">
               Set WhatsApp Message Template
             </h3>
@@ -1236,10 +1195,9 @@ export default function Users() {
         </div>
       )}
 
-      {/* ══ WHATSAPP PREVIEW MODAL ══ */}
       {showViewMessageModal && (
-        <div className="fixed inset-0 z-[100] bg-black/60 flex items-start justify-center pt-20 pb-8 overflow-y-auto">
-          <div className="bg-white p-8 rounded-xl shadow-2xl text-left w-full max-w-lg mx-4 border border-gray-200">
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20">
+          <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl text-left w-full max-w-lg mx-4 border border-gray-200">
             <h3 className="text-xl font-bold mb-4">
               Current WhatsApp Message Template
             </h3>
@@ -1260,10 +1218,9 @@ export default function Users() {
         </div>
       )}
 
-      {/* ══ DELETE USER MODAL ══ */}
       {showDeleteModal && (
-        <div className="fixed inset-0 z-[100] bg-black/60 flex items-start justify-center pt-20 pb-8 overflow-y-auto">
-          <div className="bg-white p-8 rounded-xl shadow-2xl text-center border border-gray-200">
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20">
+          <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl text-center border border-gray-200">
             <h3 className="text-xl font-bold mb-4">Delete User</h3>
             <p className="text-gray-600 mb-6">
               Are you sure you want to delete user{' '}
@@ -1289,20 +1246,18 @@ export default function Users() {
         </div>
       )}
 
-      {/* ══ DELETE LOADING OVERLAY ══ */}
       {deleting && (
-        <div className="fixed inset-0 z-[110] bg-black/60 flex items-start justify-center pt-20 pb-8 overflow-y-auto">
-          <div className="bg-white p-8 rounded-xl shadow-2xl text-center flex flex-col items-center border border-gray-200">
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-[60] pt-20">
+          <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl text-center flex flex-col items-center border border-gray-200">
             <Loader />
             <span className="mt-4 text-gray-700">Deleting user...</span>
           </div>
         </div>
       )}
 
-      {/* ══ ALERT SNACKBAR / MODAL ══ */}
       {alert && (
-        <div className="fixed inset-0 z-[120] bg-black/60 flex items-start justify-center pt-20 pb-8 overflow-y-auto">
-          <div className="bg-white p-8 rounded-xl shadow-2xl text-center flex flex-col items-center border border-gray-200">
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-[70] pt-20">
+          <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl text-center flex flex-col items-center border border-gray-200">
             {alert.type === 'success' ? (
               <svg
                 className="w-10 h-10 text-green-500 mb-2"
@@ -1346,67 +1301,14 @@ export default function Users() {
         </div>
       )}
 
-      {/* ══ MAIN PAGE CONTENT ══ */}
       <div className="flex flex-row flex-wrap items-center gap-4 min-w-fit px-6">
         <input
           type="text"
           placeholder="Search by Full Name..."
           value={searchQuery}
-          onChange={(e) => {
-            setSearchQuery(e.target.value)
-            setPageIndex(1)
-          }}
-          className="py-2 px-4 w-full md:w-[250px] border rounded"
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="py-2 px-4 w-full md:w-[400px] border rounded"
         />
-
-        <select
-          value={facultyFilter}
-          onChange={(e) => {
-            setFacultyFilter(e.target.value)
-            setPageIndex(1)
-          }}
-          className="py-2 px-4 border rounded w-full md:w-auto min-w-[150px]"
-        >
-          <option value="">All Faculties</option>
-          {uniqueFaculties.map((f) => (
-            <option key={f} value={f}>
-              {f}
-            </option>
-          ))}
-        </select>
-
-        <select
-          value={majorFilter}
-          onChange={(e) => {
-            setMajorFilter(e.target.value)
-            setPageIndex(1)
-          }}
-          className="py-2 px-4 border rounded w-full md:w-auto min-w-[150px]"
-        >
-          <option value="">All Majors</option>
-          {uniqueMajors.map((m) => (
-            <option key={m} value={m}>
-              {m}
-            </option>
-          ))}
-        </select>
-
-        <select
-          value={lntFilter}
-          onChange={(e) => {
-            setLntFilter(e.target.value)
-            setPageIndex(1)
-          }}
-          className="py-2 px-4 border rounded w-full md:w-auto min-w-[150px]"
-        >
-          <option value="">All LnT Courses</option>
-          {uniqueLnts.map((l) => (
-            <option key={l} value={l}>
-              {l}
-            </option>
-          ))}
-        </select>
-
         <div className="flex gap-2 items-center flex-wrap">
           {selectedUserIds.length > 0 && (
             <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-lg mr-2">
