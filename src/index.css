@@ -1,15 +1,32 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
 @import 'tailwindcss';
 
 @theme {
+  /* Fonts */
   --font-poppins: 'Poppins', sans-serif;
   --font-outfit: 'Outfit', sans-serif;
+  --font-montserrat: 'Montserrat', sans-serif;
 
+  /* HEAD Colors (Dashboard/Main Page) */
   --color-persian-indigo: #0A2745;
   --color-bright-lavender: #FF332C;
   --color-baby-blue: #99C4F4;
   --color-lavender-white: #F5F3FF;
+
+  /* feat/auth Colors & duplicates */
+  --color-persianIndigo: #251369;
+  --color-lavenderPurple: #9084CD;
+  --color-lavender-purple: #9084CD;
+  --color-lavenderPurpleLight: #AFA1E0;
+  --color-light-periwinkle: #C0B4FA;
+  --color-sky-blue: #7FD8F9;
+  --color-pale-cyan: #9AFCF2;
+  --color-royal-purple: #814791;
+  --color-lavender-mist: #B8D8EF;
+  --color-error: #FF624C;
 }
 
 * {
@@ -35,9 +52,22 @@ body {
   color: var(--color-persian-indigo, #251369);
 }
 
+/* Scoped variables and defaults for Authentication pages */
+.auth-page {
+  font-family: 'Montserrat', 'Poppins', sans-serif !important;
+  --color-persian-indigo: #251369 !important;
+  --color-bright-lavender: #D59DE8 !important;
+  --color-lavender-white: #F6F5FF !important;
+}
+
 @media (pointer: fine) {
-  * {
-    cursor: none !important;
+  body.has-custom-cursor {
+    cursor: none;
+  }
+  body.has-custom-cursor a,
+  body.has-custom-cursor button,
+  body.has-custom-cursor [role='button'] {
+    cursor: none;
   }
 }
 
@@ -122,14 +152,6 @@ img {
     inset -1px -1px 1px 1px rgba(255, 255, 255, 0.5);
 }
 
-.background-blur-circles div,
-.ellipse-background,
-.bobbing {
-  will-change: transform, filter;
-  transform: translateZ(0);
-  backface-visibility: hidden;
-}
-
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -149,4 +171,30 @@ img {
 
 .dropdown {
   position: relative;
+}
+
+/* feat/auth wave background classes */
+.wave-bg {
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.wave-bg-1 { background-image: url('@/assets/images/Wave1.svg'); }
+.wave-bg-2 { background-image: url('@/assets/images/Wave2.svg'); }
+.wave-bg-3 { background-image: url('@/assets/images/Wave3.svg'); }
+.wave-bg-4 { background-image: url('@/assets/images/Wave4.svg'); }
+.wave-bg-5 { background-image: url('@/assets/images/Wave5.svg'); }
+.wave-bg-6 { background-image: url('@/assets/images/Wave6.svg'); }
+.wave-bg-7 { background-image: url('@/assets/images/Wave7.svg'); }
+.wave-bg-8 { background-image: url('@/assets/images/Wave8.svg'); }
+.wave-bg-9 { background-image: url('@/assets/images/Wave9.svg'); }
+.wave-bg-10 { background-image: url('@/assets/images/Wave10.svg'); }
+
+.background-blur-circles div,
+.ellipse-background,
+.bobbing {
+  will-change: transform, filter;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }

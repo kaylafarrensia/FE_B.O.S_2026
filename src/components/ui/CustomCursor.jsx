@@ -27,6 +27,8 @@ export default function CustomCursor() {
   useEffect(() => {
     if (isTouch) return
 
+    document.body.classList.add('has-custom-cursor')
+
     const moveHandler = (e) => {
       cursorX.set(e.clientX)
       cursorY.set(e.clientY)
@@ -47,6 +49,7 @@ export default function CustomCursor() {
     document.addEventListener('mouseleave', leaveHandler)
 
     return () => {
+      document.body.classList.remove('has-custom-cursor')
       window.removeEventListener('mousemove', moveHandler)
       window.removeEventListener('mouseover', overHandler)
       document.removeEventListener('mouseleave', leaveHandler)
