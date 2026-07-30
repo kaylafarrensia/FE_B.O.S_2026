@@ -1,9 +1,9 @@
-import Table from '@/components/Table';
-import Pagination from '@/components/Pagination';
-import Loader from '@/components/ui/loader';
-import { useState, useEffect, useRef } from 'react';
-import { usersColumns } from './constants';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import Table from '@/components/Table'
+import Pagination from '@/components/Pagination'
+import Loader from '@/components/ui/loader'
+import { useState, useEffect, useRef } from 'react'
+import { usersColumns } from './constants'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import {
   getUsersDetails,
   deleteUser,
@@ -11,24 +11,28 @@ import {
   createUser,
   downloadUsersExcel,
   getUserDetail,
-} from '@/services/admin';
-import { base64ToBlob, isDataUrl, formatScheduleDisplay } from '@/lib/utils';
-import useLookupQuery from '@/hooks/queries/useLookupQuery';
+} from '@/services/admin'
+import { base64ToBlob, isDataUrl, formatScheduleDisplay } from '@/lib/utils'
+import useLookupQuery from '@/hooks/queries/useLookupQuery'
 
 export default function Users() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [pageIndex, setPageIndex] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [showErrorModal, setShowErrorModal] = useState(false);
-  const [error, setError] = useState(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState(null);
-  const [deleting, setDeleting] = useState(false);
-  const [alert, setAlert] = useState(null);
-  const [showViewModal, setShowViewModal] = useState(false);
-  const [viewUser, setViewUser] = useState(null);
-  const [viewLoading, setViewLoading] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('')
+  const [facultyFilter, setFacultyFilter] = useState('')
+  const [majorFilter, setMajorFilter] = useState('')
+  const [lntFilter, setLntFilter] = useState('')
+
+  const [pageIndex, setPageIndex] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
+  const [showErrorModal, setShowErrorModal] = useState(false)
+  const [error, setError] = useState(null)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState(null)
+  const [deleting, setDeleting] = useState(false)
+  const [alert, setAlert] = useState(null)
+  const [showViewModal, setShowViewModal] = useState(false)
+  const [viewUser, setViewUser] = useState(null)
+  const [viewLoading, setViewLoading] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
   const [editForm, setEditForm] = useState({
     id: 0,
     name: '',
@@ -42,9 +46,9 @@ export default function Users() {
     lntCourseId: 0,
     scheduleId: 0,
     status: '',
-  });
-  const [editLoading, setEditLoading] = useState(false);
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  })
+  const [editLoading, setEditLoading] = useState(false)
+  const [showCreateModal, setShowCreateModal] = useState(false)
   const [createForm, setCreateForm] = useState({
     fullName: '',
     email: '',
@@ -58,26 +62,19 @@ export default function Users() {
     lntCourseId: 0,
     scheduleId: 0,
     isJapres: null,
-  });
-  const [createLoading, setCreateLoading] = useState(false);
-  const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
-  const [showViewMessageModal, setShowViewMessageModal] = useState(false);
-  const [selectedUserIds, setSelectedUserIds] = useState([]);
-  const [bulkStatus, setBulkStatus] = useState('');
-  const [bulkLoading, setBulkLoading] = useState(false);
+  })
+  const [createLoading, setCreateLoading] = useState(false)
+  const [showWhatsAppModal, setShowWhatsAppModal] = useState(false)
+  const [showViewMessageModal, setShowViewMessageModal] = useState(false)
+  const [selectedUserIds, setSelectedUserIds] = useState([])
+  const [bulkStatus, setBulkStatus] = useState('')
+  const [bulkLoading, setBulkLoading] = useState(false)
 
   const [whatsAppMessage, setWhatsAppMessage] = useState(
-    `Halo, {nama}!
-
-Jangan lewatkan codesign BNCC 2025 untuk mendapatkan materi yang dapat mempersiapkan kamu sebagai seorang developers!
-
-https://www.instagram.com/bnccbinus/
-
-Best Regards,
-Panitia BNCC Launching`
-  );
+    `Halo, {nama}!\n\nJangan lewatkan codesign BNCC 2025 untuk mendapatkan materi yang dapat mempersiapkan kamu sebagai seorang developers!\n\nhttps://www.instagram.com/bnccbinus/\n\nBest Regards,\nPanitia BNCC Launching`,
+  )
   const [tempWhatsAppMessage, setTempWhatsAppMessage] =
-    useState(whatsAppMessage);
+    useState(whatsAppMessage)
 
   // Separate lookup query instances for edit form and create form
   const {
@@ -88,8 +85,8 @@ Panitia BNCC Launching`
     scheduleQuery,
   } = useLookupQuery(
     editForm.regionId || undefined,
-    editForm.facultyId || undefined
-  );
+    editForm.facultyId || undefined,
+  )
 
   const {
     regionQuery: createRegionQuery,
@@ -99,38 +96,38 @@ Panitia BNCC Launching`
     scheduleQuery: createScheduleQuery,
   } = useLookupQuery(
     createForm.regionId || undefined,
-    createForm.facultyId || undefined
-  );
+    createForm.facultyId || undefined,
+  )
 
-  const abortRef = useRef(null);
+  const abortRef = useRef(null)
 
-  const regions = regionQuery.data || [];
+  const regions = regionQuery.data || []
   const faculties = (facultyQuery.data || []).filter(
-    (f) => !f.regionId || Number(f.regionId) === Number(editForm.regionId)
-  );
+    (f) => !f.regionId || Number(f.regionId) === Number(editForm.regionId),
+  )
   const majors = (majorQuery.data || []).filter(
-    (m) => !m.facultyId || Number(m.facultyId) === Number(editForm.facultyId)
-  );
+    (m) => !m.facultyId || Number(m.facultyId) === Number(editForm.facultyId),
+  )
   const lntCourses = (lntCourseQuery.data || []).filter(
-    (c) => !c.regionId || Number(c.regionId) === Number(editForm.regionId)
-  );
+    (c) => !c.regionId || Number(c.regionId) === Number(editForm.regionId),
+  )
   const schedules = (scheduleQuery.data || []).filter(
-    (s) => !s.regionId || Number(s.regionId) === Number(editForm.regionId)
-  );
+    (s) => !s.regionId || Number(s.regionId) === Number(editForm.regionId),
+  )
 
-  const createRegions = createRegionQuery.data || [];
+  const createRegions = createRegionQuery.data || []
   const createFaculties = (createFacultyQuery.data || []).filter(
-    (f) => !f.regionId || Number(f.regionId) === Number(createForm.regionId)
-  );
+    (f) => !f.regionId || Number(f.regionId) === Number(createForm.regionId),
+  )
   const createMajors = (createMajorQuery.data || []).filter(
-    (m) => !m.facultyId || Number(m.facultyId) === Number(createForm.facultyId)
-  );
+    (m) => !m.facultyId || Number(m.facultyId) === Number(createForm.facultyId),
+  )
   const createLntCourses = (createLntCourseQuery.data || []).filter(
-    (c) => !c.regionId || Number(c.regionId) === Number(createForm.regionId)
-  );
+    (c) => !c.regionId || Number(c.regionId) === Number(createForm.regionId),
+  )
   const createSchedules = (createScheduleQuery.data || []).filter(
-    (s) => !s.regionId || Number(s.regionId) === Number(createForm.regionId)
-  );
+    (s) => !s.regionId || Number(s.regionId) === Number(createForm.regionId),
+  )
 
   const {
     data,
@@ -141,74 +138,74 @@ Panitia BNCC Launching`
   } = useQuery({
     queryKey: ['user-details'],
     queryFn: getUsersDetails,
-  });
+  })
 
   useEffect(() => {
     if (isError) {
-      setError(fetchError);
-      setShowErrorModal(true);
+      setError(fetchError)
+      setShowErrorModal(true)
     }
-  }, [isError, fetchError]);
+  }, [isError, fetchError])
 
   useEffect(() => {
     return () => {
-      abortRef.current?.abort();
-    };
-  }, []);
+      abortRef.current?.abort()
+    }
+  }, [])
 
   const mutation = useMutation({
     mutationFn: (id) => {
-      abortRef.current = new AbortController();
-      return deleteUser(id, { signal: abortRef.current.signal });
+      abortRef.current = new AbortController()
+      return deleteUser(id, { signal: abortRef.current.signal })
     },
     onSuccess: () => {
-      setDeleting(false);
-      setShowDeleteModal(false);
-      setAlert({ type: 'success', message: 'User deleted successfully.' });
-      refetch();
+      setDeleting(false)
+      setShowDeleteModal(false)
+      setAlert({ type: 'success', message: 'User deleted successfully.' })
+      refetch()
     },
     onError: (err) => {
-      setDeleting(false);
-      setShowDeleteModal(false);
+      setDeleting(false)
+      setShowDeleteModal(false)
       setAlert({
         type: 'error',
         message:
           err?.response?.data?.error ||
           err?.message ||
           'An unknown error occurred.',
-      });
+      })
     },
-  });
+  })
 
   const editMutation = useMutation({
     mutationFn: (form) => updateUser(form),
     onMutate: () => setEditLoading(true),
     onSuccess: () => {
-      setEditLoading(false);
-      setShowEditModal(false);
-      setAlert({ type: 'success', message: 'User updated successfully.' });
-      refetch();
+      setEditLoading(false)
+      setShowEditModal(false)
+      setAlert({ type: 'success', message: 'User updated successfully.' })
+      refetch()
     },
     onError: (err) => {
-      setEditLoading(false);
+      setEditLoading(false)
       setAlert({
         type: 'error',
         message:
           err?.response?.data?.error ||
           err?.message ||
           'An unknown error occurred.',
-      });
+      })
     },
-  });
+  })
 
   const createMutation = useMutation({
     mutationFn: (form) => createUser(form),
     onMutate: () => setCreateLoading(true),
     onSuccess: () => {
-      setCreateLoading(false);
-      setShowCreateModal(false);
-      setAlert({ type: 'success', message: 'User created successfully.' });
-      refetch();
+      setCreateLoading(false)
+      setShowCreateModal(false)
+      setAlert({ type: 'success', message: 'User created successfully.' })
+      refetch()
       setCreateForm({
         fullName: '',
         email: '',
@@ -222,28 +219,28 @@ Panitia BNCC Launching`
         lntCourseId: 0,
         scheduleId: 0,
         isJapres: null,
-      });
+      })
     },
     onError: (err) => {
-      setCreateLoading(false);
+      setCreateLoading(false)
       setAlert({
         type: 'error',
         message:
           err?.response?.data?.error ||
           err?.message ||
           'An unknown error occurred.',
-      });
+      })
     },
-  });
+  })
 
   const OpenWhatsApp = (number, text) => {
-    const formatText = encodeURIComponent(text);
-    window.open(`https://wa.me/+62${number}?text=${formatText}`);
-  };
+    const formatText = encodeURIComponent(text)
+    window.open(`https://wa.me/+62${number}?text=${formatText}`)
+  }
 
   const allData =
     data?.data?.map((user) => {
-      const reg = user.registrations?.[0] || {};
+      const reg = user.registrations?.[0] || {}
       return {
         ID: user.id,
         'BNCC ID': reg.bnccId || '-',
@@ -255,9 +252,9 @@ Panitia BNCC Launching`
           <a
             href="#"
             onClick={(e) => {
-              e.preventDefault();
-              const message = whatsAppMessage.replace('{nama}', user.name);
-              OpenWhatsApp(reg.whatsappNumber, message);
+              e.preventDefault()
+              const message = whatsAppMessage.replace('{nama}', user.name)
+              OpenWhatsApp(reg.whatsappNumber, message)
             }}
             className="text-blue-600 underline"
           >
@@ -319,8 +316,8 @@ Panitia BNCC Launching`
                   lntCourseId: reg.lntCourse?.id ?? 0,
                   scheduleId: reg.schedule?.id ?? 0,
                   status: user.status ?? '',
-                });
-                setShowEditModal(true);
+                })
+                setShowEditModal(true)
               }}
               aria-label="Edit"
               className="mx-1"
@@ -343,8 +340,8 @@ Panitia BNCC Launching`
             </button>
             <button
               onClick={() => {
-                setDeleteTarget(user.id);
-                setShowDeleteModal(true);
+                setDeleteTarget(user.id)
+                setShowDeleteModal(true)
               }}
               aria-label="Delete"
               className="mx-1"
@@ -367,64 +364,87 @@ Panitia BNCC Launching`
             </button>
           </div>
         ),
-      };
-    }) ?? [];
+      }
+    }) ?? []
 
-  const filteredData = searchQuery
-    ? allData.filter((row) =>
-      (row['Full Name'] || '')
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase())
-    )
-    : allData;
+  // Get unique options for filters from allData
+  const uniqueFaculties = Array.from(
+    new Set(
+      allData.map((item) => item['Faculty']).filter((f) => f && f !== '-'),
+    ),
+  )
+  const uniqueMajors = Array.from(
+    new Set(allData.map((item) => item['Major']).filter((m) => m && m !== '-')),
+  )
+  const uniqueLnts = Array.from(
+    new Set(
+      allData.map((item) => item['LnT Course']).filter((l) => l && l !== '-'),
+    ),
+  )
+
+  const filteredData = allData.filter((row) => {
+    const matchSearch = searchQuery
+      ? (row['Full Name'] || '')
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase())
+      : true
+    const matchFaculty = facultyFilter ? row['Faculty'] === facultyFilter : true
+    const matchMajor = majorFilter ? row['Major'] === majorFilter : true
+    const matchLnt = lntFilter ? row['LnT Course'] === lntFilter : true
+
+    return matchSearch && matchFaculty && matchMajor && matchLnt
+  })
 
   const pagedData = filteredData.slice(
     (pageIndex - 1) * itemsPerPage,
-    pageIndex * itemsPerPage
-  );
+    pageIndex * itemsPerPage,
+  )
 
-  const isAllSelected = pagedData.length > 0 && pagedData.every(row => selectedUserIds.includes(row.ID));
+  const isAllSelected =
+    pagedData.length > 0 &&
+    pagedData.every((row) => selectedUserIds.includes(row.ID))
 
   const handleSelectAll = (e) => {
     if (e.target.checked) {
-      const pageIds = pagedData.map(row => row.ID);
-      setSelectedUserIds(prev => Array.from(new Set([...prev, ...pageIds])));
+      const pageIds = pagedData.map((row) => row.ID)
+      setSelectedUserIds((prev) => Array.from(new Set([...prev, ...pageIds])))
     } else {
-      const pageIds = pagedData.map(row => row.ID);
-      setSelectedUserIds(prev => prev.filter(id => !pageIds.includes(id)));
+      const pageIds = pagedData.map((row) => row.ID)
+      setSelectedUserIds((prev) => prev.filter((id) => !pageIds.includes(id)))
     }
-  };
+  }
 
   const handleSelectUser = (userId, checked) => {
     if (checked) {
-      setSelectedUserIds(prev => [...prev, userId]);
+      setSelectedUserIds((prev) => [...prev, userId])
     } else {
-      setSelectedUserIds(prev => prev.filter(id => id !== userId));
+      setSelectedUserIds((prev) => prev.filter((id) => id !== userId))
     }
-  };
+  }
 
   const handleBulkStatusUpdate = async () => {
-    if (!bulkStatus || selectedUserIds.length === 0) return;
-    setBulkLoading(true);
+    if (!bulkStatus || selectedUserIds.length === 0) return
+    setBulkLoading(true)
     try {
       await Promise.all(
-        selectedUserIds.map((id) =>
-          updateUser({ id, status: bulkStatus })
-        )
-      );
-      setSelectedUserIds([]);
-      setBulkStatus('');
-      refetch();
-      setAlert({ type: 'success', message: 'Successfully updated status for selected users.' });
-      setTimeout(() => setAlert(null), 3000);
+        selectedUserIds.map((id) => updateUser({ id, status: bulkStatus })),
+      )
+      setSelectedUserIds([])
+      setBulkStatus('')
+      refetch()
+      setAlert({
+        type: 'success',
+        message: 'Successfully updated status for selected users.',
+      })
+      setTimeout(() => setAlert(null), 3000)
     } catch (err) {
-      console.error(err);
-      setError(err);
-      setShowErrorModal(true);
+      console.error(err)
+      setError(err)
+      setShowErrorModal(true)
     } finally {
-      setBulkLoading(false);
+      setBulkLoading(false)
     }
-  };
+  }
 
   const tableColumns = [
     {
@@ -440,7 +460,7 @@ Panitia BNCC Launching`
       headerAlign: 'center',
       width: '40px',
       itemWrapper: (value, rowData) => {
-        const isChecked = selectedUserIds.includes(rowData?.ID);
+        const isChecked = selectedUserIds.includes(rowData?.ID)
         return (
           <input
             type="checkbox"
@@ -448,72 +468,73 @@ Panitia BNCC Launching`
             onChange={(e) => handleSelectUser(rowData?.ID, e.target.checked)}
             className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 cursor-pointer"
           />
-        );
-      }
+        )
+      },
     },
-    ...usersColumns
-  ];
+    ...usersColumns,
+  ]
 
   const handleRetry = () => {
-    setShowErrorModal(false);
-    setError(null);
-    refetch();
-  };
+    setShowErrorModal(false)
+    setError(null)
+    refetch()
+  }
 
   const handleDeleteConfirm = () => {
     if (deleteTarget) {
-      setDeleting(true);
-      mutation.mutate(deleteTarget);
+      setDeleting(true)
+      mutation.mutate(deleteTarget)
     }
-  };
+  }
 
-  const handleAlertClose = () => setAlert(null);
+  const handleAlertClose = () => setAlert(null)
 
   const handleEditChange = (e) => {
-    setEditForm({ ...editForm, [e.target.name]: e.target.value });
-  };
+    setEditForm({ ...editForm, [e.target.name]: e.target.value })
+  }
 
   const handleEditSubmit = (e) => {
-    e.preventDefault();
-    editMutation.mutate(editForm);
-  };
+    e.preventDefault()
+    editMutation.mutate(editForm)
+  }
 
   const handleCreateChange = (e) => {
-    setCreateForm({ ...createForm, [e.target.name]: e.target.value });
-  };
+    setCreateForm({ ...createForm, [e.target.name]: e.target.value })
+  }
 
   const handleCreateSubmit = (e) => {
-    e.preventDefault();
-    createMutation.mutate(createForm);
-  };
+    e.preventDefault()
+    createMutation.mutate(createForm)
+  }
 
   const handleViewUser = async (userId) => {
-    setViewLoading(true);
+    setViewLoading(true)
     try {
-      const detail = await getUserDetail(String(userId));
-      setViewUser(detail.data?.[0] ?? detail.data ?? null);
-      setShowViewModal(true);
+      const detail = await getUserDetail(String(userId))
+      setViewUser(detail.data?.[0] ?? detail.data ?? null)
+      setShowViewModal(true)
     } catch (err) {
       setAlert({
         type: 'error',
         message: 'Failed to fetch user details.',
-      });
-      setShowViewModal(true);
+      })
+      setShowViewModal(true)
     } finally {
-      setViewLoading(false);
+      setViewLoading(false)
     }
-  };
+  }
 
   const handleSaveWhatsAppMessage = () => {
-    setWhatsAppMessage(tempWhatsAppMessage);
-    setShowWhatsAppModal(false);
-  };
+    setWhatsAppMessage(tempWhatsAppMessage)
+    setShowWhatsAppModal(false)
+  }
 
   return (
     <div className={`py-6 space-y-7 ${deleting ? 'pointer-events-none' : ''}`}>
+      {/* ══ ERROR MODAL ══ */}
       {showErrorModal && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20">
-          <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl text-center border border-gray-200 max-w-md w-full mx-4">
+        <div className="fixed inset-0 z-[100] bg-black/60 flex items-start justify-center pt-20 pb-8 overflow-y-auto">
+          <div className="bg-white p-8 rounded-xl shadow-2xl text-center border border-gray-200 max-w-md w-full mx-4">
             <h3 className="text-xl font-bold mb-4">Error</h3>
             <p className="text-gray-600 mb-6">
               {error?.response?.data?.error ||
@@ -538,9 +559,10 @@ Panitia BNCC Launching`
         </div>
       )}
 
+      {/* ══ VIEW MODAL ══ */}
       {showViewModal && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20 pb-8 overflow-y-auto">
-          <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl text-left min-w-[350px] max-w-[90vw] border border-gray-200">
+        <div className="fixed inset-0 z-[100] bg-black/60 flex items-start justify-center pt-20 pb-8 overflow-y-auto">
+          <div className="bg-white p-8 rounded-xl shadow-2xl text-left min-w-[350px] max-w-[90vw] border border-gray-200">
             <h3 className="text-xl font-bold mb-4">User Details</h3>
             {viewLoading ? (
               <div className="flex items-center justify-center py-8">
@@ -629,116 +651,116 @@ Panitia BNCC Launching`
                       <b>Member Letter:</b>{' '}
                       {reg.suratMember
                         ? (() => {
-                          const v = reg.suratMember;
-                          if (
-                            isDataUrl(v) ||
-                            /^([A-Za-z0-9+\/=\-_\s]+)$/.test(v)
-                          ) {
-                            return (
-                              <button
-                                onClick={async () => {
-                                  try {
-                                    let blob;
-                                    if (isDataUrl(v)) blob = base64ToBlob(v);
-                                    else {
-                                      const normalized = v
-                                        .replace(/\s/g, '')
-                                        .replace(/-/g, '+')
-                                        .replace(/_/g, '/');
-                                      blob = base64ToBlob(
-                                        'data:application/octet-stream;base64,' +
-                                        normalized
-                                      );
+                            const v = reg.suratMember
+                            if (
+                              isDataUrl(v) ||
+                              /^([A-Za-z0-9+\/=\-_\s]+)$/.test(v)
+                            ) {
+                              return (
+                                <button
+                                  onClick={async () => {
+                                    try {
+                                      let blob
+                                      if (isDataUrl(v)) blob = base64ToBlob(v)
+                                      else {
+                                        const normalized = v
+                                          .replace(/\s/g, '')
+                                          .replace(/-/g, '+')
+                                          .replace(/_/g, '/')
+                                        blob = base64ToBlob(
+                                          'data:application/octet-stream;base64,' +
+                                            normalized,
+                                        )
+                                      }
+                                      const url = URL.createObjectURL(blob)
+                                      window.open(url, '_blank')
+                                      setTimeout(
+                                        () => URL.revokeObjectURL(url),
+                                        5000,
+                                      )
+                                    } catch (e) {
+                                      console.error(
+                                        'Failed to open member letter',
+                                        e,
+                                      )
+                                      window.alert('Failed to open file')
                                     }
-                                    const url = URL.createObjectURL(blob);
-                                    window.open(url, '_blank');
-                                    setTimeout(
-                                      () => URL.revokeObjectURL(url),
-                                      5000
-                                    );
-                                  } catch (e) {
-                                    console.error(
-                                      'Failed to open member letter',
-                                      e
-                                    );
-                                    window.alert('Failed to open file');
-                                  }
-                                }}
+                                  }}
+                                  className="text-blue-600 underline"
+                                >
+                                  Member Letter
+                                </button>
+                              )
+                            }
+                            return (
+                              <a
+                                href={v}
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 className="text-blue-600 underline"
                               >
                                 Member Letter
-                              </button>
-                            );
-                          }
-                          return (
-                            <a
-                              href={v}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 underline"
-                            >
-                              Member Letter
-                            </a>
-                          );
-                        })()
+                              </a>
+                            )
+                          })()
                         : '-'}
                     </div>
                     <div>
                       <b>Binusian Card:</b>{' '}
                       {reg.binusianCard
                         ? (() => {
-                          const v = reg.binusianCard;
-                          if (
-                            isDataUrl(v) ||
-                            /^([A-Za-z0-9+\/=\-_\s]+)$/.test(v)
-                          ) {
-                            return (
-                              <button
-                                onClick={async () => {
-                                  try {
-                                    let blob;
-                                    if (isDataUrl(v)) blob = base64ToBlob(v);
-                                    else {
-                                      const normalized = v
-                                        .replace(/\s/g, '')
-                                        .replace(/-/g, '+')
-                                        .replace(/_/g, '/');
-                                      blob = base64ToBlob(
-                                        'data:application/octet-stream;base64,' +
-                                        normalized
-                                      );
+                            const v = reg.binusianCard
+                            if (
+                              isDataUrl(v) ||
+                              /^([A-Za-z0-9+\/=\-_\s]+)$/.test(v)
+                            ) {
+                              return (
+                                <button
+                                  onClick={async () => {
+                                    try {
+                                      let blob
+                                      if (isDataUrl(v)) blob = base64ToBlob(v)
+                                      else {
+                                        const normalized = v
+                                          .replace(/\s/g, '')
+                                          .replace(/-/g, '+')
+                                          .replace(/_/g, '/')
+                                        blob = base64ToBlob(
+                                          'data:application/octet-stream;base64,' +
+                                            normalized,
+                                        )
+                                      }
+                                      const url = URL.createObjectURL(blob)
+                                      window.open(url, '_blank')
+                                      setTimeout(
+                                        () => URL.revokeObjectURL(url),
+                                        5000,
+                                      )
+                                    } catch (e) {
+                                      console.error(
+                                        'Failed to open binusian card',
+                                        e,
+                                      )
+                                      window.alert('Failed to open file')
                                     }
-                                    const url = URL.createObjectURL(blob);
-                                    window.open(url, '_blank');
-                                    setTimeout(
-                                      () => URL.revokeObjectURL(url),
-                                      5000
-                                    );
-                                  } catch (e) {
-                                    console.error(
-                                      'Failed to open binusian card',
-                                      e
-                                    );
-                                    window.alert('Failed to open file');
-                                  }
-                                }}
+                                  }}
+                                  className="text-blue-600 underline"
+                                >
+                                  Binusian Card
+                                </button>
+                              )
+                            }
+                            return (
+                              <a
+                                href={v}
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 className="text-blue-600 underline"
                               >
                                 Binusian Card
-                              </button>
-                            );
-                          }
-                          return (
-                            <a
-                              href={v}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 underline"
-                            >
-                              Binusian Card
-                            </a>
-                          );
-                        })()
+                              </a>
+                            )
+                          })()
                         : '-'}
                     </div>
                   </div>
@@ -750,8 +772,8 @@ Panitia BNCC Launching`
             <div className="flex justify-end">
               <button
                 onClick={() => {
-                  setShowViewModal(false);
-                  setViewUser(null);
+                  setShowViewModal(false)
+                  setViewUser(null)
                 }}
                 className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
               >
@@ -762,10 +784,11 @@ Panitia BNCC Launching`
         </div>
       )}
 
+      {/* ══ EDIT MODAL ══ */}
       {showEditModal && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20 pb-8 overflow-y-auto">
+        <div className="fixed inset-0 z-[100] bg-black/60 flex items-start justify-center pt-20 pb-8 overflow-y-auto">
           <form
-            className="pointer-events-auto bg-white p-6 rounded-xl shadow-2xl text-left min-w-[350px] max-w-[600px] w-full mx-4 border border-gray-200"
+            className="bg-white p-6 rounded-xl shadow-2xl text-left min-w-[350px] max-w-[600px] w-full mx-4 border border-gray-200"
             onSubmit={handleEditSubmit}
           >
             <h3 className="text-xl font-bold mb-4">Edit User</h3>
@@ -821,7 +844,7 @@ Panitia BNCC Launching`
                     majorId: 0,
                     lntCourseId: 0,
                     scheduleId: 0,
-                  });
+                  })
                 }}
                 className="border p-2 rounded w-full"
                 required
@@ -841,7 +864,7 @@ Panitia BNCC Launching`
                     ...editForm,
                     facultyId: Number(e.target.value),
                     majorId: 0,
-                  });
+                  })
                 }}
                 className="border p-2 rounded w-full"
                 required
@@ -861,7 +884,7 @@ Panitia BNCC Launching`
                   setEditForm({
                     ...editForm,
                     majorId: Number(e.target.value),
-                  });
+                  })
                 }}
                 className="border p-2 rounded w-full"
                 required
@@ -881,7 +904,7 @@ Panitia BNCC Launching`
                   setEditForm({
                     ...editForm,
                     lntCourseId: Number(e.target.value),
-                  });
+                  })
                 }}
                 className="border p-2 rounded w-full"
                 required
@@ -901,7 +924,7 @@ Panitia BNCC Launching`
                   setEditForm({
                     ...editForm,
                     scheduleId: Number(e.target.value),
-                  });
+                  })
                 }}
                 className="border p-2 rounded w-full"
                 required
@@ -953,10 +976,11 @@ Panitia BNCC Launching`
         </div>
       )}
 
+      {/* ══ CREATE MODAL ══ */}
       {showCreateModal && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20 pb-8 overflow-y-auto">
+        <div className="fixed inset-0 z-[100] bg-black/60 flex items-start justify-center pt-20 pb-8 overflow-y-auto">
           <form
-            className="pointer-events-auto bg-white p-6 rounded-xl shadow-2xl text-left min-w-[350px] max-w-[600px] w-full mx-4 border border-gray-200"
+            className="bg-white p-6 rounded-xl shadow-2xl text-left min-w-[350px] max-w-[600px] w-full mx-4 border border-gray-200"
             onSubmit={handleCreateSubmit}
           >
             <h3 className="text-xl font-bold mb-4">Create User</h3>
@@ -1021,7 +1045,7 @@ Panitia BNCC Launching`
                     majorId: undefined,
                     lntCourseId: undefined,
                     scheduleId: undefined,
-                  });
+                  })
                 }}
                 className="border p-2 rounded w-full"
                 required
@@ -1041,7 +1065,7 @@ Panitia BNCC Launching`
                     ...createForm,
                     facultyId: Number(e.target.value),
                     majorId: undefined,
-                  });
+                  })
                 }}
                 className="border p-2 rounded w-full"
                 required
@@ -1061,7 +1085,7 @@ Panitia BNCC Launching`
                   setCreateForm({
                     ...createForm,
                     majorId: Number(e.target.value),
-                  });
+                  })
                 }}
                 className="border p-2 rounded w-full"
                 required
@@ -1081,7 +1105,7 @@ Panitia BNCC Launching`
                   setCreateForm({
                     ...createForm,
                     lntCourseId: Number(e.target.value),
-                  });
+                  })
                 }}
                 className="border p-2 rounded w-full"
                 required
@@ -1101,7 +1125,7 @@ Panitia BNCC Launching`
                   setCreateForm({
                     ...createForm,
                     scheduleId: Number(e.target.value),
-                  });
+                  })
                 }}
                 className="border p-2 rounded w-full"
                 required
@@ -1122,11 +1146,11 @@ Panitia BNCC Launching`
                     : ''
                 }
                 onChange={(e) => {
-                  const val = e.target.value;
+                  const val = e.target.value
                   setCreateForm({
                     ...createForm,
                     isJapres: val === '' ? null : Number(val),
-                  });
+                  })
                 }}
                 className="border p-2 rounded w-full"
               >
@@ -1158,9 +1182,10 @@ Panitia BNCC Launching`
         </div>
       )}
 
+      {/* ══ WHATSAPP SETTINGS MODAL ══ */}
       {showWhatsAppModal && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20">
-          <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl text-left w-full max-w-lg mx-4 border border-gray-200">
+        <div className="fixed inset-0 z-[100] bg-black/60 flex items-start justify-center pt-20 pb-8 overflow-y-auto">
+          <div className="bg-white p-8 rounded-xl shadow-2xl text-left w-full max-w-lg mx-4 border border-gray-200">
             <h3 className="text-xl font-bold mb-2">
               Set WhatsApp Message Template
             </h3>
@@ -1192,9 +1217,10 @@ Panitia BNCC Launching`
         </div>
       )}
 
+      {/* ══ WHATSAPP PREVIEW MODAL ══ */}
       {showViewMessageModal && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20">
-          <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl text-left w-full max-w-lg mx-4 border border-gray-200">
+        <div className="fixed inset-0 z-[100] bg-black/60 flex items-start justify-center pt-20 pb-8 overflow-y-auto">
+          <div className="bg-white p-8 rounded-xl shadow-2xl text-left w-full max-w-lg mx-4 border border-gray-200">
             <h3 className="text-xl font-bold mb-4">
               Current WhatsApp Message Template
             </h3>
@@ -1215,9 +1241,10 @@ Panitia BNCC Launching`
         </div>
       )}
 
+      {/* ══ DELETE USER MODAL ══ */}
       {showDeleteModal && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20">
-          <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl text-center border border-gray-200">
+        <div className="fixed inset-0 z-[100] bg-black/60 flex items-start justify-center pt-20 pb-8 overflow-y-auto">
+          <div className="bg-white p-8 rounded-xl shadow-2xl text-center border border-gray-200">
             <h3 className="text-xl font-bold mb-4">Delete User</h3>
             <p className="text-gray-600 mb-6">
               Are you sure you want to delete user{' '}
@@ -1243,18 +1270,20 @@ Panitia BNCC Launching`
         </div>
       )}
 
+      {/* ══ DELETE LOADING OVERLAY ══ */}
       {deleting && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-[60] pt-20">
-          <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl text-center flex flex-col items-center border border-gray-200">
+        <div className="fixed inset-0 z-[110] bg-black/60 flex items-start justify-center pt-20 pb-8 overflow-y-auto">
+          <div className="bg-white p-8 rounded-xl shadow-2xl text-center flex flex-col items-center border border-gray-200">
             <Loader />
             <span className="mt-4 text-gray-700">Deleting user...</span>
           </div>
         </div>
       )}
 
+      {/* ══ ALERT SNACKBAR / MODAL ══ */}
       {alert && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-[70] pt-20">
-          <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl text-center flex flex-col items-center border border-gray-200">
+        <div className="fixed inset-0 z-[120] bg-black/60 flex items-start justify-center pt-20 pb-8 overflow-y-auto">
+          <div className="bg-white p-8 rounded-xl shadow-2xl text-center flex flex-col items-center border border-gray-200">
             {alert.type === 'success' ? (
               <svg
                 className="w-10 h-10 text-green-500 mb-2"
@@ -1298,14 +1327,67 @@ Panitia BNCC Launching`
         </div>
       )}
 
+      {/* ══ MAIN PAGE CONTENT ══ */}
       <div className="flex flex-row flex-wrap items-center gap-4 min-w-fit px-6">
         <input
           type="text"
           placeholder="Search by Full Name..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="py-2 px-4 w-full md:w-[400px] border rounded"
+          onChange={(e) => {
+            setSearchQuery(e.target.value)
+            setPageIndex(1)
+          }}
+          className="py-2 px-4 w-full md:w-[250px] border rounded"
         />
+
+        <select
+          value={facultyFilter}
+          onChange={(e) => {
+            setFacultyFilter(e.target.value)
+            setPageIndex(1)
+          }}
+          className="py-2 px-4 border rounded w-full md:w-auto min-w-[150px]"
+        >
+          <option value="">All Faculties</option>
+          {uniqueFaculties.map((f) => (
+            <option key={f} value={f}>
+              {f}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={majorFilter}
+          onChange={(e) => {
+            setMajorFilter(e.target.value)
+            setPageIndex(1)
+          }}
+          className="py-2 px-4 border rounded w-full md:w-auto min-w-[150px]"
+        >
+          <option value="">All Majors</option>
+          {uniqueMajors.map((m) => (
+            <option key={m} value={m}>
+              {m}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={lntFilter}
+          onChange={(e) => {
+            setLntFilter(e.target.value)
+            setPageIndex(1)
+          }}
+          className="py-2 px-4 border rounded w-full md:w-auto min-w-[150px]"
+        >
+          <option value="">All LnT Courses</option>
+          {uniqueLnts.map((l) => (
+            <option key={l} value={l}>
+              {l}
+            </option>
+          ))}
+        </select>
+
         <div className="flex gap-2 items-center flex-wrap">
           {selectedUserIds.length > 0 && (
             <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-lg mr-2">
@@ -1347,8 +1429,8 @@ Panitia BNCC Launching`
           <button
             className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
             onClick={() => {
-              setTempWhatsAppMessage(whatsAppMessage);
-              setShowWhatsAppModal(true);
+              setTempWhatsAppMessage(whatsAppMessage)
+              setShowWhatsAppModal(true)
             }}
             type="button"
           >
@@ -1384,8 +1466,8 @@ Panitia BNCC Launching`
                   optionItemPerPage={[5, 10, 25, 50, 100]}
                   onChangeIndex={setPageIndex}
                   onChangeItemsPerPage={(val) => {
-                    setItemsPerPage(val);
-                    setPageIndex(1);
+                    setItemsPerPage(val)
+                    setPageIndex(1)
                   }}
                 />
                 <button
@@ -1401,5 +1483,5 @@ Panitia BNCC Launching`
         </div>
       </div>
     </div>
-  );
+  )
 }
