@@ -20,8 +20,19 @@ const EVENT_GLASS_STYLE = {
 
 
 
-export default function Calendar({ schedules, userScheduleId }) {
-  const [currentDate, setCurrentDate] = useState(new Date());
+export default function Calendar({ schedules = [], userScheduleId }) {
+  const [currentDate, setCurrentDate] = useState(() => {
+    if (schedules && schedules.length > 0 && schedules[0]?.startTime) {
+      return new Date(schedules[0].startTime);
+    }
+    return new Date();
+  });
+
+  useEffect(() => {
+    if (schedules && schedules.length > 0 && schedules[0]?.startTime) {
+      setCurrentDate(new Date(schedules[0].startTime));
+    }
+  }, [schedules]);
 
   const today = new Date();
   const year = currentDate.getFullYear();
@@ -40,9 +51,9 @@ export default function Calendar({ schedules, userScheduleId }) {
     schedules.filter((s) => {
       const d = new Date(s.startTime);
       return (
-        d.getUTCDate() === day &&
-        d.getUTCMonth() === month &&
-        d.getUTCFullYear() === year
+        d.getDate() === day &&
+        d.getMonth() === month &&
+        d.getFullYear() === year
       );
     });
 
@@ -102,7 +113,7 @@ export default function Calendar({ schedules, userScheduleId }) {
           const weekday = (firstDayWeekday + i) % 7;
           const isSunday = weekday === 0;
           const events = getEventsForDay(day);
-          const isUserDay = events.some((e) => e.id === userScheduleId);
+          const isUserDay = events.length > 0 && (!userScheduleId || events.some((e) => e.id === userScheduleId));
 
           let cls = '';
           let stl = {};

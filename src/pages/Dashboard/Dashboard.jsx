@@ -120,6 +120,13 @@ function Dashboard() {
         iconWhite: IconCalendarWhite,
         path: '/dashboard/registration',
       };
+    } else if (userStatus === 'done_launching') {
+      firstTab = {
+        label: 'SCHEDULE',
+        icon: IconCalendar,
+        iconWhite: IconCalendarWhite,
+        path: '/dashboard/confirm',
+      };
     } else {
       firstTab = {
         label: 'RE-REGIST',
@@ -295,7 +302,7 @@ function Dashboard() {
                     src={isActive ? tab.iconWhite : tab.icon}
                     alt=""
                   />
-                  <span className="whitespace-nowrap">{tab.label}</span>
+                  <span className={`whitespace-nowrap ${isActive ? 'text-white' : 'text-persian-indigo'}`}>{tab.label}</span>
                 </li>
               );
             })}
