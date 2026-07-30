@@ -24,21 +24,23 @@ export default function Table({
 
       cols.push({
         accessorFn: (row) => {
+          if (column.accessor) {
+            return row[column.accessor];
+          }
+          if (typeof column.title === 'string' && row[column.title] !== undefined) {
+            return row[column.title];
+          }
           const keys = Object.keys(row);
           return row[keys[dataIndex]] ?? row[keys[index]];
         },
+        header: column.title || 'Column',
 
-        header:
-          typeof column.title === 'string'
-            ? column.title
-            : 'Column',
-
-        cell: ({ getValue }) => {
+        cell: ({ getValue, row }) => {
           const value = getValue();
           let content;
 
           if (column.itemWrapper) {
-            content = column.itemWrapper(value);
+            content = column.itemWrapper(value, row.original);
           } else if (
             typeof value === 'string' ||
             typeof value === 'number' ||
