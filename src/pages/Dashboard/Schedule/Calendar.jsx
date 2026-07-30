@@ -1,7 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Card from '../../../components/ui/Card.jsx';
-import { formatDate, formatStartEndTime } from '../../../utils/index.js';
 
 const MONTH_NAMES = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -18,25 +17,28 @@ const EVENT_GLASS_STYLE = {
   '--glass-to': 'rgba(68, 137, 212, 0.9)',
 };
 
-
-
 export default function Calendar({ schedules = [], userScheduleId }) {
   const [currentDate, setCurrentDate] = useState(() => {
-    if (schedules && schedules.length > 0 && schedules[0]?.startTime) {
-      return new Date(schedules[0].startTime);
+    if (Array.isArray(schedules) && schedules.length > 0 && schedules[0]?.startTime) {
+      const d = new Date(schedules[0].startTime);
+      if (!isNaN(d.getTime())) return d;
     }
     return new Date();
   });
 
   useEffect(() => {
-    if (schedules && schedules.length > 0 && schedules[0]?.startTime) {
-      setCurrentDate(new Date(schedules[0].startTime));
+    if (Array.isArray(schedules) && schedules.length > 0 && schedules[0]?.startTime) {
+      const d = new Date(schedules[0].startTime);
+      if (!isNaN(d.getTime())) {
+        setCurrentDate(d);
+      }
     }
   }, [schedules]);
 
   const today = new Date();
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth();
+  const validDate = currentDate instanceof Date && !isNaN(currentDate.getTime()) ? currentDate : today;
+  const year = validDate.getFullYear();
+  const month = validDate.getMonth();
 
   const firstDayWeekday = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -48,8 +50,10 @@ export default function Calendar({ schedules = [], userScheduleId }) {
     year === today.getFullYear();
 
   const getEventsForDay = (day) =>
-    schedules.filter((s) => {
+    (Array.isArray(schedules) ? schedules : []).filter((s) => {
+      if (!s || !s.startTime) return false;
       const d = new Date(s.startTime);
+      if (isNaN(d.getTime())) return false;
       return (
         d.getDate() === day &&
         d.getMonth() === month &&
@@ -66,13 +70,15 @@ export default function Calendar({ schedules = [], userScheduleId }) {
         </h2>
         <div className="flex space-x-2">
           <button
-            className="p-1 rounded-full hover:bg-lavender-white text-persian-indigo"
+            type="button"
+            className="p-1 rounded-full hover:bg-lavender-white text-persian-indigo cursor-pointer"
             onClick={() => setCurrentDate(new Date(year, month - 1, 1))}
           >
             <ChevronLeft />
           </button>
           <button
-            className="p-1 rounded-full hover:bg-lavender-white text-persian-indigo"
+            type="button"
+            className="p-1 rounded-full hover:bg-lavender-white text-persian-indigo cursor-pointer"
             onClick={() => setCurrentDate(new Date(year, month + 1, 1))}
           >
             <ChevronRight />
@@ -94,8 +100,8 @@ export default function Calendar({ schedules = [], userScheduleId }) {
 
       {/* Day cells */}
       <div className="grid grid-cols-7 gap-2 text-center justify-items-center">
-        {/* Tanggal dari bulan sebelumnya, sebagai pengisi sebelum tanggal 1 */}
-        {[...Array(firstDayWeekday)].map((_, i) => {
+        {/* Previous month padding */}
+        {[...Array(isNaN(firstDayWeekday) ? 0 : firstDayWeekday)].map((_, i) => {
           const trailingDay = prevMonthDays - firstDayWeekday + i + 1;
           const isSunday = i === 0;
           return (
@@ -108,7 +114,7 @@ export default function Calendar({ schedules = [], userScheduleId }) {
           );
         })}
 
-        {[...Array(daysInMonth)].map((_, i) => {
+        {[...Array(isNaN(daysInMonth) ? 30 : daysInMonth)].map((_, i) => {
           const day = i + 1;
           const weekday = (firstDayWeekday + i) % 7;
           const isSunday = weekday === 0;

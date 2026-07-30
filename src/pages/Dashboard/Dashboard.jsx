@@ -164,22 +164,14 @@ function Dashboard() {
 
   useEffect(() => {
     const normalizedPath = location.pathname.replace(/\/+$/, '');
-
-    // Determine the correct page for this status
-    let correctPath = '/dashboard/schedule';
-    if (userStatus === 'registration') {
-      correctPath = '/dashboard/registration';
-    } else if (userStatus === 'done_launching') {
-      correctPath = '/dashboard/confirm';
-    }
-
-    // Pages that are "status-driven" (non-neutral pages)
-    const statusPages = ['/dashboard/schedule', '/dashboard/registration', '/dashboard/confirm', '/dashboard/re-registration'];
-    const onStatusPage = statusPages.includes(normalizedPath);
-
-    // Redirect if bare /dashboard OR currently on a status page that doesn't match
-    if (normalizedPath === '/dashboard' || (onStatusPage && normalizedPath !== correctPath)) {
-      navigate(correctPath, { replace: true });
+    if (normalizedPath === '/dashboard') {
+      let defaultPath = '/dashboard/schedule';
+      if (userStatus === 'registration') {
+        defaultPath = '/dashboard/registration';
+      } else if (userStatus === 'done_launching') {
+        defaultPath = '/dashboard/confirm';
+      }
+      navigate(defaultPath, { replace: true });
     }
   }, [location.pathname, navigate, userStatus]);
 
