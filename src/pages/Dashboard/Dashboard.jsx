@@ -39,16 +39,32 @@ function Dashboard() {
         });
         if (res.ok) {
           const json = await res.json();
-          if (json?.data?.registration?.schedule) {
-            setUserSchedule(json.data.registration.schedule);
+          const data = json?.data;
+
+          // Read schedule
+          if (data?.registration?.schedule) {
+            setUserSchedule(data.registration.schedule);
+          }
+
+          // Read status from API and map to local userStatus
+          // Only override if not already on a specific sub-path (let path-based useEffect take over after nav)
+          const apiStatus = data?.status ?? data?.registration?.status ?? data?.userStatus;
+          if (apiStatus) {
+            if (apiStatus === 'done_launching' || apiStatus === 'confirm_launching') {
+              setUserStatus('done_launching');
+            } else if (apiStatus === 'registration' || apiStatus === 'registered') {
+              setUserStatus('registration');
+            }
+            // 'schedule' is the default, no need to set it explicitly
           }
         }
       } catch (err) {
-        console.warn('Failed to load profile schedule:', err);
+        console.warn('Failed to load profile:', err);
       }
     };
     fetchProfile();
   }, []);
+
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [userSchedule, setUserSchedule] = useState({
@@ -141,16 +157,25 @@ function Dashboard() {
 
   useEffect(() => {
     const normalizedPath = location.pathname.replace(/\/+$/, '');
-    if (normalizedPath === '/dashboard') {
-      let defaultPath = '/dashboard/schedule';
-      if (userStatus === 'registration') {
-        defaultPath = '/dashboard/registration';
-      } else if (userStatus === 'done_launching') {
-        defaultPath = '/dashboard/confirm';
-      }
-      navigate(defaultPath, { replace: true });
+
+    // Determine the correct page for this status
+    let correctPath = '/dashboard/schedule';
+    if (userStatus === 'registration') {
+      correctPath = '/dashboard/registration';
+    } else if (userStatus === 'done_launching') {
+      correctPath = '/dashboard/confirm';
+    }
+
+    // Pages that are "status-driven" (non-neutral pages)
+    const statusPages = ['/dashboard/schedule', '/dashboard/registration', '/dashboard/confirm', '/dashboard/re-registration'];
+    const onStatusPage = statusPages.includes(normalizedPath);
+
+    // Redirect if bare /dashboard OR currently on a status page that doesn't match
+    if (normalizedPath === '/dashboard' || (onStatusPage && normalizedPath !== correctPath)) {
+      navigate(correctPath, { replace: true });
     }
   }, [location.pathname, navigate, userStatus]);
+
 
   useEffect(() => {
     setIsSidebarOpen(false);
