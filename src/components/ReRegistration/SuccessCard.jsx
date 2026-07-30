@@ -1,11 +1,14 @@
 import { motion } from 'framer-motion'
 import { Check } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import Card from './Card'
 
 export default function SuccessCard({
   title = 'Re-registration Successful!',
   message = "Thank you for joining our family! You're now officially a BNCC member.",
 }) {
+  const navigate = useNavigate()
+
   return (
     <Card className="flex w-full max-w-[560px] mx-auto min-h-[520px] flex-col items-center justify-center p-5 text-center md:max-w-[660px] md:min-h-[460px] md:p-6 lg:h-full lg:min-h-[500px] lg:w-full lg:max-w-none lg:p-12">
       <motion.div
@@ -34,6 +37,16 @@ export default function SuccessCard({
       >
         {message}
       </motion.p>
+
+      <motion.button
+        initial={{ y: 8, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.45, duration: 0.4 }}
+        onClick={() => navigate('/dashboard/profile')}
+        className="mt-6 flex items-center justify-center gap-2 rounded-lg bg-gradient-to-br from-[#0A2745] to-[#2474C0] px-6 py-2.5 sm:px-8 sm:py-3.5 text-xs sm:text-base font-bold text-white shadow-md transition hover:brightness-110 active:scale-95 cursor-pointer"
+      >
+        Go to Profile
+      </motion.button>
     </Card>
   )
 }
