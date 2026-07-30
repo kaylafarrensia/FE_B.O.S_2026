@@ -49,17 +49,7 @@ function Dashboard() {
           const apiStatus =
             data?.status ?? data?.registration?.status ?? data?.userStatus
           if (apiStatus) {
-            if (
-              apiStatus === 'done_launching' ||
-              apiStatus === 'confirm_launching'
-            ) {
-              setUserStatus('done_launching')
-            } else if (
-              apiStatus === 'registration' ||
-              apiStatus === 'registered'
-            ) {
-              setUserStatus('registration')
-            }
+            setUserStatus(apiStatus)
           }
         }
       } catch (err) {
@@ -96,14 +86,39 @@ function Dashboard() {
     return params.get('status') || 'schedule'
   })
 
-  // Keep path sync clean without overriding custom subpaths
+  // Enforce status-based routing guards
   useEffect(() => {
-    if (location.pathname.startsWith('/dashboard/re-registration')) {
-      setUserStatus('done_launching')
-    } else if (location.pathname.startsWith('/dashboard/registration')) {
-      setUserStatus('registration')
+    const path = location.pathname
+    if (path.startsWith('/dashboard/confirm') && userStatus !== 'done_launching') {
+      if (userStatus === 'confirm_launching') {
+        navigate('/dashboard/registration', { replace: true })
+      } else if (userStatus === 'letter_verified' || userStatus === 'done_reregist') {
+        navigate('/dashboard/re-registration', { replace: true })
+      } else {
+        navigate('/dashboard/schedule', { replace: true })
+      }
+    } else if (path.startsWith('/dashboard/registration') && userStatus !== 'confirm_launching') {
+      if (userStatus === 'done_launching') {
+        navigate('/dashboard/confirm', { replace: true })
+      } else if (userStatus === 'letter_verified' || userStatus === 'done_reregist') {
+        navigate('/dashboard/re-registration', { replace: true })
+      } else {
+        navigate('/dashboard/schedule', { replace: true })
+      }
+    } else if (
+      path.startsWith('/dashboard/re-registration') &&
+      userStatus !== 'letter_verified' &&
+      userStatus !== 'done_reregist'
+    ) {
+      if (userStatus === 'done_launching') {
+        navigate('/dashboard/confirm', { replace: true })
+      } else if (userStatus === 'confirm_launching') {
+        navigate('/dashboard/registration', { replace: true })
+      } else {
+        navigate('/dashboard/schedule', { replace: true })
+      }
     }
-  }, [location.pathname])
+  }, [location.pathname, userStatus, navigate])
 
   const tabs = useMemo(() => {
     let firstTab
@@ -138,14 +153,21 @@ function Dashboard() {
       }
     } else {
       // Fallback based on user status
-      if (userStatus === 'registration') {
+      if (userStatus === 'done_launching') {
+        firstTab = {
+          label: 'SCHEDULE',
+          icon: IconCalendar,
+          iconWhite: IconCalendarWhite,
+          path: '/dashboard/confirm',
+        }
+      } else if (userStatus === 'confirm_launching') {
         firstTab = {
           label: 'REGIST',
           icon: IconCalendar,
           iconWhite: IconCalendarWhite,
           path: '/dashboard/registration',
         }
-      } else if (userStatus === 'done_launching') {
+      } else if (userStatus === 'letter_verified' || userStatus === 'done_reregist') {
         firstTab = {
           label: 'RE-REGIST',
           icon: IconCalendar,
@@ -192,9 +214,11 @@ function Dashboard() {
     const normalizedPath = location.pathname.replace(/\/+$/, '')
     if (normalizedPath === '/dashboard') {
       let defaultPath = '/dashboard/schedule'
-      if (userStatus === 'registration') {
+      if (userStatus === 'done_launching') {
+        defaultPath = '/dashboard/confirm'
+      } else if (userStatus === 'confirm_launching') {
         defaultPath = '/dashboard/registration'
-      } else if (userStatus === 'done_launching') {
+      } else if (userStatus === 'letter_verified' || userStatus === 'done_reregist') {
         defaultPath = '/dashboard/re-registration'
       }
       navigate(defaultPath, { replace: true })

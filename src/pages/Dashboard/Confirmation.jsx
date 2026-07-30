@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useOutletContext, useNavigate } from 'react-router-dom'
 import Card from '../../components/ui/Card.jsx'
 import Button from '../../components/ui/Button.jsx'
 import IconSchedule from '../../assets/icons/IconSchedule.svg'
@@ -8,6 +9,8 @@ import Calendar from './Schedule/Calendar.jsx'
 import ContactPerson from './Japres/ContactPerson.jsx'
 
 export default function Confirmation() {
+  const navigate = useNavigate()
+  const { setUserStatus } = useOutletContext()
   const [schedule, setSchedule] = useState({
     id: 2,
     startTime: '2026-08-25T12:00:00Z',
@@ -51,7 +54,7 @@ export default function Confirmation() {
       const apiUrl =
         import.meta.env.VITE_API_URL ||
         'https://staging-launching-api.bncc.net/api'
-      await fetch(`${apiUrl}/user/status`, {
+      const res = await fetch(`${apiUrl}/user/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -59,6 +62,10 @@ export default function Confirmation() {
         },
         body: JSON.stringify({ status: 'confirm_launching' }),
       })
+      if (res.ok) {
+        setUserStatus('confirm_launching')
+        navigate('/dashboard/registration')
+      }
     } catch (err) {
       console.warn('Failed to update status:', err)
     } finally {
