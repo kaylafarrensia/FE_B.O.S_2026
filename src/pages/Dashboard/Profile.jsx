@@ -13,7 +13,7 @@ const DUMMY_USER = {
     whatsappNumber: '0821-0000-1234',
     lineId: 'johndoeline',
     nim: '2602345678',
-    bnccId: 'BNCC2602345',
+    bnccId: null,
     schedule: {
       startTime: '2026-08-15T09:00:00Z',
       endTime: '2026-08-15T12:00:00Z',
@@ -91,9 +91,7 @@ function Profile() {
                   json.data.registration?.lineId ||
                   DUMMY_USER.registration.lineId,
                 nim: json.data.registration?.nim || DUMMY_USER.registration.nim,
-                bnccId:
-                  json.data.registration?.bnccId ||
-                  DUMMY_USER.registration.bnccId,
+                bnccId: json.data.registration?.bnccId ?? null,
                 lntCourse:
                   json.data.registration?.lntCourse ||
                   DUMMY_USER.registration.lntCourse,
@@ -218,7 +216,7 @@ function Profile() {
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">BNCC ID</p>
                     <p className="text-sm sm:text-lg font-semibold">
-                      {user.registration.bnccId || '-'}
+                      {user.registration.bnccId || '—'}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2">
