@@ -47,7 +47,7 @@ export default function ReRegistrationForm({
 
   useEffect(() => {
     const loadData = async () => {
-      const token = localStorage.getItem('accessToken')
+      const token = localStorage.getItem('token') || localStorage.getItem('accessToken')
 
       if (!token) {
         // No token: fallback to mock courses so form is default and testable
@@ -152,7 +152,7 @@ export default function ReRegistrationForm({
     setIsSubmitting(true)
 
     try {
-      const token = localStorage.getItem('accessToken')
+      const token = localStorage.getItem('token') || localStorage.getItem('accessToken')
 
       if (!token) {
         // Local fallback: Mock successful submit if user is not signed in

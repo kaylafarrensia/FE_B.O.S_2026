@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import Card from '../../components/ui/Card.jsx'
 import Button from '../../components/ui/Button.jsx'
 import IconDownload from '../../assets/icons/IconDownload.svg'
@@ -57,8 +58,53 @@ function renderEmail(email) {
 }
 
 function Profile() {
-  const user = DUMMY_USER
+  const [user, setUser] = useState(DUMMY_USER)
+  const [loading, setLoading] = useState(false)
   const { userSchedule } = useOutletContext()
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const token = localStorage.getItem('token')
+      if (!token) return
+
+      setLoading(true)
+      try {
+        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'
+        const res = await fetch(`${apiUrl}/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        if (res.ok) {
+          const json = await res.json()
+          if (json?.data) {
+            setUser({
+              name: json.data.fullName || json.data.name || DUMMY_USER.name,
+              email: json.data.email || DUMMY_USER.email,
+              registration: {
+                ...DUMMY_USER.registration,
+                ...json.data.registration,
+                whatsappNumber: json.data.registration?.whatsappNumber || DUMMY_USER.registration.whatsappNumber,
+                lineId: json.data.registration?.lineId || DUMMY_USER.registration.lineId,
+                nim: json.data.registration?.nim || DUMMY_USER.registration.nim,
+                bnccId: json.data.registration?.bnccId || DUMMY_USER.registration.bnccId,
+                lntCourse: json.data.registration?.lntCourse || DUMMY_USER.registration.lntCourse,
+                faculty: json.data.registration?.faculty || DUMMY_USER.registration.faculty,
+                major: json.data.registration?.major || DUMMY_USER.registration.major,
+                region: json.data.registration?.region || DUMMY_USER.registration.region,
+                linkedinUrl: json.data.registration?.linkedinUrl || DUMMY_USER.registration.linkedinUrl,
+                githubUrl: json.data.registration?.githubUrl || DUMMY_USER.registration.githubUrl,
+              }
+            })
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to load profile from backend, using mock data:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProfile()
+  }, [])
 
   return (
     <div className="relative">

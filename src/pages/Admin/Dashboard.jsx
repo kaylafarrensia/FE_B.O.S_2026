@@ -61,7 +61,14 @@ const adminNameDict = {
 export default function Dashboard() {
     const [collapsed, setCollapsed] = useState(false);
     const location = useLocation();
-    //   const navigate = useNavigate();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+        if (import.meta.env.PROD && !token) {
+            navigate('/signin', { replace: true });
+        }
+    }, [navigate]);
 
     //   const token = localStorage.getItem('token');
 

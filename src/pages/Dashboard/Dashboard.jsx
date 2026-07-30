@@ -22,6 +22,13 @@ function Dashboard() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  useEffect(() => {
+    const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+    if (import.meta.env.PROD && !token) {
+      navigate('/signin', { replace: true });
+    }
+  }, [navigate]);
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [userSchedule, setUserSchedule] = useState({
     id: 2,
