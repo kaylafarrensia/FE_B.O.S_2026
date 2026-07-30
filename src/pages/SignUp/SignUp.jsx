@@ -972,7 +972,14 @@ export default function SignUp() {
                 color: '#FFFFFF',
               }}
             >
-              <span style={{ color: '#FFFFFF' }}>Sign In</span>
+              <span
+                style={{
+                  color: '#FFFFFF',
+                  cssText: 'color: #FFFFFF !important',
+                }}
+              >
+                Sign In
+              </span>
             </button>
           </div>
         </div>
