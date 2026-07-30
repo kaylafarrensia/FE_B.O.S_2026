@@ -228,9 +228,6 @@ Panitia BNCC Launching`,
         majorId: Number(form.majorId),
         lntCourseId: Number(form.lntCourseId),
         scheduleId: Number(form.scheduleId),
-        binusEmail: `${String(form.nim || '').trim()}@binus.ac.id`,
-        confirmPassword: String(form.password || ''),
-        heardFrom: null,
       }
 
       if (
@@ -239,8 +236,6 @@ Panitia BNCC Launching`,
         form.isJapres !== ''
       ) {
         payload.isJapres = Number(form.isJapres)
-      } else {
-        payload.isJapres = 0
       }
 
       return createUser(payload)
@@ -1129,7 +1124,7 @@ Panitia BNCC Launching`,
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 rounded-lg bg-yes text-white hover:bg-blue-700"
+                className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
                 disabled={createLoading}
               >
                 {createLoading ? <Loader /> : 'Create'}
@@ -1246,7 +1241,6 @@ Panitia BNCC Launching`,
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeStyle="round"
                   strokeWidth={2}
                   d="M5 13l4 4L19 7"
                 />
@@ -1274,7 +1268,7 @@ Panitia BNCC Launching`,
               onClick={handleAlertClose}
               className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
             >
-              CloseY
+              Close
             </button>
           </div>
         </div>
@@ -1304,7 +1298,7 @@ Panitia BNCC Launching`,
             }}
             type="button"
           >
-            Set WA Message'
+            Set WA Message
           </button>
           <button
             className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
