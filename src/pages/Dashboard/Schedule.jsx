@@ -133,7 +133,7 @@ export default function Schedule() {
               <ul className="flex flex-col gap-2 py-5">
                 <li className="flex flex-row items-center gap-3">
                   <img src={IconSchedule} alt="Schedule" className="w-[15px] sm:w-[30px]" />
-                  <p className="font-bold text-xs sm:text-base">
+                  <p className="font-bold text-xs sm:text-lg">
                     {userSchedule ? formatDate(userSchedule.startTime) : 'No schedule selected yet.'}
                   </p>
                 </li>
