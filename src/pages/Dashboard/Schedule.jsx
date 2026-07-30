@@ -139,7 +139,7 @@ export default function Schedule() {
                 </li>
                 <li className="flex flex-row items-center gap-3">
                   <img src={IconTime} alt="Clock" className="w-[15px] sm:w-[30px]" />
-                  <p className="font-bold text-xs sm:text-base">
+                  <p className="font-bold text-xs sm:text-lg">
                     {userSchedule
                       ? formatStartEndTime(userSchedule.startTime, userSchedule.endTime)
                       : 'No schedule selected yet.'}

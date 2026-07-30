@@ -3,8 +3,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import IconSchedule from '../../../assets/icons/IconSchedule.svg';
 import { formatDate, formatStartEndTime } from '../../../utils/index.js';
 
-const DATE_LABEL_CLASS = 'font-semibold text-xs sm:text-lg text-[#251369]';
-const TIME_LABEL_CLASS = 'text-xs sm:text-lg text-gray-500';
+const DATE_LABEL_CLASS = 'font-semibold text-xs sm:text-base text-[#251369]';
+const TIME_LABEL_CLASS = 'text-xs sm:text-base text-gray-500';
 
 export default function ScheduleDropdown({ schedules, onSelect }) {
   const [open, setOpen] = useState(false);
