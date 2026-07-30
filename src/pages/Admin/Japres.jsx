@@ -189,8 +189,8 @@ export default function Japres() {
   return (
     <div className={`py-6 space-y-7`}>
       {showErrorModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white p-8 rounded-lg shadow-xl text-center">
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20">
+          <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl border border-gray-200 text-center">
             <h3 className="text-xl font-bold mb-4">Error</h3>
             <p className="text-gray-600 mb-6">
               {error?.response?.data?.error ||
@@ -216,8 +216,8 @@ export default function Japres() {
       )}
 
       {alert && (
-        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-[70]">
-          <div className="bg-white p-8 rounded-lg shadow-xl text-center flex flex-col items-center">
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-[70] pt-20">
+          <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl border border-gray-200 text-center flex flex-col items-center">
             {alert.type === 'success' ? (
               <svg
                 className="w-10 h-10 text-green-500 mb-2"
@@ -309,9 +309,9 @@ export default function Japres() {
       </div>
 
       {showEditModal && editJapres && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100]">
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-[100] pt-20">
           <form
-            className="bg-white p-8 rounded-lg shadow-xl text-left min-w-[350px] max-w-[90vw]"
+            className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl border border-gray-200 text-left min-w-[350px] max-w-[90vw]"
             onSubmit={handleEditSubmit}
             style={{ width: '100%', maxWidth: 600 }}
           >
@@ -391,8 +391,8 @@ export default function Japres() {
       )}
 
       {showConfirmModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[101]">
-          <div className="bg-white p-8 rounded-lg shadow-xl text-center min-w-[350px]">
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-[101] pt-20">
+          <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl border border-gray-200 text-center min-w-[350px]">
             <h3 className="text-xl font-bold mb-4">Confirm Edit</h3>
             <p className="mb-6">
               Are you sure you want to change Japres status to{' '}

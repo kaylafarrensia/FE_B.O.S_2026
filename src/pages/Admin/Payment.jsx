@@ -395,8 +395,8 @@ export default function Payment() {
   return (
     <div className={`py-6 space-y-7`}>
       {showEditModal && editPayment && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-[400px]">
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20">
+          <div className="pointer-events-auto bg-white p-6 rounded-xl shadow-2xl border border-gray-200 w-[400px]">
             <h3 className="text-lg font-semibold mb-4">Edit Payment Status</h3>
             <p className="mb-4">
               User: {editPayment.name} ({editPayment.bnccId})
@@ -443,8 +443,8 @@ export default function Payment() {
         </div>
       )}
       {showErrorModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white p-8 rounded-lg shadow-xl text-center">
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20">
+          <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl border border-gray-200 text-center">
             <h3 className="text-xl font-bold mb-4">Error</h3>
             <p className="text-gray-600 mb-6">
               {error?.response?.data?.error ||
@@ -470,8 +470,8 @@ export default function Payment() {
       )}
 
       {alert && (
-        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-[70]">
-          <div className="bg-white p-8 rounded-lg shadow-xl text-center flex flex-col items-center">
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-[70] pt-20">
+          <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl border border-gray-200 text-center flex flex-col items-center">
             {alert.type === 'success' ? (
               <svg
                 className="w-10 h-10 text-green-500 mb-2"
@@ -515,8 +515,8 @@ export default function Payment() {
         </div>
       )}
       {previewOpen && previewUrl && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-4 max-w-4xl w-[90%] max-h-[90%] overflow-auto">
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20">
+          <div className="pointer-events-auto bg-white rounded-xl shadow-2xl border border-gray-200 p-4 max-w-4xl w-[90%] max-h-[90%] overflow-auto">
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-lg font-semibold">Payment Proof Preview</h3>
               <div className="flex items-center gap-2">
