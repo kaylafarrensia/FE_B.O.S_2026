@@ -213,25 +213,23 @@ Panitia BNCC Launching`,
 
   const createMutation = useMutation({
     mutationFn: (form) => {
-      const payload = { ...form }
-      // Ensure required numeric IDs are numbers
-      if (payload.regionId) payload.regionId = Number(payload.regionId)
-      else delete payload.regionId
+      const payload = {
+        fullName: String(form.fullName || '').trim(),
+        email: String(form.email || '').trim(),
+        password: String(form.password || ''),
+        nim: String(form.nim || '').trim(),
+        lineId: String(form.lineId || '').trim(),
+        whatsappNumber: String(form.whatsappNumber || '').trim(),
+        regionId: Number(form.regionId || 0),
+        facultyId: Number(form.facultyId || 0),
+        majorId: Number(form.majorId || 0),
+        lntCourseId: Number(form.lntCourseId || 0),
+        scheduleId: Number(form.scheduleId || 0),
+      }
 
-      if (payload.facultyId) payload.facultyId = Number(payload.facultyId)
-      else delete payload.facultyId
-
-      if (payload.majorId) payload.majorId = Number(payload.majorId)
-      else delete payload.majorId
-
-      if (payload.lntCourseId) payload.lntCourseId = Number(payload.lntCourseId)
-      else delete payload.lntCourseId
-
-      if (payload.scheduleId) payload.scheduleId = Number(payload.scheduleId)
-      else delete payload.scheduleId
-
-      if (payload.isJapres === null || payload.isJapres === undefined || payload.isJapres === '') delete payload.isJapres
-      else payload.isJapres = Number(payload.isJapres)
+      if (form.isJapres !== null && form.isJapres !== undefined && form.isJapres !== '') {
+        payload.isJapres = Number(form.isJapres)
+      }
 
       return createUser(payload)
     },
