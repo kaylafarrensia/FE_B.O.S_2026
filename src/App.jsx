@@ -7,6 +7,7 @@ import Schedule from './pages/Dashboard/Schedule.jsx'
 import Registration from './pages/Dashboard/Registration.jsx'
 import Japres from './pages/Dashboard/Japres.jsx'
 import Profile from './pages/Dashboard/Profile.jsx'
+import Confirmation from './pages/Dashboard/Confirmation.jsx'
 import SignIn from './pages/SignIn/SignIn.jsx'
 import SignUp from './pages/SignUp/SignUp.jsx'
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword.jsx'
@@ -39,6 +40,7 @@ function App() {
         <Route path="re-registration" element={<ReRegistration />} />
         <Route path="japres" element={<Japres />} />
         <Route path="profile" element={<Profile />} />
+        <Route path="confirm" element={<Confirmation />} />
       </Route>
       <Route path="/signin" element={<SignIn />} />
       <Route path="/auth/signin" element={<SignIn />} />

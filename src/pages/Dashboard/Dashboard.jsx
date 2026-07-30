@@ -83,6 +83,8 @@ function Dashboard() {
       setUserStatus('done_launching');
     } else if (location.pathname === '/dashboard/registration') {
       setUserStatus('registration');
+    } else if (location.pathname === '/dashboard/confirm') {
+      setUserStatus('done_launching');
     }
   }, [location.pathname]);
 
@@ -144,7 +146,7 @@ function Dashboard() {
       if (userStatus === 'registration') {
         defaultPath = '/dashboard/registration';
       } else if (userStatus === 'done_launching') {
-        defaultPath = '/dashboard/re-registration';
+        defaultPath = '/dashboard/confirm';
       }
       navigate(defaultPath, { replace: true });
     }
