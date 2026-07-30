@@ -115,7 +115,7 @@ export default function SignIn() {
           setLoginError(errorMsg)
         },
         onSuccess: () => {
-          navigate('/dashboard/profile')
+          navigate('/dashboard/schedule')
         },
       }
     )
