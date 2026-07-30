@@ -179,7 +179,7 @@ export default function Hero() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => navigate('/signup')}
+              onClick={() => navigate('/auth/signup')}
               className="inline-flex items-center justify-center rounded-md bg-[linear-gradient(135deg,#0C4076_0%,#4489D4_100%)] text-white font-semibold text-sm transition-all duration-300 hover:brightness-105 px-10 py-3 sm:px-14 sm:py-3.5 cursor-pointer border-none"
             >
               SIGN UP NOW!

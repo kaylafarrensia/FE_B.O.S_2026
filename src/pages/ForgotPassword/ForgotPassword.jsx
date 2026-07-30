@@ -180,7 +180,7 @@ export default function ForgotPassword() {
             <p className="text-center text-xs sm:text-sm font-medium pb-1">
               Remember your password?{' '}
               <span
-                onClick={() => navigate('/signin')}
+                onClick={() => navigate('/auth/signin')}
                 className={`cursor-pointer font-bold text-[#1476bc] underline underline-offset-2 hover:opacity-80 transition-opacity ${focusRingClasses}`}
               >
                 Sign in here
@@ -229,7 +229,7 @@ export default function ForgotPassword() {
             </p>
 
             <button
-              onClick={() => navigate('/signin')}
+              onClick={() => navigate('/auth/signin')}
               className="w-full max-w-[170px] py-3 rounded-xl text-white font-bold text-sm sm:text-base shadow-md transition-all cursor-pointer hover:opacity-90 active:scale-[0.98]"
               style={{ background: 'linear-gradient(135deg, #1B5198 0%, #2A6DC2 100%)' }}
               type="button"

@@ -216,7 +216,7 @@ export default function SignIn() {
             {/* Forgot Password */}
             <div className="flex justify-end -mt-1">
               <span
-                onClick={() => navigate('/forgot-password')}
+                onClick={() => navigate('/auth/forgot-password')}
                 className="cursor-pointer text-[11px] sm:text-xs font-medium text-[#105EA9] underline underline-offset-2 hover:text-[#1476bc] transition-colors"
               >
                 Forgot your password?
@@ -241,7 +241,7 @@ export default function SignIn() {
             <p className="text-center text-xs sm:text-sm font-medium pb-1">
               Don't have an account?{' '}
               <span
-                onClick={() => navigate('/signup')}
+                onClick={() => navigate('/auth/signup')}
                 className="cursor-pointer font-bold text-[#1476bc] underline underline-offset-2 hover:opacity-80 transition-opacity"
               >
                 Register here

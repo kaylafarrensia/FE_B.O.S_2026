@@ -41,11 +41,15 @@ function App() {
         <Route path="profile" element={<Profile />} />
       </Route>
       <Route path="/signin" element={<SignIn />} />
+      <Route path="/auth/signin" element={<SignIn />} />
       <Route path="/login" element={<SignIn />} />
       <Route path="/signup" element={<SignUp />} />
+      <Route path="/auth/signup" element={<SignUp />} />
       <Route path="/register" element={<SignUp />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/auth/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/auth/reset-password" element={<ResetPassword />} />
       <Route path="/admin/signin" element={<AdminSignIn />} />
 
       {/* Admin routes */}

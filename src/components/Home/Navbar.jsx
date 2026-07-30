@@ -251,7 +251,7 @@ function MobileMenu({ isOpen, links, onClose, headerHeight, activeSection }) {
                 className="flex items-center justify-end p-4 rounded-lg transition-all duration-300 bg-gradient-to-r from-[#0C4076] to-[#2474C0] text-white font-bold tracking-[2.5px] uppercase text-sm sm:text-lg mt-4 cursor-pointer hover:from-[#062547] hover:to-[#164C82] shadow-md shadow-[#0C4076]/30"
                 onClick={() => {
                   onClose()
-                  navigate('/signin')
+                  navigate('/auth/signin')
                 }}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -331,7 +331,7 @@ export default function Navbar() {
             <motion.button
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.96 }}
-              onClick={() => navigate('/signin')}
+              onClick={() => navigate('/auth/signin')}
               className="relative hidden h-[42px] w-[115px] items-center justify-center overflow-hidden rounded-sm bg-[linear-gradient(135deg,#0C4076_0%,#4489D4_100%)] font-semibold text-white transition-shadow duration-300 hover:shadow-[0_6px_20px_rgba(12,64,118,0.35)] lg:flex cursor-pointer border-none"
             >
               <motion.span

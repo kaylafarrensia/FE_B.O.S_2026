@@ -204,7 +204,7 @@ export default function ResetPassword() {
               <div className="rounded-lg bg-red-50 border border-red-200 px-3 py-2.5 text-[11px] sm:text-xs text-red-600 text-center font-semibold leading-snug">
                 {linkError}{' '}
                 <span
-                  onClick={() => navigate('/forgot-password')}
+                  onClick={() => navigate('/auth/forgot-password')}
                   className="font-bold underline cursor-pointer hover:opacity-80"
                 >
                   Request a new link
@@ -327,7 +327,7 @@ export default function ResetPassword() {
             </h3>
 
             <button
-              onClick={() => navigate('/signin')}
+              onClick={() => navigate('/auth/signin')}
               className="w-full max-w-[220px] py-3 rounded-xl text-white font-bold text-sm sm:text-base shadow-md transition-all cursor-pointer hover:opacity-90 active:scale-[0.98]"
               style={{ background: 'linear-gradient(135deg, #1B5198 0%, #2A6DC2 100%)' }}
               type="button"

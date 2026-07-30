@@ -620,7 +620,7 @@ export default function SignUp() {
             <div className="mt-4 text-center text-xs sm:text-sm text-[#0D2A4E]">
               <span>Already have an account? </span>
               <span
-                onClick={() => navigate('/signin')}
+                onClick={() => navigate('/auth/signin')}
                 className="font-bold text-[#1D5CB5] underline cursor-pointer hover:opacity-80 transition-opacity"
               >
                 Sign in here
@@ -678,7 +678,7 @@ export default function SignUp() {
             </p>
 
             <button
-              onClick={() => navigate('/signin')}
+              onClick={() => navigate('/auth/signin')}
               className="w-full max-w-[170px] py-3 rounded-xl text-white font-bold text-sm sm:text-base shadow-md transition-all cursor-pointer hover:opacity-90 active:scale-[0.98]"
               style={{ background: 'linear-gradient(135deg, #1B5198 0%, #2A6DC2 100%)' }}
             >
