@@ -76,6 +76,15 @@ export default function Users() {
   const [tempWhatsAppMessage, setTempWhatsAppMessage] =
     useState(whatsAppMessage)
 
+  // Helper function to safely render text (prevents React crashes from objects)
+  const safeRender = (val) => {
+    if (val === null || val === undefined) return '-'
+    if (typeof val === 'object') {
+      return val.name || val.title || JSON.stringify(val)
+    }
+    return String(val)
+  }
+
   // Separate lookup query instances for edit form and create form
   const {
     regionQuery,
@@ -571,200 +580,210 @@ export default function Users() {
             ) : viewUser ? (
               <div className="space-y-2 mb-6">
                 <div>
-                  <b>Name:</b> {viewUser.name}
+                  <b>Name:</b> {safeRender(viewUser.name)}
                 </div>
                 <div>
-                  <b>Email:</b> {viewUser.email}
+                  <b>Email:</b> {safeRender(viewUser.email)}
                 </div>
                 <div>
-                  <b>Status:</b> {viewUser.status}
+                  <b>Status:</b> {safeRender(viewUser.status)}
                 </div>
                 <div>
-                  <b>Role:</b> {viewUser.role}
+                  <b>Role:</b> {safeRender(viewUser.role)}
                 </div>
                 <div>
-                  <b>Created At:</b> {viewUser.createdAt}
+                  <b>Created At:</b> {safeRender(viewUser.createdAt)}
                 </div>
                 <div>
-                  <b>Updated At:</b> {viewUser.updatedAt}
+                  <b>Updated At:</b> {safeRender(viewUser.updatedAt)}
                 </div>
-                {viewUser.registrations?.map((reg, idx) => (
-                  <div key={idx} className="border-t pt-2 mt-2">
-                    <div>
-                      <b>NIM:</b> {reg.nim}
-                    </div>
-                    <div>
-                      <b>BNCC ID:</b> {reg.bnccId}
-                    </div>
-                    <div>
-                      <b>LINE:</b> {reg.lineId}
-                    </div>
-                    <div>
-                      <b>WhatsApp:</b> {reg.whatsappNumber}
-                    </div>
-                    <div>
-                      <b>Region:</b> {reg.region?.name}
-                    </div>
-                    <div>
-                      <b>Faculty:</b> {reg.faculty?.name}
-                    </div>
-                    <div>
-                      <b>Major:</b> {reg.major?.name}
-                    </div>
-                    <div>
-                      <b>LnT Course:</b> {reg.lntCourse?.title}
-                    </div>
-                    <div>
-                      <b>Schedule:</b> {reg.schedule?.title}
-                    </div>
-                    <div>
-                      <b>LinkedIn:</b>{' '}
-                      {reg.linkedinUrl ? (
-                        <a
-                          href={reg.linkedinUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 underline"
-                        >
-                          LinkedIn
-                        </a>
-                      ) : (
-                        '-'
-                      )}
-                    </div>
-                    <div>
-                      <b>Github:</b>{' '}
-                      {reg.githubUrl ? (
-                        <a
-                          href={reg.githubUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 underline"
-                        >
-                          Github
-                        </a>
-                      ) : (
-                        '-'
-                      )}
-                    </div>
-                    <div>
-                      <b>Member Letter:</b>{' '}
-                      {reg.suratMember
-                        ? (() => {
-                            const v = reg.suratMember
-                            if (
-                              isDataUrl(v) ||
-                              /^([A-Za-z0-9+\/=\-_\s]+)$/.test(v)
-                            ) {
-                              return (
-                                <button
-                                  onClick={async () => {
-                                    try {
-                                      let blob
-                                      if (isDataUrl(v)) blob = base64ToBlob(v)
-                                      else {
-                                        const normalized = v
-                                          .replace(/\s/g, '')
-                                          .replace(/-/g, '+')
-                                          .replace(/_/g, '/')
-                                        blob = base64ToBlob(
-                                          'data:application/octet-stream;base64,' +
-                                            normalized,
+                {Array.isArray(viewUser.registrations) ? (
+                  viewUser.registrations.map((reg, idx) => (
+                    <div key={idx} className="border-t pt-2 mt-2">
+                      <div>
+                        <b>NIM:</b> {safeRender(reg.nim)}
+                      </div>
+                      <div>
+                        <b>BNCC ID:</b> {safeRender(reg.bnccId)}
+                      </div>
+                      <div>
+                        <b>LINE:</b> {safeRender(reg.lineId)}
+                      </div>
+                      <div>
+                        <b>WhatsApp:</b> {safeRender(reg.whatsappNumber)}
+                      </div>
+                      <div>
+                        <b>Region:</b> {safeRender(reg.region?.name)}
+                      </div>
+                      <div>
+                        <b>Faculty:</b> {safeRender(reg.faculty?.name)}
+                      </div>
+                      <div>
+                        <b>Major:</b> {safeRender(reg.major?.name)}
+                      </div>
+                      <div>
+                        <b>LnT Course:</b> {safeRender(reg.lntCourse?.title)}
+                      </div>
+                      <div>
+                        <b>Schedule:</b> {safeRender(reg.schedule?.title)}
+                      </div>
+                      <div>
+                        <b>LinkedIn:</b>{' '}
+                        {reg.linkedinUrl ? (
+                          <a
+                            href={reg.linkedinUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 underline"
+                          >
+                            LinkedIn
+                          </a>
+                        ) : (
+                          '-'
+                        )}
+                      </div>
+                      <div>
+                        <b>Github:</b>{' '}
+                        {reg.githubUrl ? (
+                          <a
+                            href={reg.githubUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 underline"
+                          >
+                            Github
+                          </a>
+                        ) : (
+                          '-'
+                        )}
+                      </div>
+                      <div>
+                        <b>Member Letter:</b>{' '}
+                        {reg.suratMember
+                          ? (() => {
+                              const v = reg.suratMember
+                              if (typeof v !== 'string')
+                                return <span>{safeRender(v)}</span>
+                              if (
+                                isDataUrl(v) ||
+                                /^([A-Za-z0-9+\/=\-_\s]+)$/.test(v)
+                              ) {
+                                return (
+                                  <button
+                                    onClick={async () => {
+                                      try {
+                                        let blob
+                                        if (isDataUrl(v)) blob = base64ToBlob(v)
+                                        else {
+                                          const normalized = v
+                                            .replace(/\s/g, '')
+                                            .replace(/-/g, '+')
+                                            .replace(/_/g, '/')
+                                          blob = base64ToBlob(
+                                            'data:application/octet-stream;base64,' +
+                                              normalized,
+                                          )
+                                        }
+                                        const url = URL.createObjectURL(blob)
+                                        window.open(url, '_blank')
+                                        setTimeout(
+                                          () => URL.revokeObjectURL(url),
+                                          5000,
                                         )
+                                      } catch (e) {
+                                        console.error(
+                                          'Failed to open member letter',
+                                          e,
+                                        )
+                                        window.alert('Failed to open file')
                                       }
-                                      const url = URL.createObjectURL(blob)
-                                      window.open(url, '_blank')
-                                      setTimeout(
-                                        () => URL.revokeObjectURL(url),
-                                        5000,
-                                      )
-                                    } catch (e) {
-                                      console.error(
-                                        'Failed to open member letter',
-                                        e,
-                                      )
-                                      window.alert('Failed to open file')
-                                    }
-                                  }}
+                                    }}
+                                    className="text-blue-600 underline"
+                                  >
+                                    Member Letter
+                                  </button>
+                                )
+                              }
+                              return (
+                                <a
+                                  href={v}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
                                   className="text-blue-600 underline"
                                 >
                                   Member Letter
-                                </button>
+                                </a>
                               )
-                            }
-                            return (
-                              <a
-                                href={v}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 underline"
-                              >
-                                Member Letter
-                              </a>
-                            )
-                          })()
-                        : '-'}
-                    </div>
-                    <div>
-                      <b>Binusian Card:</b>{' '}
-                      {reg.binusianCard
-                        ? (() => {
-                            const v = reg.binusianCard
-                            if (
-                              isDataUrl(v) ||
-                              /^([A-Za-z0-9+\/=\-_\s]+)$/.test(v)
-                            ) {
-                              return (
-                                <button
-                                  onClick={async () => {
-                                    try {
-                                      let blob
-                                      if (isDataUrl(v)) blob = base64ToBlob(v)
-                                      else {
-                                        const normalized = v
-                                          .replace(/\s/g, '')
-                                          .replace(/-/g, '+')
-                                          .replace(/_/g, '/')
-                                        blob = base64ToBlob(
-                                          'data:application/octet-stream;base64,' +
-                                            normalized,
+                            })()
+                          : '-'}
+                      </div>
+                      <div>
+                        <b>Binusian Card:</b>{' '}
+                        {reg.binusianCard
+                          ? (() => {
+                              const v = reg.binusianCard
+                              if (typeof v !== 'string')
+                                return <span>{safeRender(v)}</span>
+                              if (
+                                isDataUrl(v) ||
+                                /^([A-Za-z0-9+\/=\-_\s]+)$/.test(v)
+                              ) {
+                                return (
+                                  <button
+                                    onClick={async () => {
+                                      try {
+                                        let blob
+                                        if (isDataUrl(v)) blob = base64ToBlob(v)
+                                        else {
+                                          const normalized = v
+                                            .replace(/\s/g, '')
+                                            .replace(/-/g, '+')
+                                            .replace(/_/g, '/')
+                                          blob = base64ToBlob(
+                                            'data:application/octet-stream;base64,' +
+                                              normalized,
+                                          )
+                                        }
+                                        const url = URL.createObjectURL(blob)
+                                        window.open(url, '_blank')
+                                        setTimeout(
+                                          () => URL.revokeObjectURL(url),
+                                          5000,
                                         )
+                                      } catch (e) {
+                                        console.error(
+                                          'Failed to open binusian card',
+                                          e,
+                                        )
+                                        window.alert('Failed to open file')
                                       }
-                                      const url = URL.createObjectURL(blob)
-                                      window.open(url, '_blank')
-                                      setTimeout(
-                                        () => URL.revokeObjectURL(url),
-                                        5000,
-                                      )
-                                    } catch (e) {
-                                      console.error(
-                                        'Failed to open binusian card',
-                                        e,
-                                      )
-                                      window.alert('Failed to open file')
-                                    }
-                                  }}
+                                    }}
+                                    className="text-blue-600 underline"
+                                  >
+                                    Binusian Card
+                                  </button>
+                                )
+                              }
+                              return (
+                                <a
+                                  href={v}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
                                   className="text-blue-600 underline"
                                 >
                                   Binusian Card
-                                </button>
+                                </a>
                               )
-                            }
-                            return (
-                              <a
-                                href={v}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 underline"
-                              >
-                                Binusian Card
-                              </a>
-                            )
-                          })()
-                        : '-'}
+                            })()
+                          : '-'}
+                      </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="border-t border-gray-200 pt-3 mt-3 text-sm text-gray-500 italic">
+                    No registrations found.
                   </div>
-                ))}
+                )}
               </div>
             ) : (
               <p>Could not load user details.</p>
