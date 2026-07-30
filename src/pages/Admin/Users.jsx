@@ -12,7 +12,7 @@ import {
   downloadUsersExcel,
   getUserDetail,
 } from '@/services/admin'
-import { base64ToBlob, isDataUrl, formatScheduleDisplay } from '@/lib/utils'
+import { base64ToBlob, isDataUrl } from '@/lib/utils'
 import useLookupQuery from '@/hooks/queries/useLookupQuery'
 
 export default function Users() {
@@ -62,9 +62,6 @@ export default function Users() {
   const [createLoading, setCreateLoading] = useState(false)
   const [showWhatsAppModal, setShowWhatsAppModal] = useState(false)
   const [showViewMessageModal, setShowViewMessageModal] = useState(false)
-  const [selectedUserIds, setSelectedUserIds] = useState([])
-  const [bulkStatus, setBulkStatus] = useState('')
-  const [bulkLoading, setBulkLoading] = useState(false)
 
   const [whatsAppMessage, setWhatsAppMessage] = useState(
     `Halo, {nama}!
@@ -79,58 +76,55 @@ Panitia BNCC Launching`,
   const [tempWhatsAppMessage, setTempWhatsAppMessage] =
     useState(whatsAppMessage)
 
-  // Separate lookup query instances for edit form and create form
   const {
     regionQuery,
     facultyQuery,
     majorQuery,
     lntCourseQuery,
     scheduleQuery,
-  } = useLookupQuery(
-    editForm.regionId || undefined,
-    editForm.facultyId || undefined,
-  )
-
-  const {
-    regionQuery: createRegionQuery,
-    facultyQuery: createFacultyQuery,
-    majorQuery: createMajorQuery,
-    lntCourseQuery: createLntCourseQuery,
-    scheduleQuery: createScheduleQuery,
-  } = useLookupQuery(
-    createForm.regionId || undefined,
-    createForm.facultyId || undefined,
-  )
+  } = useLookupQuery()
 
   const abortRef = useRef(null)
 
-  const regions = regionQuery.data || []
-  const faculties = (facultyQuery.data || []).filter(
-    (f) => !f.regionId || Number(f.regionId) === Number(editForm.regionId),
-  )
-  const majors = (majorQuery.data || []).filter(
-    (m) => !m.facultyId || Number(m.facultyId) === Number(editForm.facultyId),
-  )
-  const lntCourses = (lntCourseQuery.data || []).filter(
-    (c) => !c.regionId || Number(c.regionId) === Number(editForm.regionId),
-  )
-  const schedules = (scheduleQuery.data || []).filter(
-    (s) => !s.regionId || Number(s.regionId) === Number(editForm.regionId),
-  )
+  const watchedRegionId = editForm.regionId
+  const watchedFacultyId = editForm.facultyId
 
-  const createRegions = createRegionQuery.data || []
-  const createFaculties = (createFacultyQuery.data || []).filter(
-    (f) => !f.regionId || Number(f.regionId) === Number(createForm.regionId),
-  )
-  const createMajors = (createMajorQuery.data || []).filter(
-    (m) => !m.facultyId || Number(m.facultyId) === Number(createForm.facultyId),
-  )
-  const createLntCourses = (createLntCourseQuery.data || []).filter(
-    (c) => !c.regionId || Number(c.regionId) === Number(createForm.regionId),
-  )
-  const createSchedules = (createScheduleQuery.data || []).filter(
-    (s) => !s.regionId || Number(s.regionId) === Number(createForm.regionId),
-  )
+  const regions = regionQuery.data || []
+  const faculties =
+    facultyQuery.data?.filter(
+      (faculty) => faculty.regionId === watchedRegionId,
+    ) || []
+  const majors =
+    majorQuery.data?.filter((major) => major.facultyId === watchedFacultyId) ||
+    []
+  const lntCourses =
+    lntCourseQuery.data?.filter(
+      (course) => course.regionId === watchedRegionId,
+    ) || []
+  const schedules =
+    scheduleQuery.data?.filter(
+      (schedule) => schedule.regionId === watchedRegionId,
+    ) || []
+
+  const watchedCreateRegionId = createForm.regionId
+  const watchedCreateFacultyId = createForm.facultyId
+
+  const createFaculties =
+    facultyQuery.data?.filter(
+      (faculty) => faculty.regionId === watchedCreateRegionId,
+    ) || []
+  const createMajors =
+    majorQuery.data?.filter(
+      (major) => major.facultyId === watchedCreateFacultyId,
+    ) || []
+  const createLntCourses =
+    lntCourseQuery.data?.filter(
+      (course) => course.regionId === watchedCreateRegionId,
+    ) || []
+  const createSchedules =
+    scheduleQuery.data?.filter(
+      (schedule) => schedule.regionId === watchedCreateRegionId,
+    ) || []
 
   const {
     data,
@@ -383,80 +377,6 @@ Panitia BNCC Launching`,
     pageIndex * itemsPerPage,
   )
 
-  const isAllSelected =
-    pagedData.length > 0 &&
-    pagedData.every((row) => selectedUserIds.includes(row.ID))
-
-  const handleSelectAll = (e) => {
-    if (e.target.checked) {
-      const pageIds = pagedData.map((row) => row.ID)
-      setSelectedUserIds((prev) => Array.from(new Set([...prev, ...pageIds])))
-    } else {
-      const pageIds = pagedData.map((row) => row.ID)
-      setSelectedUserIds((prev) => prev.filter((id) => !pageIds.includes(id)))
-    }
-  }
-
-  const handleSelectUser = (userId, checked) => {
-    if (checked) {
-      setSelectedUserIds((prev) => [...prev, userId])
-    } else {
-      setSelectedUserIds((prev) => prev.filter((id) => id !== userId))
-    }
-  }
-
-  const handleBulkStatusUpdate = async () => {
-    if (!bulkStatus || selectedUserIds.length === 0) return
-    setBulkLoading(true)
-    try {
-      await Promise.all(
-        selectedUserIds.map((id) => updateUser({ id, status: bulkStatus })),
-      )
-      setSelectedUserIds([])
-      setBulkStatus('')
-      refetch()
-      setAlert({
-        type: 'success',
-        message: 'Successfully updated status for selected users.',
-      })
-      setTimeout(() => setAlert(null), 3000)
-    } catch (err) {
-      console.error(err)
-      setError(err)
-      setShowErrorModal(true)
-    } finally {
-      setBulkLoading(false)
-    }
-  }
-
-  const tableColumns = [
-    {
-      title: (
-        <input
-          type="checkbox"
-          checked={isAllSelected}
-          onChange={handleSelectAll}
-          className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 cursor-pointer"
-        />
-      ),
-      itemAlign: 'center',
-      headerAlign: 'center',
-      width: '40px',
-      itemWrapper: (value, rowData) => {
-        const isChecked = selectedUserIds.includes(rowData?.ID)
-        return (
-          <input
-            type="checkbox"
-            checked={isChecked}
-            onChange={(e) => handleSelectUser(rowData?.ID, e.target.checked)}
-            className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 cursor-pointer"
-          />
-        )
-      },
-    },
-    ...usersColumns,
-  ]
-
   const handleRetry = () => {
     setShowErrorModal(false)
     setError(null)
@@ -515,8 +435,8 @@ Panitia BNCC Launching`,
   return (
     <div className={`py-6 space-y-7 ${deleting ? 'pointer-events-none' : ''}`}>
       {showErrorModal && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20">
-          <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl text-center border border-gray-200 max-w-md w-full mx-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-8 rounded-lg shadow-xl text-center">
             <h3 className="text-xl font-bold mb-4">Error</h3>
             <p className="text-gray-600 mb-6">
               {error?.response?.data?.error ||
@@ -542,8 +462,8 @@ Panitia BNCC Launching`,
       )}
 
       {showViewModal && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20 pb-8 overflow-y-auto">
-          <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl text-left min-w-[350px] max-w-[90vw] border border-gray-200">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-8 rounded-lg shadow-xl text-left min-w-[350px] max-w-[90vw]">
             <h3 className="text-xl font-bold mb-4">User Details</h3>
             {viewLoading ? (
               <div className="flex items-center justify-center py-8">
@@ -766,9 +686,9 @@ Panitia BNCC Launching`,
       )}
 
       {showEditModal && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20 pb-8 overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <form
-            className="pointer-events-auto bg-white p-6 rounded-xl shadow-2xl text-left min-w-[350px] max-w-[600px] w-full mx-4 border border-gray-200"
+            className="bg-white p-6 rounded-lg shadow-xl text-left min-w-[350px] max-w-[600px] w-full"
             onSubmit={handleEditSubmit}
           >
             <h3 className="text-xl font-bold mb-4">Edit User</h3>
@@ -913,7 +833,7 @@ Panitia BNCC Launching`,
                 <option value="">Select Schedule</option>
                 {schedules.map((s) => (
                   <option key={s.id} value={s.id}>
-                    {formatScheduleDisplay(s)}
+                    {s.title}
                   </option>
                 ))}
               </select>
@@ -957,9 +877,9 @@ Panitia BNCC Launching`,
       )}
 
       {showCreateModal && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20 pb-8 overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <form
-            className="pointer-events-auto bg-white p-6 rounded-xl shadow-2xl text-left min-w-[350px] max-w-[600px] w-full mx-4 border border-gray-200"
+            className="bg-white p-6 rounded-lg shadow-xl text-left min-w-[350px] max-w-[600px] w-full"
             onSubmit={handleCreateSubmit}
           >
             <h3 className="text-xl font-bold mb-4">Create User</h3>
@@ -1030,7 +950,7 @@ Panitia BNCC Launching`,
                 required
               >
                 <option value="">Select Region</option>
-                {createRegions.map((r) => (
+                {regions.map((r) => (
                   <option key={r.id} value={r.id}>
                     {r.name}
                   </option>
@@ -1113,7 +1033,7 @@ Panitia BNCC Launching`,
                 <option value="">Select Schedule</option>
                 {createSchedules.map((s) => (
                   <option key={s.id} value={s.id}>
-                    {formatScheduleDisplay(s)}
+                    {s.title}
                   </option>
                 ))}
               </select>
@@ -1162,8 +1082,8 @@ Panitia BNCC Launching`,
       )}
 
       {showWhatsAppModal && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20">
-          <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl text-left w-full max-w-lg mx-4 border border-gray-200">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-8 rounded-lg shadow-xl text-left w-full max-w-lg">
             <h3 className="text-xl font-bold mb-2">
               Set WhatsApp Message Template
             </h3>
@@ -1196,8 +1116,8 @@ Panitia BNCC Launching`,
       )}
 
       {showViewMessageModal && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20">
-          <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl text-left w-full max-w-lg mx-4 border border-gray-200">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-8 rounded-lg shadow-xl text-left w-full max-w-lg">
             <h3 className="text-xl font-bold mb-4">
               Current WhatsApp Message Template
             </h3>
@@ -1219,8 +1139,8 @@ Panitia BNCC Launching`,
       )}
 
       {showDeleteModal && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20">
-          <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl text-center border border-gray-200">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-8 rounded-lg shadow-xl text-center">
             <h3 className="text-xl font-bold mb-4">Delete User</h3>
             <p className="text-gray-600 mb-6">
               Are you sure you want to delete user{' '}
@@ -1247,8 +1167,8 @@ Panitia BNCC Launching`,
       )}
 
       {deleting && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-[60] pt-20">
-          <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl text-center flex flex-col items-center border border-gray-200">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
+          <div className="bg-white p-8 rounded-lg shadow-xl text-center flex flex-col items-center">
             <Loader />
             <span className="mt-4 text-gray-700">Deleting user...</span>
           </div>
@@ -1256,8 +1176,8 @@ Panitia BNCC Launching`,
       )}
 
       {alert && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-[70] pt-20">
-          <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl text-center flex flex-col items-center border border-gray-200">
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[70]">
+          <div className="bg-white p-8 rounded-lg shadow-xl text-center flex flex-col items-center">
             {alert.type === 'success' ? (
               <svg
                 className="w-10 h-10 text-green-500 mb-2"
@@ -1309,37 +1229,7 @@ Panitia BNCC Launching`,
           onChange={(e) => setSearchQuery(e.target.value)}
           className="py-2 px-4 w-full md:w-[400px] border rounded"
         />
-        <div className="flex gap-2 items-center flex-wrap">
-          {selectedUserIds.length > 0 && (
-            <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-lg mr-2">
-              <span className="text-sm font-semibold text-blue-800">
-                {selectedUserIds.length} selected
-              </span>
-              <select
-                className="border p-1 text-sm rounded bg-white text-gray-700 font-medium"
-                value={bulkStatus}
-                onChange={(e) => setBulkStatus(e.target.value)}
-              >
-                <option value="">Select Status</option>
-                <option value="email_verified">Email Verified</option>
-                <option value="email_unverified">Email Unverified</option>
-                <option value="done_launching">Done Launching</option>
-                <option value="confirm_launching">Confirm Launching</option>
-                <option value="letter_error">Letter Error</option>
-                <option value="letter_verified">Letter Verified</option>
-                <option value="done_reregist">Done Re-Registration</option>
-                <option value="closed">Closed</option>
-              </select>
-              <button
-                type="button"
-                onClick={handleBulkStatusUpdate}
-                disabled={!bulkStatus || bulkLoading}
-                className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1.5 rounded disabled:opacity-50 font-medium cursor-pointer"
-              >
-                {bulkLoading ? 'Updating...' : 'Apply'}
-              </button>
-            </div>
-          )}
+        <div className="flex gap-2">
           <button
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
             onClick={() => setShowCreateModal(true)}
@@ -1369,7 +1259,7 @@ Panitia BNCC Launching`,
       <div className="flex flex-row gap-7 min-w-fit px-6">
         <div className="p-5 rounded-[8px] bg-white w-full">
           <Table
-            columns={tableColumns}
+            columns={usersColumns}
             data={pagedData}
             loading={isLoading}
             striped={true}
