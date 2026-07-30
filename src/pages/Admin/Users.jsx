@@ -179,22 +179,14 @@ Panitia BNCC Launching`,
 
   const editMutation = useMutation({
     mutationFn: (form) => {
-      const payload = { ...form }
-      if (!payload.regionId || Number(payload.regionId) <= 0) delete payload.regionId
-      else payload.regionId = Number(payload.regionId)
-
-      if (!payload.facultyId || Number(payload.facultyId) <= 0) delete payload.facultyId
-      else payload.facultyId = Number(payload.facultyId)
-
-      if (!payload.majorId || Number(payload.majorId) <= 0) delete payload.majorId
-      else payload.majorId = Number(payload.majorId)
-
-      if (!payload.lntCourseId || Number(payload.lntCourseId) <= 0) delete payload.lntCourseId
-      else payload.lntCourseId = Number(payload.lntCourseId)
-
-      if (!payload.scheduleId || Number(payload.scheduleId) <= 0) delete payload.scheduleId
-      else payload.scheduleId = Number(payload.scheduleId)
-
+      const payload = {
+        ...form,
+        regionId: Number(form.regionId),
+        facultyId: Number(form.facultyId),
+        majorId: Number(form.majorId),
+        lntCourseId: Number(form.lntCourseId),
+        scheduleId: Number(form.scheduleId),
+      }
       return updateUser(payload)
     },
     onMutate: () => setEditLoading(true),
@@ -206,7 +198,6 @@ Panitia BNCC Launching`,
     },
     onError: (err) => {
       setEditLoading(false)
-      // Safely extract the exact backend message (whether it's a string or an array of messages)
       const msg = err?.response?.data?.message
       const backendError = Array.isArray(msg) ? msg.join(', ') : msg
       setAlert({
@@ -229,15 +220,18 @@ Panitia BNCC Launching`,
         nim: String(form.nim || '').trim(),
         lineId: String(form.lineId || '').trim(),
         whatsappNumber: String(form.whatsappNumber || '').trim(),
+        regionId: Number(form.regionId),
+        facultyId: Number(form.facultyId),
+        majorId: Number(form.majorId),
+        lntCourseId: Number(form.lntCourseId),
+        scheduleId: Number(form.scheduleId),
       }
 
-      if (form.regionId && Number(form.regionId) > 0) payload.regionId = Number(form.regionId)
-      if (form.facultyId && Number(form.facultyId) > 0) payload.facultyId = Number(form.facultyId)
-      if (form.majorId && Number(form.majorId) > 0) payload.majorId = Number(form.majorId)
-      if (form.lntCourseId && Number(form.lntCourseId) > 0) payload.lntCourseId = Number(form.lntCourseId)
-      if (form.scheduleId && Number(form.scheduleId) > 0) payload.scheduleId = Number(form.scheduleId)
-
-      if (form.isJapres !== null && form.isJapres !== undefined && form.isJapres !== '') {
+      if (
+        form.isJapres !== null &&
+        form.isJapres !== undefined &&
+        form.isJapres !== ''
+      ) {
         payload.isJapres = Number(form.isJapres)
       }
 
