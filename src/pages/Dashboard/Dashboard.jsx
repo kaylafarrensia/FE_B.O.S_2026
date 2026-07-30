@@ -221,7 +221,7 @@ function Dashboard() {
                   alt=""
                   className="w-6 sm:w-8"
                 />
-                <span className="font-outfit text-left text-sm sm:text-lg">
+                <span className={`font-outfit text-left text-sm sm:text-lg ${isActive ? 'text-white' : ''}`}>
                   {tab.label}
                 </span>
               </motion.button>
@@ -255,7 +255,7 @@ function Dashboard() {
                 <li
                   key={tab.label}
                   ref={(el) => (tabRefs.current[idx] = el)}
-                  className={`flex items-center justify-center gap-2 font-outfit tracking-wider relative cursor-pointer text-sm transition-colors duration-200 ${isActive ? 'text-white' : 'text-persian-indigo'
+                  className={`flex items-center justify-center gap-2 font-outfit tracking-wider relative z-10 cursor-pointer text-sm transition-colors duration-200 ${isActive ? 'text-white' : 'text-persian-indigo'
                     }`}
                   style={{ width: pillWidth }}
                   onClick={() => {
