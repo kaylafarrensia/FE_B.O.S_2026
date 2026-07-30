@@ -89,18 +89,30 @@ function Dashboard() {
   // Enforce status-based routing guards
   useEffect(() => {
     const path = location.pathname
-    if (path.startsWith('/dashboard/confirm') && userStatus !== 'done_launching') {
+    if (
+      path.startsWith('/dashboard/confirm') &&
+      userStatus !== 'done_launching'
+    ) {
       if (userStatus === 'confirm_launching') {
         navigate('/dashboard/registration', { replace: true })
-      } else if (userStatus === 'letter_verified' || userStatus === 'done_reregist') {
+      } else if (
+        userStatus === 'letter_verified' ||
+        userStatus === 'done_reregist'
+      ) {
         navigate('/dashboard/re-registration', { replace: true })
       } else {
         navigate('/dashboard/schedule', { replace: true })
       }
-    } else if (path.startsWith('/dashboard/registration') && userStatus !== 'confirm_launching') {
+    } else if (
+      path.startsWith('/dashboard/registration') &&
+      userStatus !== 'confirm_launching'
+    ) {
       if (userStatus === 'done_launching') {
         navigate('/dashboard/confirm', { replace: true })
-      } else if (userStatus === 'letter_verified' || userStatus === 'done_reregist') {
+      } else if (
+        userStatus === 'letter_verified' ||
+        userStatus === 'done_reregist'
+      ) {
         navigate('/dashboard/re-registration', { replace: true })
       } else {
         navigate('/dashboard/schedule', { replace: true })
@@ -167,7 +179,10 @@ function Dashboard() {
           iconWhite: IconCalendarWhite,
           path: '/dashboard/registration',
         }
-      } else if (userStatus === 'letter_verified' || userStatus === 'done_reregist') {
+      } else if (
+        userStatus === 'letter_verified' ||
+        userStatus === 'done_reregist'
+      ) {
         firstTab = {
           label: 'RE-REGIST',
           icon: IconCalendar,
@@ -218,7 +233,10 @@ function Dashboard() {
         defaultPath = '/dashboard/confirm'
       } else if (userStatus === 'confirm_launching') {
         defaultPath = '/dashboard/registration'
-      } else if (userStatus === 'letter_verified' || userStatus === 'done_reregist') {
+      } else if (
+        userStatus === 'letter_verified' ||
+        userStatus === 'done_reregist'
+      ) {
         defaultPath = '/dashboard/re-registration'
       }
       navigate(defaultPath, { replace: true })
@@ -240,12 +258,7 @@ function Dashboard() {
 
       {/* Mobile top bar */}
       <div className="xl:hidden fixed top-0 left-0 w-full z-50 flex flex-row justify-between items-center px-8 py-4 bg-white/5 backdrop-blur-lg border-b border-white/10">
-        <img
-          src={BNCCBlue}
-          alt="BNCC Logo"
-          className="w-20 cursor-pointer"
-          onClick={() => navigate('/')}
-        />
+        <img src={BNCCBlue} alt="BNCC Logo" className="w-20" />
         <button
           className="cursor-pointer"
           onClick={() => setIsSidebarOpen(true)}
@@ -310,12 +323,7 @@ function Dashboard() {
 
       {/* Desktop Nav */}
       <ul className="hidden xl:flex fixed top-0 left-0 w-full z-50 flex flex-row justify-between items-center px-[10vw] py-4 bg-white/5 backdrop-blur-lg border-b border-white/10">
-        <img
-          src={BNCCBlue}
-          alt="BNCC Logo"
-          className="w-30 cursor-pointer"
-          onClick={() => navigate('/')}
-        />
+        <img src={BNCCBlue} alt="BNCC Logo" className="w-30" />
         <div ref={cardRef} className="relative">
           <Card className="flex ml-auto border-white border-2 shadow-xl py-3 rounded-xl relative overflow-visible">
             <motion.div

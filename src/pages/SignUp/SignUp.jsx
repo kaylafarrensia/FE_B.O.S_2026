@@ -200,6 +200,8 @@ export default function SignUp() {
       })
       return
     }
+
+    // Explicit validation/casting mapping matching the admin dashboard payload pattern
     const payload = {
       fullName: String(data.fullName || '').trim(),
       lineId: String(data.lineId || '').trim(),
@@ -217,6 +219,7 @@ export default function SignUp() {
       isJapres: 0,
       heardFrom: null,
     }
+
     registerMutation.mutate(payload, {
       onSuccess: (res) => {
         const code = res?.expoId || res?.data?.expoId || 'EXBC01001'
@@ -224,9 +227,11 @@ export default function SignUp() {
         setCurrentStep(4)
       },
       onError: (err) => {
+        const msg = err?.response?.data?.message
+        const backendError = Array.isArray(msg) ? msg.join(', ') : msg
         const errorMsg =
+          backendError ||
           err?.response?.data?.error ||
-          err?.response?.data?.message ||
           err?.message ||
           'Registration failed. Please try again.'
         showPopup({
@@ -1026,7 +1031,7 @@ export default function SignUp() {
             Copied to clipboard!
           </span>
           <button
-            onClick={() => setToastVisible(false)}
+            onClick={() => (setToastValue = setToastVisible(false))}
             className="text-[#0A2745] hover:opacity-70 cursor-pointer"
           >
             <X size={16} />
