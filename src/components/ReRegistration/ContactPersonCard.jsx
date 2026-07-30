@@ -43,7 +43,7 @@ export default function ContactPersonCard({
                     className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4 lg:h-6 lg:w-6"
                   />
                 </span>
-                <span className="text-xs font-medium text-slate-700 sm:text-sm lg:text-base hover:underline">
+                <span className="text-xs font-medium text-slate-700 sm:text-sm lg:text-base xl:text-lg hover:underline">
                   {username} ({name})
                 </span>
               </a>
@@ -53,7 +53,7 @@ export default function ContactPersonCard({
           <button
             type="button"
             onClick={handleContactClick}
-            className="mt-5 flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg bg-gradient-to-r from-[#113E7E] to-[#2B73C4] text-white font-semibold text-xs shadow-md transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] cursor-pointer"
+            className="mt-5 flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 xl:px-6 xl:py-3 rounded-lg bg-gradient-to-r from-[#113E7E] to-[#2B73C4] text-white font-semibold text-xs xl:text-base shadow-md transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] cursor-pointer"
           >
             <svg
               className="w-4 h-4 sm:w-4.5 sm:h-4.5 fill-current text-white shrink-0"

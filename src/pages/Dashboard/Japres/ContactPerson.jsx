@@ -21,14 +21,14 @@ export default function ContactPerson() {
         <h1 className="font-bold sm:text-3xl text-xl w-fit">Contact Person</h1>
         <div className="flex flex-row gap-3 items-center">
           <img src={IconLine} alt="" className="w-5 sm:w-7" />
-          <p className="text-xs sm:text-lg">
+          <p className="text-xs sm:text-lg xl:text-xl">
             <span className="whitespace-nowrap">{DUMMY_CONTACT.line}</span>{' '}
             <span className="whitespace-nowrap">({DUMMY_CONTACT.name})</span>
           </p>
         </div>
         <button
           onClick={() => openWhatsApp(DUMMY_CONTACT.wa)}
-          className="flex items-center gap-2.5 px-4 py-2 sm:px-6 sm:py-2.5 rounded-[14px] bg-gradient-to-r from-[#113E7E] to-[#2B73C4] text-white font-medium text-xs sm:text-sm shadow-md transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] cursor-pointer"
+          className="flex items-center gap-2.5 px-4 py-2 sm:px-6 sm:py-2.5 xl:px-8 xl:py-3.5 rounded-[14px] bg-gradient-to-r from-[#113E7E] to-[#2B73C4] text-white font-medium text-xs sm:text-sm xl:text-base shadow-md transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] cursor-pointer"
         >
           <svg
             className="w-5 h-5 sm:w-6 sm:h-6 fill-current text-white shrink-0"

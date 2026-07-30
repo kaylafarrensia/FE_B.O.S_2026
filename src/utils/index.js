@@ -31,7 +31,7 @@ export function formatStartEndTime(startIso, endIso) {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false,
-      timeZone: 'UTC',
+      timeZone: 'Asia/Jakarta',
     });
   return `${fmt(startIso)} – ${fmt(endIso)} WIB`;
 }

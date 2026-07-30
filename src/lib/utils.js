@@ -75,10 +75,14 @@ export function formatDate(dateString) {
 // Format: 19.00 - 21.00 WIB
 export function formatStartEndTime(start, end) {
   if (!start || !end) return '';
-  const pad = (n) => n.toString().padStart(2, '0');
-  const s = new Date(start);
-  const e = new Date(end);
-  return `${pad(s.getHours())}.${pad(s.getMinutes())} - ${pad(e.getHours())}.${pad(e.getMinutes())} WIB`;
+  const fmt = (iso) =>
+    new Date(iso).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: 'Asia/Jakarta',
+    });
+  return `${fmt(start)} - ${fmt(end)} WIB`;
 }
 
 // Base64 and Blob conversions
