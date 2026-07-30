@@ -10,9 +10,19 @@ import SignUp from './pages/SignUp/SignUp.jsx'
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword.jsx'
 import ResetPassword from './pages/ResetPassword/ResetPassword.jsx'
 
+// Admin Pages
+import AdminDashboard from './pages/Admin/Dashboard.jsx'
+import Overview from './pages/Admin/Overview.jsx'
+import AdminJapres from './pages/Admin/Japres.jsx'
+import User from './pages/Admin/Users.jsx'
+import Documents from './pages/Admin/Documents.jsx'
+import Payment from './pages/Admin/Payment.jsx'
+import Subscription from './pages/Admin/Subscription.jsx'
+
 function App() {
   return (
     <Routes>
+      {/* User / Landing routes */}
       <Route path="/comingsoon" element={<ComingSoon />} />
       <Route path="/" element={<Home />} />
       <Route path="/dashboard" element={<Dashboard />}>
@@ -26,6 +36,17 @@ function App() {
       <Route path="/register" element={<SignUp />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+
+      {/* Admin routes */}
+      <Route path="/admin" element={<AdminDashboard />}>
+        <Route index element={<Overview />} />
+        <Route path="overview" element={<Overview />} />
+        <Route path="users" element={<User />} />
+        <Route path="documents" element={<Documents />} />
+        <Route path="payment" element={<Payment />} />
+        <Route path="japres" element={<AdminJapres />} />
+        <Route path="subscription" element={<Subscription />} />
+      </Route>
     </Routes>
   )
 }

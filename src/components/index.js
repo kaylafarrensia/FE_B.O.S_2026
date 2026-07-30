@@ -5,3 +5,5 @@ export { default as Popup } from './Popup';
 export { default as Footer } from './Footer';
 export { default as AuthHeader } from './auth/AuthHeader';
 export { default as AuthFooter } from './auth/AuthFooter';
+export { default as Table } from './Table';
+export { default as Pagination } from './Pagination';
