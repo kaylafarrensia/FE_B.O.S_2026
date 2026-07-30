@@ -124,7 +124,7 @@ export default function Overview() {
   return (
     <>
       {showErrorModal && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20">
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-10 pb-10 overflow-y-auto">
           <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl border border-gray-200 text-center">
             <h3 className="text-xl font-bold mb-4">Error</h3>
             <p className="text-gray-600 mb-6">

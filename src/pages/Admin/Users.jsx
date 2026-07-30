@@ -484,7 +484,7 @@ Panitia BNCC Launching`,
   return (
     <div className={`py-6 space-y-7 ${deleting ? 'pointer-events-none' : ''}`}>
       {showErrorModal && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20">
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-10 pb-10 overflow-y-auto">
           <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl border border-gray-200 text-center">
             <h3 className="text-xl font-bold mb-4">Error</h3>
             <p className="text-gray-600 mb-6">
@@ -518,8 +518,8 @@ Panitia BNCC Launching`,
       )}
 
       {showViewModal && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20">
-          <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl border border-gray-200 text-left min-w-[350px] max-w-[90vw]">
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-10 pb-10 overflow-y-auto">
+          <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl border border-gray-200 text-left min-w-[350px] max-w-[90vw] max-h-[85vh] overflow-y-auto">
             <h3 className="text-xl font-bold mb-4">User Details</h3>
             {viewLoading ? (
               <div className="flex items-center justify-center py-8">
@@ -742,7 +742,7 @@ Panitia BNCC Launching`,
       )}
 
       {showEditModal && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20">
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-10 pb-10 overflow-y-auto">
           <form
             className="pointer-events-auto bg-white p-6 rounded-xl shadow-2xl border border-gray-200 text-left min-w-[350px] max-w-[600px] w-full"
             onSubmit={handleEditSubmit}
@@ -933,7 +933,7 @@ Panitia BNCC Launching`,
       )}
 
       {showCreateModal && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20">
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-10 pb-10 overflow-y-auto">
           <form
             className="pointer-events-auto bg-white p-6 rounded-xl shadow-2xl border border-gray-200 text-left min-w-[350px] max-w-[600px] w-full"
             onSubmit={handleCreateSubmit}
@@ -1138,7 +1138,7 @@ Panitia BNCC Launching`,
       )}
 
       {showWhatsAppModal && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20">
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-10 pb-10 overflow-y-auto">
           <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl border border-gray-200 text-left w-full max-w-lg">
             <h3 className="text-xl font-bold mb-2">
               Set WhatsApp Message Template
@@ -1172,7 +1172,7 @@ Panitia BNCC Launching`,
       )}
 
       {showViewMessageModal && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20">
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-10 pb-10 overflow-y-auto">
           <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl border border-gray-200 text-left w-full max-w-lg">
             <h3 className="text-xl font-bold mb-4">
               Current WhatsApp Message Template
@@ -1195,7 +1195,7 @@ Panitia BNCC Launching`,
       )}
 
       {showDeleteModal && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20">
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-10 pb-10 overflow-y-auto">
           <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl border border-gray-200 text-center">
             <h3 className="text-xl font-bold mb-4">Delete User</h3>
             <p className="text-gray-600 mb-6">

@@ -395,7 +395,7 @@ export default function Payment() {
   return (
     <div className={`py-6 space-y-7`}>
       {showEditModal && editPayment && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20">
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-10 pb-10 overflow-y-auto">
           <div className="pointer-events-auto bg-white p-6 rounded-xl shadow-2xl border border-gray-200 w-[400px]">
             <h3 className="text-lg font-semibold mb-4">Edit Payment Status</h3>
             <p className="mb-4">
@@ -443,7 +443,7 @@ export default function Payment() {
         </div>
       )}
       {showErrorModal && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20">
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-10 pb-10 overflow-y-auto">
           <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl border border-gray-200 text-center">
             <h3 className="text-xl font-bold mb-4">Error</h3>
             <p className="text-gray-600 mb-6">
@@ -515,7 +515,7 @@ export default function Payment() {
         </div>
       )}
       {previewOpen && previewUrl && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-20">
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-10 pb-10 overflow-y-auto">
           <div className="pointer-events-auto bg-white rounded-xl shadow-2xl border border-gray-200 p-4 max-w-4xl w-[90%] max-h-[90%] overflow-auto">
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-lg font-semibold">Payment Proof Preview</h3>
