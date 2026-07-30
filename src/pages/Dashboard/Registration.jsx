@@ -33,7 +33,7 @@ export default function Registration() {
     registrationFiles,
     setRegistrationFiles,
     registrationOutcome: outcome,
-    setRegistrationOutcome: setOutcome
+    setRegistrationOutcome: setOutcome,
   } = context
 
   const binusianCard = registrationFiles?.binusianCard
@@ -200,15 +200,16 @@ export default function Registration() {
                 </div>
               </div>
             </div>
- 
+
             <div className="self-center mt-4">
               <button
                 type="submit"
                 disabled={!binusianCard || !memberLetter}
+                style={{ color: '#FFFFFF' }}
                 className={
                   !binusianCard || !memberLetter
-                    ? "bg-gradient-to-r from-[#84A4C9] to-[#A3C7EE] text-white px-10 py-2.5 rounded-lg text-sm sm:text-base font-semibold shadow-sm cursor-not-allowed select-none"
-                    : "bg-[#1E5FA8] hover:bg-[#12376B] text-white px-10 py-2.5 rounded-lg text-sm sm:text-base font-semibold shadow-md transition-all hover:scale-[1.02] transform duration-300 cursor-pointer"
+                    ? 'bg-gradient-to-r from-[#84A4C9] to-[#A3C7EE] px-10 py-2.5 rounded-lg text-sm sm:text-base font-semibold shadow-sm cursor-not-allowed select-none'
+                    : 'bg-[#1E5FA8] hover:bg-[#12376B] px-10 py-2.5 rounded-lg text-sm sm:text-base font-semibold shadow-md transition-all hover:scale-[1.02] transform duration-300 cursor-pointer'
                 }
               >
                 Submit
@@ -250,65 +251,137 @@ export default function Registration() {
 
           {/* Day cells */}
           <div className="grid grid-cols-7 gap-2 text-center justify-items-center">
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg text-red-300">30</div>
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg text-gray-300">31</div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg text-red-300">
+              30
+            </div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg text-gray-300">
+              31
+            </div>
             <div
               className="w-10 h-10 flex items-center justify-center text-center rounded-lg font-semibold glassmorphism text-[#0A2745] cursor-pointer"
               style={TODAY_GLASS_STYLE}
             >
               1
             </div>
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">2</div>
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">3</div>
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">4</div>
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">5</div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">
+              2
+            </div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">
+              3
+            </div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">
+              4
+            </div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">
+              5
+            </div>
 
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-red-500 font-medium cursor-pointer">6</div>
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">7</div>
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">8</div>
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">9</div>
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">10</div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-red-500 font-medium cursor-pointer">
+              6
+            </div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">
+              7
+            </div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">
+              8
+            </div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">
+              9
+            </div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">
+              10
+            </div>
             <div
               className="w-10 h-10 flex items-center justify-center text-center rounded-lg font-semibold text-white glassmorphism cursor-pointer"
               style={DUE_DATE_GLASS_STYLE}
             >
               11
             </div>
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">12</div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">
+              12
+            </div>
 
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-red-500 font-medium cursor-pointer">13</div>
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">14</div>
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">15</div>
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">16</div>
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">17</div>
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">18</div>
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">19</div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-red-500 font-medium cursor-pointer">
+              13
+            </div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">
+              14
+            </div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">
+              15
+            </div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">
+              16
+            </div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">
+              17
+            </div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">
+              18
+            </div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">
+              19
+            </div>
 
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-red-500 font-medium cursor-pointer">20</div>
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">21</div>
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">22</div>
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">23</div>
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">24</div>
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">25</div>
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">26</div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-red-500 font-medium cursor-pointer">
+              20
+            </div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">
+              21
+            </div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">
+              22
+            </div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">
+              23
+            </div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">
+              24
+            </div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">
+              25
+            </div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">
+              26
+            </div>
 
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-red-500 font-medium cursor-pointer">27</div>
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">28</div>
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">29</div>
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">30</div>
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg text-slate-300 font-medium">1</div>
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg text-slate-300 font-medium">2</div>
-            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg text-slate-300 font-medium">3</div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-red-500 font-medium cursor-pointer">
+              27
+            </div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">
+              28
+            </div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">
+              29
+            </div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg hover:bg-slate-100/50 text-[#0A2745] font-medium cursor-pointer">
+              30
+            </div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg text-slate-300 font-medium">
+              1
+            </div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg text-slate-300 font-medium">
+              2
+            </div>
+            <div className="w-10 h-10 flex items-center justify-center text-center rounded-lg text-slate-300 font-medium">
+              3
+            </div>
           </div>
 
           {/* Legend */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 mt-5 text-xs sm:text-sm text-[#0A2745]">
             <div className="flex items-center gap-2">
-              <span className="w-6 h-6 rounded-md shadow-sm glassmorphism" style={TODAY_GLASS_STYLE} />
+              <span
+                className="w-6 h-6 rounded-md shadow-sm glassmorphism"
+                style={TODAY_GLASS_STYLE}
+              />
               <span className="font-semibold">Today</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="w-6 h-6 rounded-md shadow-sm glassmorphism" style={DUE_DATE_GLASS_STYLE} />
+              <span
+                className="w-6 h-6 rounded-md shadow-sm glassmorphism"
+                style={DUE_DATE_GLASS_STYLE}
+              />
               <span className="font-semibold">Due Date Registration</span>
             </div>
           </div>
@@ -338,8 +411,8 @@ export default function Registration() {
           Your registration is being verified!
         </h2>
         <p className="text-sm sm:text-base text-slate-500 leading-relaxed max-w-2xl font-poppins font-medium">
-          Thank you for registering to be part of our family! Your registration is
-          currently under review and will be verified within 24 hours. Please
+          Thank you for registering to be part of our family! Your registration
+          is currently under review and will be verified within 24 hours. Please
           check back periodically for updates on your verification status.
         </p>
       </Card>
@@ -376,7 +449,9 @@ export default function Registration() {
             className="h-[92px] w-auto shrink-0 object-contain self-start mt-0.5"
           />
           <div className="flex-1 min-w-0">
-            <h4 className="text-xl font-bold text-[#0A2745] font-poppins">BNCC</h4>
+            <h4 className="text-xl font-bold text-[#0A2745] font-poppins">
+              BNCC
+            </h4>
             <div className="mt-3 flex flex-col gap-2.5 text-xs sm:text-base font-semibold text-[#0A2745]/85">
               <div className="flex items-center gap-3">
                 <img
@@ -387,7 +462,10 @@ export default function Registration() {
                 <span>@yviluo (Yovi Gracia Lo)</span>
               </div>
               <div className="flex items-center gap-3">
-                <svg viewBox="0 0 24 24" className="w-5 h-5 sm:w-7 sm:h-7 shrink-0">
+                <svg
+                  viewBox="0 0 24 24"
+                  className="w-5 h-5 sm:w-7 sm:h-7 shrink-0"
+                >
                   <path
                     d="M12.008.01a11.95 11.95 0 00-10.42 17.846L0 24l6.303-1.654A11.95 11.95 0 1012.008.01z"
                     fill="#0A2745"
@@ -422,8 +500,8 @@ export default function Registration() {
           Registration Successful!
         </h2>
         <p className="text-sm sm:text-base text-slate-500 leading-relaxed max-w-2xl font-poppins font-medium">
-          Thank you for registering and becoming part of our family! Let's move on
-          to re-registration.
+          Thank you for registering and becoming part of our family! Let's move
+          on to re-registration.
         </p>
 
         <button

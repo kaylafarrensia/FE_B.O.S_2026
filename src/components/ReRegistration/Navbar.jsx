@@ -7,7 +7,7 @@ import icJapres from '../../../public/icons/ic-japres.svg'
 import icProfile from '../../../public/icons/ic-profile.svg'
 
 const TABS = [
-  { key: 'reregist', label: 'Re-Regist', icon: icReregist },
+  { key: 'reregist', label: 'RE-REGIST', icon: icReregist },
   { key: 'japres', label: 'Japres', icon: icJapres },
   { key: 'profile', label: 'Profile', icon: icProfile },
 ]
@@ -34,13 +34,13 @@ export default function Navbar({ activeTab = 'reregist', onTabChange }) {
               type="button"
               onClick={() => handleTabClick(tab.key)}
               aria-current={isActive ? 'page' : undefined}
-              className={`relative flex items-center gap-2 overflow-hidden rounded-[10px] px-7 py-3.5 font-outfit text-xs font-normal tracking-[0.15em] cursor-pointer ${
-                isActive ? 'text-white' : 'text-slate-700'
+              className={`relative flex items-center gap-2 overflow-hidden rounded-[10px] px-7 py-3.5 font-outfit text-xs font-normal tracking-[0.15em] cursor-pointer transition-colors duration-200 ${
+                isActive ? 'text-white font-semibold' : 'text-slate-700'
               }`}
             >
               {isActive && (
                 <motion.div
-                  layoutId="navbar-active-pill"
+                  layoutId="reregist-navbar-active-pill"
                   className="pointer-events-none absolute inset-0 rounded-[10px] border border-[#99C4F4] bg-gradient-to-br from-[#0A2745] to-[#2474C0] shadow-[2px_4px_4px_0px_rgba(0,0,0,0.25)] backdrop-blur-md"
                   transition={{ type: 'spring', stiffness: 400, damping: 32 }}
                 />
@@ -54,11 +54,7 @@ export default function Navbar({ activeTab = 'reregist', onTabChange }) {
                 src={tab.icon}
                 alt=""
                 className={`relative z-10 h-4 w-4 transition-[filter] duration-300 ${
-                  isActive
-                    ? 'brightness-0 invert'
-                    : tab.key === 'reregist'
-                      ? 'brightness-0 opacity-70'
-                      : ''
+                  isActive ? 'brightness-0 invert' : ''
                 }`}
               />
               <span className="relative z-10 hidden uppercase transition-colors duration-300 sm:inline">
@@ -69,7 +65,7 @@ export default function Navbar({ activeTab = 'reregist', onTabChange }) {
         })}
       </div>
 
-      {/* Hamburger trigger (mobile & tablet) — thicker bars */}
+      {/* Hamburger trigger (mobile & tablet) */}
       <button
         type="button"
         onClick={() => setMenuOpen(true)}
@@ -85,7 +81,6 @@ export default function Navbar({ activeTab = 'reregist', onTabChange }) {
       <AnimatePresence>
         {menuOpen && (
           <>
-            {/* Backdrop: invisible, click-to-close only — no blur/dark on main page */}
             <motion.div
               key="backdrop"
               initial={{ opacity: 0 }}
@@ -118,23 +113,26 @@ export default function Navbar({ activeTab = 'reregist', onTabChange }) {
               </button>
 
               <div className="flex flex-1 flex-col items-end justify-start gap-10 pt-6 md:gap-14 md:pt-10">
-                {TABS.map((tab) => (
-                  <button
-                    key={tab.key}
-                    type="button"
-                    onClick={() => handleTabClick(tab.key)}
-                    className="flex items-center gap-3 font-outfit text-base font-semibold uppercase tracking-[0.15em] md:gap-4 md:text-lg cursor-pointer"
-                  >
-                    <img
-                      src={tab.icon}
-                      alt=""
-                      className={`h-5 w-5 shrink-0 md:h-6 md:w-6 ${
-                        tab.key === 'reregist' ? 'brightness-0 opacity-70' : ''
+                {TABS.map((tab) => {
+                  const isActive = tab.key === activeTab
+                  return (
+                    <button
+                      key={tab.key}
+                      type="button"
+                      onClick={() => handleTabClick(tab.key)}
+                      className={`flex items-center gap-3 font-outfit text-base font-semibold uppercase tracking-[0.15em] md:gap-4 md:text-lg cursor-pointer transition-colors duration-200 ${
+                        isActive ? 'text-[#2474C0]' : 'text-[#0A2745]'
                       }`}
-                    />
-                    <span className="text-[#0A2745]">{tab.label}</span>
-                  </button>
-                ))}
+                    >
+                      <img
+                        src={tab.icon}
+                        alt=""
+                        className="h-5 w-5 shrink-0 md:h-6 md:w-6"
+                      />
+                      <span>{tab.label}</span>
+                    </button>
+                  )
+                })}
               </div>
             </motion.div>
           </>

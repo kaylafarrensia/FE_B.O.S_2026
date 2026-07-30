@@ -77,7 +77,8 @@ export default function ScheduleDropdown({ schedules, onSelect }) {
                     {formatDate(schedule.startTime)}
                   </span>
                   <span className={TIME_LABEL_CLASS}>
-                    {formatStartEndTime(schedfule.startTime, schedule.endTime)}
+                    {/* ── Typo fixed here ── */}
+                    {formatStartEndTime(schedule.startTime, schedule.endTime)}
                   </span>
                 </div>
               ))}

@@ -1,139 +1,142 @@
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { useEffect, useState, useRef, useMemo } from 'react';
-import { motion } from 'framer-motion';
-import IconCalendar from '../../assets/icons/IconCalendar.svg';
-import IconCalendarWhite from '../../assets/icons/IconCalendarWhite.svg';
-import IconTrophy from '../../assets/icons/IconTrophy.svg';
-import IconTrophyWhite from '../../assets/icons/IconTrophyWhite.svg';
-import IconProfile from '../../assets/icons/IconProfile.svg';
-import IconProfileWhite from '../../assets/icons/IconProfileWhite.svg';
-import IconMenu from '../../assets/icons/IconMenu.svg';
-import IconClose from '../../assets/icons/IconClose.svg';
-import BNCCBlue from '../../assets/images/BnccBlue.png';
-import Card from '../../components/ui/Card.jsx';
-import BubbleBackground from '../../components/ui/BubbleBackground.jsx';
-import PerspectiveGrid from '../../components/ui/PerspectiveGrid.jsx';
-
-// Dummy user status - bisa diganti saat backend tersedia
-const DUMMY_STATUS = 'schedule'; // 'schedule' | 'payment' | 'registration'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { useEffect, useState, useRef, useMemo } from 'react'
+import { motion } from 'framer-motion'
+import IconCalendar from '../../assets/icons/IconCalendar.svg'
+import IconCalendarWhite from '../../assets/icons/IconCalendarWhite.svg'
+import IconTrophy from '../../assets/icons/IconTrophy.svg'
+import IconTrophyWhite from '../../assets/icons/IconTrophyWhite.svg'
+import IconProfile from '../../assets/icons/IconProfile.svg'
+import IconProfileWhite from '../../assets/icons/IconProfileWhite.svg'
+import IconMenu from '../../assets/icons/IconMenu.svg'
+import IconClose from '../../assets/icons/IconClose.svg'
+import BNCCBlue from '../../assets/images/BnccBlue.png'
+import Card from '../../components/ui/Card.jsx'
+import BubbleBackground from '../../components/ui/BubbleBackground.jsx'
+import PerspectiveGrid from '../../components/ui/PerspectiveGrid.jsx'
 
 function Dashboard() {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const navigate = useNavigate()
+  const location = useLocation()
 
   useEffect(() => {
-    const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+    const token =
+      localStorage.getItem('token') || localStorage.getItem('accessToken')
     if (import.meta.env.PROD && !token) {
-      navigate('/auth/signin', { replace: true });
+      navigate('/auth/signin', { replace: true })
     }
-  }, [navigate]);
+  }, [navigate])
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
-      if (!token) return;
+      const token =
+        localStorage.getItem('token') || localStorage.getItem('accessToken')
+      if (!token) return
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'https://staging-launching-api.bncc.net/api';
+        const apiUrl =
+          import.meta.env.VITE_API_URL ||
+          'https://staging-launching-api.bncc.net/api'
         const res = await fetch(`${apiUrl}/profile`, {
           headers: { Authorization: `Bearer ${token}` },
-        });
+        })
         if (res.ok) {
-          const json = await res.json();
-          const data = json?.data;
+          const json = await res.json()
+          const data = json?.data
 
-          // Read schedule
           if (data?.registration?.schedule) {
-            setUserSchedule(data.registration.schedule);
+            setUserSchedule(data.registration.schedule)
           }
 
-          // Read status from API and map to local userStatus
-          // Only override if not already on a specific sub-path (let path-based useEffect take over after nav)
-          const apiStatus = data?.status ?? data?.registration?.status ?? data?.userStatus;
+          const apiStatus =
+            data?.status ?? data?.registration?.status ?? data?.userStatus
           if (apiStatus) {
-            if (apiStatus === 'done_launching' || apiStatus === 'confirm_launching') {
-              setUserStatus('done_launching');
-            } else if (apiStatus === 'registration' || apiStatus === 'registered') {
-              setUserStatus('registration');
+            if (
+              apiStatus === 'done_launching' ||
+              apiStatus === 'confirm_launching'
+            ) {
+              setUserStatus('done_launching')
+            } else if (
+              apiStatus === 'registration' ||
+              apiStatus === 'registered'
+            ) {
+              setUserStatus('registration')
             }
-            // 'schedule' is the default, no need to set it explicitly
           }
         }
       } catch (err) {
-        console.warn('Failed to load profile:', err);
+        console.warn('Failed to load profile:', err)
       }
-    };
-    fetchProfile();
-  }, []);
+    }
+    fetchProfile()
+  }, [])
 
-
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [userSchedule, setUserSchedule] = useState({
     id: 2,
     startTime: '2026-08-15T09:00:00Z',
     endTime: '2026-08-15T12:00:00Z',
-  });
+  })
   const [registrationFiles, setRegistrationFiles] = useState({
     binusianCard: null,
     memberLetter: null,
-  });
+  })
   const [reRegistrationInputs, setReRegistrationInputs] = useState({
     linkedin: '',
     github: '',
     course: '',
-  });
-  const [registrationOutcome, setRegistrationOutcome] = useState('initial');
-  const [reRegistrationSubmitted, setReRegistrationSubmitted] = useState(false);
-  const pillWidth = 180;
-  const [pillStyle, setPillStyle] = useState({ left: 0 });
-  const tabRefs = useRef([]);
-  const cardRef = useRef(null);
+  })
+  const [registrationOutcome, setRegistrationOutcome] = useState('initial')
+  const [reRegistrationSubmitted, setReRegistrationSubmitted] = useState(false)
+  const pillWidth = 180
+  const [pillStyle, setPillStyle] = useState({ left: 0 })
+  const tabRefs = useRef([])
+  const cardRef = useRef(null)
 
   const [userStatus, setUserStatus] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('status') || 'schedule';
-  });
+    const params = new URLSearchParams(window.location.search)
+    return params.get('status') || 'schedule'
+  })
 
-  // Promote userStatus based on visited path to keep state consistent
   useEffect(() => {
     if (location.pathname === '/dashboard/re-registration') {
-      setUserStatus('done_launching');
+      setUserStatus('done_launching')
     } else if (location.pathname === '/dashboard/registration') {
-      setUserStatus('registration');
+      setUserStatus('registration')
     } else if (location.pathname === '/dashboard/confirm') {
-      setUserStatus('done_launching');
+      setUserStatus('schedule')
     }
-  }, [location.pathname]);
+  }, [location.pathname])
 
   const tabs = useMemo(() => {
-    let firstTab;
-    if (userStatus === 'schedule') {
+    let firstTab
+    // If we are explicitly on the confirm page, show SCHEDULE pointing to /dashboard/confirm
+    if (location.pathname.startsWith('/dashboard/confirm')) {
+      firstTab = {
+        label: 'SCHEDULE',
+        icon: IconCalendar,
+        iconWhite: IconCalendarWhite,
+        path: '/dashboard/confirm',
+      }
+    } else if (userStatus === 'schedule') {
       firstTab = {
         label: 'SCHEDULE',
         icon: IconCalendar,
         iconWhite: IconCalendarWhite,
         path: '/dashboard/schedule',
-      };
+      }
     } else if (userStatus === 'registration') {
       firstTab = {
         label: 'REGIST',
         icon: IconCalendar,
         iconWhite: IconCalendarWhite,
         path: '/dashboard/registration',
-      };
-    } else if (userStatus === 'done_launching') {
-      firstTab = {
-        label: 'SCHEDULE',
-        icon: IconCalendar,
-        iconWhite: IconCalendarWhite,
-        path: '/dashboard/confirm',
-      };
+      }
     } else {
       firstTab = {
         label: 'RE-REGIST',
         icon: IconCalendar,
         iconWhite: IconCalendarWhite,
         path: '/dashboard/re-registration',
-      };
+      }
     }
 
     return [
@@ -150,39 +153,38 @@ function Dashboard() {
         iconWhite: IconProfileWhite,
         path: '/dashboard/profile',
       },
-    ];
-  }, [userStatus]);
+    ]
+  }, [userStatus, location.pathname])
 
   const updatePillPosition = (path) => {
-    const activeIndex = tabs.findIndex((t) => t.path === path);
+    const activeIndex = tabs.findIndex((t) => path.startsWith(t.path))
     if (activeIndex !== -1) {
       setPillStyle({
         left: activeIndex * pillWidth,
-      });
+      })
     }
-  };
+  }
 
   useEffect(() => {
-    const normalizedPath = location.pathname.replace(/\/+$/, '');
+    const normalizedPath = location.pathname.replace(/\/+$/, '')
     if (normalizedPath === '/dashboard') {
-      let defaultPath = '/dashboard/schedule';
+      let defaultPath = '/dashboard/schedule'
       if (userStatus === 'registration') {
-        defaultPath = '/dashboard/registration';
+        defaultPath = '/dashboard/registration'
       } else if (userStatus === 'done_launching') {
-        defaultPath = '/dashboard/confirm';
+        defaultPath = '/dashboard/re-registration'
       }
-      navigate(defaultPath, { replace: true });
+      navigate(defaultPath, { replace: true })
     }
-  }, [location.pathname, navigate, userStatus]);
-
-
-  useEffect(() => {
-    setIsSidebarOpen(false);
-  }, [location.pathname]);
+  }, [location.pathname, navigate, userStatus])
 
   useEffect(() => {
-    updatePillPosition(location.pathname);
-  }, [location.pathname, tabs]);
+    setIsSidebarOpen(false)
+  }, [location.pathname])
+
+  useEffect(() => {
+    updatePillPosition(location.pathname)
+  }, [location.pathname, tabs])
 
   return (
     <div className="dashboard-page relative z-0 min-h-screen flex flex-col overflow-hidden">
@@ -227,17 +229,18 @@ function Dashboard() {
         </div>
         <nav className="flex flex-col py-6 px-3 space-y-4">
           {tabs.map((tab) => {
-            const isActive = location.pathname.startsWith(tab.path);
+            const isActive = location.pathname.startsWith(tab.path)
             return (
               <motion.button
                 key={tab.label}
-                className={`flex items-center justify-end gap-4 p-4 rounded-lg transition-all duration-200 ${isActive
-                  ? 'bg-gradient-to-r from-persian-indigo to-[#2474C0] text-white'
-                  : 'text-persian-indigo hover:bg-white/30'
-                  }`}
+                className={`flex items-center justify-end gap-4 p-4 rounded-lg transition-all duration-200 ${
+                  isActive
+                    ? 'bg-gradient-to-r from-persian-indigo to-[#2474C0] text-white'
+                    : 'text-persian-indigo hover:bg-white/30'
+                }`}
                 onClick={() => {
-                  navigate(tab.path);
-                  setIsSidebarOpen(false);
+                  navigate(tab.path)
+                  setIsSidebarOpen(false)
                 }}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -247,11 +250,13 @@ function Dashboard() {
                   alt=""
                   className="w-6 sm:w-8"
                 />
-                <span className={`font-outfit text-left text-sm sm:text-lg ${isActive ? 'text-white' : ''}`}>
+                <span
+                  className={`font-outfit text-left text-sm sm:text-lg ${isActive ? 'text-white' : ''}`}
+                >
                   {tab.label}
                 </span>
               </motion.button>
-            );
+            )
           })}
         </nav>
       </motion.div>
@@ -276,17 +281,18 @@ function Dashboard() {
               transition={{ type: 'spring', stiffness: 400, damping: 30 }}
             />
             {tabs.map((tab, idx) => {
-              const isActive = location.pathname.startsWith(tab.path);
+              const isActive = location.pathname.startsWith(tab.path)
               return (
                 <li
                   key={tab.label}
                   ref={(el) => (tabRefs.current[idx] = el)}
-                  className={`flex items-center justify-center gap-2 font-outfit tracking-wider relative z-10 cursor-pointer text-sm transition-colors duration-200 ${isActive ? 'text-white' : 'text-persian-indigo'
-                    }`}
+                  className={`flex items-center justify-center gap-2 font-outfit tracking-wider relative z-10 cursor-pointer text-sm transition-colors duration-200 ${
+                    isActive ? 'text-white' : 'text-persian-indigo'
+                  }`}
                   style={{ width: pillWidth }}
                   onClick={() => {
-                    navigate(tab.path);
-                    updatePillPosition(tab.path);
+                    navigate(tab.path)
+                    updatePillPosition(tab.path)
                   }}
                 >
                   <img
@@ -294,32 +300,38 @@ function Dashboard() {
                     src={isActive ? tab.iconWhite : tab.icon}
                     alt=""
                   />
-                  <span className={`whitespace-nowrap ${isActive ? 'text-white' : 'text-persian-indigo'}`}>{tab.label}</span>
+                  <span
+                    className={`whitespace-nowrap ${isActive ? 'text-white' : 'text-persian-indigo'}`}
+                  >
+                    {tab.label}
+                  </span>
                 </li>
-              );
+              )
             })}
           </Card>
         </div>
       </ul>
 
       <div className="flex-grow flex flex-col pt-[72px] xl:pt-28 min-h-0 overflow-y-auto">
-        <Outlet context={{
-          userSchedule,
-          setUserSchedule,
-          userStatus,
-          setUserStatus,
-          registrationFiles,
-          setRegistrationFiles,
-          reRegistrationInputs,
-          setReRegistrationInputs,
-          registrationOutcome,
-          setRegistrationOutcome,
-          reRegistrationSubmitted,
-          setReRegistrationSubmitted
-        }} />
+        <Outlet
+          context={{
+            userSchedule,
+            setUserSchedule,
+            userStatus,
+            setUserStatus,
+            registrationFiles,
+            setRegistrationFiles,
+            reRegistrationInputs,
+            setReRegistrationInputs,
+            registrationOutcome,
+            setRegistrationOutcome,
+            reRegistrationSubmitted,
+            setReRegistrationSubmitted,
+          }}
+        />
       </div>
     </div>
-  );
+  )
 }
 
-export default Dashboard;
+export default Dashboard

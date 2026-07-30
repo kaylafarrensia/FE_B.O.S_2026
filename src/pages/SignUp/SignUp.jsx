@@ -2,8 +2,13 @@ import { useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { FaUsers } from 'react-icons/fa'
-import { Eye, EyeOff, Loader2 } from 'lucide-react'
-import { usePopup, useLookupQuery, useLinkQuery, useAuthMutation } from '@/hooks'
+import { Eye, EyeOff, Loader2, X } from 'lucide-react'
+import {
+  usePopup,
+  useLookupQuery,
+  useLinkQuery,
+  useAuthMutation,
+} from '@/hooks'
 import { formatScheduleDisplay } from '@/lib/utils'
 import AuthBackground from '@/components/AuthBackground'
 
@@ -42,7 +47,10 @@ function SelectionHandle({ position }) {
 function BoundingBox({ children }) {
   return (
     <div className="relative inline-block">
-      <div className="absolute inset-0 border-2 border-[#207CDB]" aria-hidden="true">
+      <div
+        className="absolute inset-0 border-2 border-[#207CDB]"
+        aria-hidden="true"
+      >
         <SelectionHandle position="top-left" />
         <SelectionHandle position="top-right" />
         <SelectionHandle position="bottom-left" />
@@ -55,7 +63,8 @@ function BoundingBox({ children }) {
 
 const inputClass =
   'w-full rounded-lg px-3.5 py-2 text-xs sm:text-sm text-[#0A2745] placeholder-[#81A8CE]/80 outline-none transition-all bg-[#EBF5FF]/50 border border-[#99C4F4] focus:bg-[#EBF5FF]/70 focus:border-[#207CDB] focus:ring-2 focus:ring-[#207CDB]/20'
-const labelClass = 'block text-[11px] sm:text-xs font-semibold text-[#0A2745] font-poppins mb-1.5'
+const labelClass =
+  'block text-[11px] sm:text-xs font-semibold text-[#0A2745] font-poppins mb-1.5'
 const selectClass =
   'w-full rounded-lg px-3.5 py-2 text-xs sm:text-sm outline-none transition-all appearance-none cursor-pointer bg-[#EBF5FF]/50 border border-[#99C4F4] focus:bg-[#EBF5FF]/70 focus:border-[#207CDB] focus:ring-2 focus:ring-[#207CDB]/20'
 
@@ -89,13 +98,22 @@ export default function SignUp() {
   const [successVisible, setSuccessVisible] = useState(false)
   const [expoCode, setExpoCode] = useState('')
   const [showExpoCode, setShowExpoCode] = useState(false)
+  const [toastVisible, setToastVisible] = useState(false)
+
+  // ── New State to track if the user has clicked "Show Code" ──
+  const [hasSeenCode, setHasSeenCode] = useState(false)
 
   const watchedPassword = watch('password', '')
   const watchedRegionId = watch('regionId')
   const watchedFacultyId = watch('facultyId')
 
-  const { regionQuery, facultyQuery, majorQuery, lntCourseQuery, scheduleQuery } =
-    useLookupQuery(watchedRegionId, watchedFacultyId)
+  const {
+    regionQuery,
+    facultyQuery,
+    majorQuery,
+    lntCourseQuery,
+    scheduleQuery,
+  } = useLookupQuery(watchedRegionId, watchedFacultyId)
   const { registerMutation } = useAuthMutation()
 
   const { linkQuery } = useLinkQuery(watchedRegionId)
@@ -107,30 +125,45 @@ export default function SignUp() {
 
   const regions = regionQuery.data || []
   const faculties = (facultyQuery.data || []).filter(
-    (f) => !f.regionId || Number(f.regionId) === Number(watchedRegionId)
+    (f) => !f.regionId || Number(f.regionId) === Number(watchedRegionId),
   )
   const majors = (majorQuery.data || []).filter(
-    (m) => !m.facultyId || Number(m.facultyId) === Number(watchedFacultyId)
+    (m) => !m.facultyId || Number(m.facultyId) === Number(watchedFacultyId),
   )
   const lntCourses = (lntCourseQuery.data || []).filter(
-    (c) => !c.regionId || Number(c.regionId) === Number(watchedRegionId)
+    (c) => !c.regionId || Number(c.regionId) === Number(watchedRegionId),
   )
   const schedules = (scheduleQuery.data || []).filter(
-    (s) => !s.regionId || Number(s.regionId) === Number(watchedRegionId)
+    (s) => !s.regionId || Number(s.regionId) === Number(watchedRegionId),
   )
 
   const selectedRegion = regions.find(
-    (r) => Number(r.id) === Number(watchedRegionId)
+    (r) => Number(r.id) === Number(watchedRegionId),
   )
 
   /* ── navigation ── */
   const onNext = async () => {
     if (currentStep === 1) {
-      const ok = await trigger(['fullName', 'lineId', 'whatsappNumber', 'nim', 'regionId', 'facultyId', 'majorId'])
+      const ok = await trigger([
+        'fullName',
+        'lineId',
+        'whatsappNumber',
+        'nim',
+        'regionId',
+        'facultyId',
+        'majorId',
+      ])
       const regOpen = selectedRegion?.isRegistrationOpen
       if (ok && (regOpen === undefined || regOpen === true)) setCurrentStep(2)
     } else if (currentStep === 2) {
-      const ok = await trigger(['email', 'binusEmail', 'password', 'confirmPassword', 'lntCourseId', 'scheduleId'])
+      const ok = await trigger([
+        'email',
+        'binusEmail',
+        'password',
+        'confirmPassword',
+        'lntCourseId',
+        'scheduleId',
+      ])
       if (ok) setCurrentStep(3)
     }
   }
@@ -151,11 +184,20 @@ export default function SignUp() {
       return
     }
     if (!waChecked) {
-      showPopup({ type: 'error', heading: 'Confirmation Required', message: 'Please confirm you have joined the WhatsApp group.' })
+      showPopup({
+        type: 'error',
+        heading: 'Confirmation Required',
+        message: 'Please confirm you have joined the WhatsApp group.',
+      })
       return
     }
     if (!isPasswordValid) {
-      showPopup({ type: 'error', heading: 'Invalid Password', message: 'Password must be at least 8 chars with 1 uppercase and 1 lowercase letter.' })
+      showPopup({
+        type: 'error',
+        heading: 'Invalid Password',
+        message:
+          'Password must be at least 8 chars with 1 uppercase and 1 lowercase letter.',
+      })
       return
     }
     const payload = {
@@ -196,14 +238,46 @@ export default function SignUp() {
     })
   }
 
+  /* ── Copy to Clipboard Handler ── */
+  const handleToggleAndCopy = () => {
+    const code = expoCode || 'EXBC01001'
+    setShowExpoCode(!showExpoCode)
+
+    // Unlock the submit button
+    setHasSeenCode(true)
+
+    // Copy to clipboard
+    navigator.clipboard
+      .writeText(code)
+      .then(() => {
+        setToastVisible(true)
+        // Hide toast after 3 seconds
+        setTimeout(() => {
+          setToastVisible(false)
+        }, 3000)
+      })
+      .catch((err) => console.error('Failed to copy: ', err))
+  }
+
   /* ── step titles ── */
-  const stepTitle = currentStep === 1
-    ? <>Personal <span className="text-[#2474C0]">Information</span></>
-    : currentStep === 2
-    ? <>BNCC <span className="text-[#2474C0]">Registration</span></>
-    : currentStep === 3
-    ? <>BNCC <span className="text-[#2474C0]">Community</span></>
-    : <>Get your <span className="text-[#2474C0]">Expo Code</span></>
+  const stepTitle =
+    currentStep === 1 ? (
+      <>
+        Personal <span className="text-[#2474C0]">Information</span>
+      </>
+    ) : currentStep === 2 ? (
+      <>
+        BNCC <span className="text-[#2474C0]">Registration</span>
+      </>
+    ) : currentStep === 3 ? (
+      <>
+        BNCC <span className="text-[#2474C0]">Community</span>
+      </>
+    ) : (
+      <>
+        Get your <span className="text-[#2474C0]">Expo Code</span>
+      </>
+    )
 
   const progressPct = (currentStep / TOTAL_STEPS) * 100
 
@@ -243,9 +317,7 @@ export default function SignUp() {
           </div>
 
           {/* ══ Glassmorphism Card ══ */}
-          <div
-            className="relative z-2 -mt-5 min-[400px]:-mt-7 sm:-mt-8 w-[82%] max-w-[19rem] min-[400px]:max-w-[21rem] sm:max-w-[24rem] lg:max-w-[26rem] flex flex-col rounded-[15px] border-[2.5px] border-white/90 bg-white/35 backdrop-blur-lg px-5 sm:px-8 pt-5 sm:pt-7 pb-5 sm:pb-6 text-[#0A2745]"
-          >
+          <div className="relative z-2 -mt-5 min-[400px]:-mt-7 sm:-mt-8 w-[82%] max-w-[19rem] min-[400px]:max-w-[21rem] sm:max-w-[24rem] lg:max-w-[26rem] flex flex-col rounded-[15px] border-[2.5px] border-white/90 bg-white/35 backdrop-blur-lg px-5 sm:px-8 pt-5 sm:pt-7 pb-5 sm:pb-6 text-[#0A2745]">
             {/* Card heading */}
             <h2 className="font-bold text-lg sm:text-xl text-center text-[#0D2A4E] mb-5">
               {stepTitle}
@@ -262,25 +334,39 @@ export default function SignUp() {
                     <input
                       {...register('fullName', {
                         required: 'Full name is required',
-                        minLength: { value: 3, message: 'Full name length must be at least 3 characters long' },
+                        minLength: {
+                          value: 3,
+                          message:
+                            'Full name length must be at least 3 characters long',
+                        },
                       })}
                       type="text"
                       placeholder="Enter your name"
                       className={inputClass}
                     />
-                    {errors.fullName && <p className="text-[10px] text-red-500 mt-1">{errors.fullName.message}</p>}
+                    {errors.fullName && (
+                      <p className="text-[10px] text-red-500 mt-1">
+                        {errors.fullName.message}
+                      </p>
+                    )}
                   </div>
 
                   {/* Line ID */}
                   <div>
                     <label className={labelClass}>Line ID</label>
                     <input
-                      {...register('lineId', { required: 'Line ID is required' })}
+                      {...register('lineId', {
+                        required: 'Line ID is required',
+                      })}
                       type="text"
                       placeholder="Enter your Line ID"
                       className={inputClass}
                     />
-                    {errors.lineId && <p className="text-[10px] text-red-500 mt-1">{errors.lineId.message}</p>}
+                    {errors.lineId && (
+                      <p className="text-[10px] text-red-500 mt-1">
+                        {errors.lineId.message}
+                      </p>
+                    )}
                   </div>
 
                   {/* WhatsApp */}
@@ -289,13 +375,22 @@ export default function SignUp() {
                     <input
                       {...register('whatsappNumber', {
                         required: 'WhatsApp number is required',
-                        validate: (v) => (v && v.length >= 9 && v.length <= 12 && /^\d+$/.test(v)) || 'WhatsApp number must be 9–12 digits',
+                        validate: (v) =>
+                          (v &&
+                            v.length >= 9 &&
+                            v.length <= 12 &&
+                            /^\d+$/.test(v)) ||
+                          'WhatsApp number must be 9–12 digits',
                       })}
                       type="text"
                       placeholder="Enter your WhatsApp number"
                       className={inputClass}
                     />
-                    {errors.whatsappNumber && <p className="text-[10px] text-red-500 mt-1">{errors.whatsappNumber.message}</p>}
+                    {errors.whatsappNumber && (
+                      <p className="text-[10px] text-red-500 mt-1">
+                        {errors.whatsappNumber.message}
+                      </p>
+                    )}
                   </div>
 
                   {/* NIM */}
@@ -304,13 +399,18 @@ export default function SignUp() {
                     <input
                       {...register('nim', {
                         required: 'NIM is required',
-                        validate: (v) => /^\d{10}$/.test(v) || 'NIM harus 10 angka',
+                        validate: (v) =>
+                          /^\d{10}$/.test(v) || 'NIM harus 10 angka',
                       })}
                       type="text"
                       placeholder="Enter your NIM"
                       className={inputClass}
                     />
-                    {errors.nim && <p className="text-[10px] text-red-500 mt-1">{errors.nim.message}</p>}
+                    {errors.nim && (
+                      <p className="text-[10px] text-red-500 mt-1">
+                        {errors.nim.message}
+                      </p>
+                    )}
                   </div>
 
                   {/* Region Kampus */}
@@ -327,19 +427,45 @@ export default function SignUp() {
                             onChange={(e) => {
                               const val = Number(e.target.value)
                               field.onChange(val)
-                              setValue('facultyId', '', { shouldValidate: true })
+                              setValue('facultyId', '', {
+                                shouldValidate: true,
+                              })
                               setValue('majorId', '', { shouldValidate: true })
-                              setValue('lntCourseId', '', { shouldValidate: true })
-                              setValue('scheduleId', '', { shouldValidate: true })
+                              setValue('lntCourseId', '', {
+                                shouldValidate: true,
+                              })
+                              setValue('scheduleId', '', {
+                                shouldValidate: true,
+                              })
                             }}
                             className={`${selectClass} ${!field.value ? 'text-[#81A8CE]' : 'text-[#0A2745] font-semibold'}`}
                           >
-                            <option value="" disabled className="text-[#81A8CE]">Select your campus region</option>
-                            {regions.map((r) => <option key={r.id} value={r.id} className="text-[#0A2745] font-normal">{r.name}</option>)}
+                            <option
+                              value=""
+                              disabled
+                              className="text-[#81A8CE]"
+                            >
+                              Select your campus region
+                            </option>
+                            {regions.map((r) => (
+                              <option
+                                key={r.id}
+                                value={r.id}
+                                className="text-[#0A2745] font-normal"
+                              >
+                                {r.name}
+                              </option>
+                            ))}
                           </select>
-                          <div className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#4C88C7]">▾</div>
+                          <div className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#4C88C7]">
+                            ▾
+                          </div>
                         </div>
-                        {errors.regionId && <p className="text-[10px] text-red-500 mt-1">{errors.regionId.message}</p>}
+                        {errors.regionId && (
+                          <p className="text-[10px] text-red-500 mt-1">
+                            {errors.regionId.message}
+                          </p>
+                        )}
                       </div>
                     )}
                   />
@@ -364,12 +490,34 @@ export default function SignUp() {
                             className={`${selectClass} ${!field.value ? 'text-[#81A8CE]' : 'text-[#0A2745] font-semibold'}`}
                             style={{ opacity: !watchedRegionId ? 0.6 : 1 }}
                           >
-                            <option value="" disabled className="text-[#81A8CE]">{!watchedRegionId ? 'Please select your campus region first' : 'Select your faculty'}</option>
-                            {faculties.map((f) => <option key={f.id} value={f.id} className="text-[#0A2745] font-normal">{f.name}</option>)}
+                            <option
+                              value=""
+                              disabled
+                              className="text-[#81A8CE]"
+                            >
+                              {!watchedRegionId
+                                ? 'Please select your campus region first'
+                                : 'Select your faculty'}
+                            </option>
+                            {faculties.map((f) => (
+                              <option
+                                key={f.id}
+                                value={f.id}
+                                className="text-[#0A2745] font-normal"
+                              >
+                                {f.name}
+                              </option>
+                            ))}
                           </select>
-                          <div className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#4C88C7]">▾</div>
+                          <div className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#4C88C7]">
+                            ▾
+                          </div>
                         </div>
-                        {errors.facultyId && <p className="text-[10px] text-red-500 mt-1">{errors.facultyId.message}</p>}
+                        {errors.facultyId && (
+                          <p className="text-[10px] text-red-500 mt-1">
+                            {errors.facultyId.message}
+                          </p>
+                        )}
                       </div>
                     )}
                   />
@@ -386,16 +534,40 @@ export default function SignUp() {
                           <select
                             value={field.value || ''}
                             disabled={!watchedFacultyId}
-                            onChange={(e) => field.onChange(Number(e.target.value))}
+                            onChange={(e) =>
+                              field.onChange(Number(e.target.value))
+                            }
                             className={`${selectClass} ${!field.value ? 'text-[#81A8CE]' : 'text-[#0A2745] font-semibold'}`}
                             style={{ opacity: !watchedFacultyId ? 0.6 : 1 }}
                           >
-                            <option value="" disabled className="text-[#81A8CE]">{!watchedFacultyId ? 'Please select your faculty first' : 'Select your major'}</option>
-                            {majors.map((m) => <option key={m.id} value={m.id} className="text-[#0A2745] font-normal">{m.name}</option>)}
+                            <option
+                              value=""
+                              disabled
+                              className="text-[#81A8CE]"
+                            >
+                              {!watchedFacultyId
+                                ? 'Please select your faculty first'
+                                : 'Select your major'}
+                            </option>
+                            {majors.map((m) => (
+                              <option
+                                key={m.id}
+                                value={m.id}
+                                className="text-[#0A2745] font-normal"
+                              >
+                                {m.name}
+                              </option>
+                            ))}
                           </select>
-                          <div className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#4C88C7]">▾</div>
+                          <div className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#4C88C7]">
+                            ▾
+                          </div>
                         </div>
-                        {errors.majorId && <p className="text-[10px] text-red-500 mt-1">{errors.majorId.message}</p>}
+                        {errors.majorId && (
+                          <p className="text-[10px] text-red-500 mt-1">
+                            {errors.majorId.message}
+                          </p>
+                        )}
                       </div>
                     )}
                   />
@@ -411,13 +583,20 @@ export default function SignUp() {
                     <input
                       {...register('email', {
                         required: 'Email is required',
-                        pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, message: 'Must be a valid email' },
+                        pattern: {
+                          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                          message: 'Must be a valid email',
+                        },
                       })}
                       type="text"
                       placeholder="Enter your email"
                       className={inputClass}
                     />
-                    {errors.email && <p className="text-[10px] text-red-500 mt-1">{errors.email.message}</p>}
+                    {errors.email && (
+                      <p className="text-[10px] text-red-500 mt-1">
+                        {errors.email.message}
+                      </p>
+                    )}
                   </div>
 
                   {/* BINUS Email */}
@@ -426,13 +605,20 @@ export default function SignUp() {
                     <input
                       {...register('binusEmail', {
                         required: 'BINUS email is required',
-                        pattern: { value: /binus\.ac\.id$/i, message: 'Email must contain binus.ac.id' },
+                        pattern: {
+                          value: /binus\.ac\.id$/i,
+                          message: 'Email must contain binus.ac.id',
+                        },
                       })}
                       type="text"
                       placeholder="Enter your BINUS email"
                       className={inputClass}
                     />
-                    {errors.binusEmail && <p className="text-[10px] text-red-500 mt-1">{errors.binusEmail.message}</p>}
+                    {errors.binusEmail && (
+                      <p className="text-[10px] text-red-500 mt-1">
+                        {errors.binusEmail.message}
+                      </p>
+                    )}
                   </div>
 
                   {/* Password */}
@@ -443,7 +629,9 @@ export default function SignUp() {
                         {...register('password', {
                           required: 'Password is required',
                           validate: (v) =>
-                            (v.length >= 8 && /[A-Z]/.test(v) && /[a-z]/.test(v)) ||
+                            (v.length >= 8 &&
+                              /[A-Z]/.test(v) &&
+                              /[a-z]/.test(v)) ||
                             'Min 8 chars with uppercase & lowercase',
                         })}
                         type={showPassword ? 'text' : 'password'}
@@ -455,10 +643,18 @@ export default function SignUp() {
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#4C88C7] hover:text-[#0D2A4E] transition-colors cursor-pointer"
                       >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        {showPassword ? (
+                          <EyeOff className="w-4 h-4" />
+                        ) : (
+                          <Eye className="w-4 h-4" />
+                        )}
                       </button>
                     </div>
-                    {errors.password && <p className="text-[10px] text-red-500 mt-1">{errors.password.message}</p>}
+                    {errors.password && (
+                      <p className="text-[10px] text-red-500 mt-1">
+                        {errors.password.message}
+                      </p>
+                    )}
                   </div>
 
                   {/* Confirm Password */}
@@ -468,7 +664,8 @@ export default function SignUp() {
                       <input
                         {...register('confirmPassword', {
                           required: 'Please confirm your password',
-                          validate: (v) => v === watchedPassword || 'Passwords do not match',
+                          validate: (v) =>
+                            v === watchedPassword || 'Passwords do not match',
                         })}
                         type={showConfirmPassword ? 'text' : 'password'}
                         placeholder="Confirm your password"
@@ -476,13 +673,23 @@ export default function SignUp() {
                       />
                       <button
                         type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
                         className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#4C88C7] hover:text-[#0D2A4E] transition-colors cursor-pointer"
                       >
-                        {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        {showConfirmPassword ? (
+                          <EyeOff className="w-4 h-4" />
+                        ) : (
+                          <Eye className="w-4 h-4" />
+                        )}
                       </button>
                     </div>
-                    {errors.confirmPassword && <p className="text-[10px] text-red-500 mt-1">{errors.confirmPassword.message}</p>}
+                    {errors.confirmPassword && (
+                      <p className="text-[10px] text-red-500 mt-1">
+                        {errors.confirmPassword.message}
+                      </p>
+                    )}
                   </div>
 
                   {/* LnT Course */}
@@ -496,15 +703,37 @@ export default function SignUp() {
                         <div className="relative">
                           <select
                             value={field.value || ''}
-                            onChange={(e) => field.onChange(Number(e.target.value))}
+                            onChange={(e) =>
+                              field.onChange(Number(e.target.value))
+                            }
                             className={`${selectClass} ${!field.value ? 'text-[#81A8CE]' : 'text-[#0A2745] font-semibold'}`}
                           >
-                            <option value="" disabled className="text-[#81A8CE]">Select your LnT Course</option>
-                            {lntCourses.map((c) => <option key={c.id} value={c.id} className="text-[#0A2745] font-normal">{c.title || c.name}</option>)}
+                            <option
+                              value=""
+                              disabled
+                              className="text-[#81A8CE]"
+                            >
+                              Select your LnT Course
+                            </option>
+                            {lntCourses.map((c) => (
+                              <option
+                                key={c.id}
+                                value={c.id}
+                                className="text-[#0A2745] font-normal"
+                              >
+                                {c.title || c.name}
+                              </option>
+                            ))}
                           </select>
-                          <div className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#4C88C7]">▾</div>
+                          <div className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#4C88C7]">
+                            ▾
+                          </div>
                         </div>
-                        {errors.lntCourseId && <p className="text-[10px] text-red-500 mt-1">{errors.lntCourseId.message}</p>}
+                        {errors.lntCourseId && (
+                          <p className="text-[10px] text-red-500 mt-1">
+                            {errors.lntCourseId.message}
+                          </p>
+                        )}
                       </div>
                     )}
                   />
@@ -516,19 +745,43 @@ export default function SignUp() {
                     rules={{ required: 'Jadwal BNCC Launching is required' }}
                     render={({ field }) => (
                       <div>
-                        <label className={labelClass}>Jadwal BNCC Launching</label>
+                        <label className={labelClass}>
+                          Jadwal BNCC Launching
+                        </label>
                         <div className="relative">
                           <select
                             value={field.value || ''}
-                            onChange={(e) => field.onChange(Number(e.target.value))}
+                            onChange={(e) =>
+                              field.onChange(Number(e.target.value))
+                            }
                             className={`${selectClass} ${!field.value ? 'text-[#81A8CE]' : 'text-[#0A2745] font-semibold'}`}
                           >
-                            <option value="" disabled className="text-[#81A8CE]">Select your Launch Schedule</option>
-                            {schedules.map((s) => <option key={s.id} value={s.id} className="text-[#0A2745] font-normal">{formatScheduleDisplay(s)}</option>)}
+                            <option
+                              value=""
+                              disabled
+                              className="text-[#81A8CE]"
+                            >
+                              Select your Launch Schedule
+                            </option>
+                            {schedules.map((s) => (
+                              <option
+                                key={s.id}
+                                value={s.id}
+                                className="text-[#0A2745] font-normal"
+                              >
+                                {formatScheduleDisplay(s)}
+                              </option>
+                            ))}
                           </select>
-                          <div className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#4C88C7]">▾</div>
+                          <div className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#4C88C7]">
+                            ▾
+                          </div>
                         </div>
-                        {errors.scheduleId && <p className="text-[10px] text-red-500 mt-1">{errors.scheduleId.message}</p>}
+                        {errors.scheduleId && (
+                          <p className="text-[10px] text-red-500 mt-1">
+                            {errors.scheduleId.message}
+                          </p>
+                        )}
                       </div>
                     )}
                   />
@@ -539,23 +792,32 @@ export default function SignUp() {
               {currentStep === 3 && (
                 <>
                   <div className="text-[#0D2A4E]">
-                    <h3 className="text-base font-bold mb-2">Join Our WhatsApp Group</h3>
+                    <h3 className="text-base font-bold mb-2">
+                      Join Our WhatsApp Group
+                    </h3>
                     <p className="text-xs sm:text-sm leading-relaxed mb-4 text-[#2D4F77]">
-                      BNCC has a dedicated WhatsApp Group for updates on upcoming activities and events.
-                      It's also a place to connect with new friends, share interests, and enjoy meaningful
-                      experiences together with the BNCC community.
+                      BNCC has a dedicated WhatsApp Group for updates on
+                      upcoming activities and events. It's also a place to
+                      connect with new friends, share interests, and enjoy
+                      meaningful experiences together with the BNCC community.
                     </p>
                     <a
-                      href={linkQuery?.wa_info || '#'}
+                      href="https://chat.whatsapp.com/GBwfCl7xyKs1g2KpbX80DV"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
                       <button
                         type="button"
                         className="w-full py-3 rounded-xl text-white font-semibold flex items-center justify-center gap-2 cursor-pointer shadow-md hover:opacity-95 transition-opacity text-sm"
-                        style={{ background: 'linear-gradient(135deg, #1B5198 0%, #2A6DC2 100%)' }}
+                        style={{
+                          background:
+                            'linear-gradient(135deg, #1B5198 0%, #2A6DC2 100%)',
+                        }}
                       >
-                        <FaUsers className="text-base" />
+                        <FaUsers
+                          className="text-base text-white"
+                          color="white"
+                        />
                         <span>Join WhatsApp Group</span>
                       </button>
                     </a>
@@ -581,20 +843,28 @@ export default function SignUp() {
                 <div className="flex flex-col items-center text-center py-2">
                   <div className="w-full flex items-center justify-between gap-2 p-2 sm:p-2.5 rounded-xl border-2 border-[#94BEE7] bg-[#E8F2FD] mb-4">
                     <span className="font-mono text-base sm:text-lg font-bold text-[#0D2A4E] tracking-widest pl-3">
-                      {showExpoCode ? (expoCode || 'EXBC01001') : 'XXXXXXXXX'}
+                      {showExpoCode ? expoCode || 'EXBC01001' : 'XXXXXXXXX'}
                     </span>
                     <button
                       type="button"
-                      onClick={() => setShowExpoCode(!showExpoCode)}
+                      onClick={handleToggleAndCopy}
                       className="px-3.5 py-2 rounded-lg text-white font-medium text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer shadow transition-all hover:opacity-90"
-                      style={{ background: 'linear-gradient(135deg, #1B5198 0%, #2A6DC2 100%)' }}
+                      style={{
+                        background:
+                          'linear-gradient(135deg, #1B5198 0%, #2A6DC2 100%)',
+                      }}
                     >
                       {showExpoCode ? <EyeOff size={16} /> : <Eye size={16} />}
                       <span>{showExpoCode ? 'Hide Code' : 'Show Code'}</span>
                     </button>
                   </div>
                   <p className="text-xs sm:text-sm text-[#386496] leading-snug px-2 mb-2">
-                    This <strong className="font-bold text-[#0D2A4E]">Expo Code</strong> will be required on the official BINUS University website during registration.
+                    This{' '}
+                    <strong className="font-bold text-[#0D2A4E]">
+                      Expo Code
+                    </strong>{' '}
+                    will be required on the official BINUS University website
+                    during registration.
                   </p>
                 </div>
               )}
@@ -603,15 +873,23 @@ export default function SignUp() {
               <div className="flex justify-center pt-2">
                 <button
                   type="submit"
-                  disabled={currentStep === 3 && (registerMutation.isPending || !waChecked)}
-                  className="w-32 py-2 sm:py-2.5 rounded-lg bg-[#1E5FA8] hover:bg-[#12376B] text-white font-bold text-xs sm:text-sm shadow-md transition cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-50"
+                  disabled={
+                    (currentStep === 3 &&
+                      (registerMutation.isPending || !waChecked)) ||
+                    (currentStep === 4 && !hasSeenCode)
+                  }
+                  className="w-32 py-2 sm:py-2.5 rounded-lg bg-[#1E5FA8] hover:bg-[#12376B] text-white font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#1E5FA8]"
                 >
-                  {registerMutation.isPending && <Loader2 size={13} className="animate-spin" />}
+                  {registerMutation.isPending && (
+                    <Loader2 size={13} className="animate-spin" />
+                  )}
                   {currentStep === 3
-                    ? (registerMutation.isPending ? 'Submitting...' : 'Submit')
+                    ? registerMutation.isPending
+                      ? 'Submitting...'
+                      : 'Submit'
                     : currentStep === 4
-                    ? 'Done'
-                    : 'Next'}
+                      ? 'Done'
+                      : 'Next'}
                 </button>
               </div>
             </form>
@@ -657,16 +935,25 @@ export default function SignUp() {
           {/* Blurred overlay */}
           <div
             className="absolute inset-0 transition-opacity duration-300"
-            style={{ background: 'rgba(15, 35, 65, 0.30)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
+            style={{
+              background: 'rgba(15, 35, 65, 0.30)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+            }}
           />
           {/* Glassmorphism Popup Card */}
-          <div
-            className="relative z-10 w-full max-w-[22rem] sm:max-w-[26rem] rounded-[22px] border border-white/90 bg-white/40 backdrop-blur-2xl px-6 sm:px-9 py-8 sm:py-10 flex flex-col items-center text-center shadow-[0_20px_50px_rgba(10,39,69,0.25)]"
-          >
+          <div className="relative z-10 w-full max-w-[22rem] sm:max-w-[26rem] rounded-[22px] border border-white/90 bg-white/40 backdrop-blur-2xl px-6 sm:px-9 py-8 sm:py-10 flex flex-col items-center text-center shadow-[0_20px_50px_rgba(10,39,69,0.25)]">
             {/* Green Checkmark Badge */}
             <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-full bg-[#22C55E] flex items-center justify-center mb-6 shadow-[0_8px_20px_rgba(34,197,94,0.35)]">
-              <svg className="w-10 h-10 text-white stroke-current stroke-[3.5] fill-none" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              <svg
+                className="w-10 h-10 text-white stroke-current stroke-[3.5] fill-none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
             </div>
 
@@ -680,7 +967,9 @@ export default function SignUp() {
             <button
               onClick={() => navigate('/auth/signin')}
               className="w-full max-w-[170px] py-3 rounded-xl text-white font-bold text-sm sm:text-base shadow-md transition-all cursor-pointer hover:opacity-90 active:scale-[0.98]"
-              style={{ background: 'linear-gradient(135deg, #1B5198 0%, #2A6DC2 100%)' }}
+              style={{
+                background: 'linear-gradient(135deg, #1B5198 0%, #2A6DC2 100%)',
+              }}
             >
               Sign In
             </button>
@@ -693,7 +982,11 @@ export default function SignUp() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
             className="absolute inset-0"
-            style={{ background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }}
+            style={{
+              background: 'rgba(0,0,0,0.35)',
+              backdropFilter: 'blur(4px)',
+              WebkitBackdropFilter: 'blur(4px)',
+            }}
             onClick={hidePopup}
           />
           <div
@@ -709,16 +1002,35 @@ export default function SignUp() {
             <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4">
               <span className="text-2xl text-red-500">✕</span>
             </div>
-            <h3 className="text-base font-bold text-[#0D2A4E] mb-2">{config.heading}</h3>
+            <h3 className="text-base font-bold text-[#0D2A4E] mb-2">
+              {config.heading}
+            </h3>
             <p className="text-sm text-[#3D6080] mb-6">{config.message}</p>
             <button
               onClick={hidePopup}
               className="px-8 py-2.5 rounded-xl text-white font-semibold text-sm"
-              style={{ background: 'linear-gradient(135deg, #1B5198 0%, #2A6DC2 100%)' }}
+              style={{
+                background: 'linear-gradient(135deg, #1B5198 0%, #2A6DC2 100%)',
+              }}
             >
               Close
             </button>
           </div>
+        </div>
+      )}
+
+      {/* ════════════ TOAST NOTIFICATION ════════════ */}
+      {toastVisible && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] flex items-center justify-between gap-4 px-5 py-3 rounded-xl border border-white/60 bg-white/40 backdrop-blur-md shadow-lg w-11/12 max-w-sm transition-all duration-300">
+          <span className="text-sm font-medium text-[#0A2745]">
+            Copied to clipboard!
+          </span>
+          <button
+            onClick={() => setToastVisible(false)}
+            className="text-[#0A2745] hover:opacity-70 cursor-pointer"
+          >
+            <X size={16} />
+          </button>
         </div>
       )}
     </AuthBackground>

@@ -216,7 +216,8 @@ function Profile() {
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">BNCC ID</p>
                     <p className="text-sm sm:text-lg font-semibold">
-                      {user.registration.bnccId || '—'}
+                      {/* Changed from '—' to '-' to match LinkedIn & Github */}
+                      {user.registration.bnccId || '-'}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2">
@@ -288,13 +289,14 @@ function Profile() {
                           alt="Download"
                           className="w-6 h-6 mr-2"
                         />
-                        <p className="text-xs sm:text-sm">
+                        <p className="text-xs sm:text-sm text-white">
                           Download Latest Submission
                         </p>
                       </Button>
                     ) : (
                       <button
                         disabled
+                        style={{ color: '#FFFFFF' }}
                         className="w-full flex items-center justify-center gap-2 rounded-lg py-2.5 sm:py-3 px-8 text-sm sm:text-base font-semibold bg-gradient-to-r from-[#84A4C9] to-[#A3C7EE] text-white cursor-not-allowed select-none shadow-sm"
                       >
                         <img
@@ -302,7 +304,7 @@ function Profile() {
                           alt="Download"
                           className="w-6 h-6 mr-2 text-white"
                         />
-                        <p className="text-xs sm:text-sm">
+                        <p className="text-xs sm:text-sm text-white">
                           Download Latest Submission
                         </p>
                       </button>
@@ -328,13 +330,14 @@ function Profile() {
                           alt="Download"
                           className="w-6 h-6 mr-2"
                         />
-                        <p className="text-xs sm:text-sm">
+                        <p className="text-xs sm:text-sm text-white">
                           Download Binusian Card
                         </p>
                       </Button>
                     ) : (
                       <button
                         disabled
+                        style={{ color: '#FFFFFF' }}
                         className="w-full flex items-center justify-center gap-2 rounded-lg py-2.5 sm:py-3 px-8 text-sm sm:text-base font-semibold bg-gradient-to-r from-[#84A4C9] to-[#A3C7EE] text-white cursor-not-allowed select-none shadow-sm"
                       >
                         <img
@@ -342,7 +345,7 @@ function Profile() {
                           alt="Download"
                           className="w-6 h-6 mr-2 text-white"
                         />
-                        <p className="text-xs sm:text-sm">
+                        <p className="text-xs sm:text-sm text-white">
                           Download Binusian Card
                         </p>
                       </button>

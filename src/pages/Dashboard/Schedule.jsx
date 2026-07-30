@@ -1,14 +1,14 @@
-import { useState, useEffect } from 'react';
-import { useOutletContext, useNavigate } from 'react-router-dom';
-import Card from '../../components/ui/Card.jsx';
-import Button from '../../components/ui/Button.jsx';
-import IconSchedule from '../../assets/icons/IconSchedule.svg';
-import IconTime from '../../assets/icons/IconTime.svg';
-import { formatDate, formatStartEndTime } from '../../utils/index.js';
-import Calendar from './Schedule/Calendar.jsx';
-import ScheduleDropdown from './Schedule/ScheduleDropdown.jsx';
-import SavedPopup from './Schedule/SavedPopup.jsx';
-import ContactPerson from './Japres/ContactPerson.jsx';
+import { useState, useEffect } from 'react'
+import { useOutletContext, useNavigate } from 'react-router-dom'
+import Card from '../../components/ui/Card.jsx'
+import Button from '../../components/ui/Button.jsx'
+import IconSchedule from '../../assets/icons/IconSchedule.svg'
+import IconTime from '../../assets/icons/IconTime.svg'
+import { formatDate, formatStartEndTime } from '../../utils/index.js'
+import Calendar from './Schedule/Calendar.jsx'
+import ScheduleDropdown from './Schedule/ScheduleDropdown.jsx'
+import SavedPopup from './Schedule/SavedPopup.jsx'
+import ContactPerson from './Japres/ContactPerson.jsx'
 
 // ── Dummy Data (replace with API when backend is ready) ───────────────────────
 const DUMMY_USER = {
@@ -20,65 +20,118 @@ const DUMMY_USER = {
     endTime: '2026-08-15T12:00:00Z',
   },
   region: { id: 2, name: 'Jakarta' },
-};
+}
 
 const DUMMY_SCHEDULES = [
-  { id: 1, title: 'Session 1', startTime: '2026-08-14T09:00:00Z', endTime: '2026-08-14T12:00:00Z' },
-  { id: 2, title: 'Session 2', startTime: '2026-08-15T09:00:00Z', endTime: '2026-08-15T12:00:00Z' },
-];
+  {
+    id: 1,
+    title: 'Session 1',
+    startTime: '2026-08-14T09:00:00Z',
+    endTime: '2026-08-14T12:00:00Z',
+  },
+  {
+    id: 2,
+    title: 'Session 2',
+    startTime: '2026-08-15T09:00:00Z',
+    endTime: '2026-08-15T12:00:00Z',
+  },
+]
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function Schedule() {
-  const navigate = useNavigate();
-  const [popupOpen, setPopupOpen] = useState(false);
-  const [tempSchedule, setTempSchedule] = useState(null);
-  const { userSchedule, setUserSchedule, setUserStatus } = useOutletContext();
-  const [availableSchedules, setAvailableSchedules] = useState([]);
+  const navigate = useNavigate()
+  const [popupOpen, setPopupOpen] = useState(false)
+  const [tempSchedule, setTempSchedule] = useState(null)
+  const { userSchedule, setUserSchedule, setUserStatus } = useOutletContext()
+  const [availableSchedules, setAvailableSchedules] = useState([])
+
+  // State to hold the dynamic Zoom link from your backend
+  const [joinLink, setJoinLink] = useState('')
+
+  // Fetch the link from the /links API endpoint
+  useEffect(() => {
+    const fetchLinks = async () => {
+      const token =
+        localStorage.getItem('token') || localStorage.getItem('accessToken')
+      try {
+        const apiUrl =
+          import.meta.env.VITE_API_URL ||
+          'https://staging-launching-api.bncc.net/api'
+
+        if (token) {
+          const res = await fetch(`${apiUrl}/links`, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          if (res.ok) {
+            const json = await res.json()
+            // Pulling the 'zoom' link from the backend link management
+            if (json?.data?.zoom) {
+              setJoinLink(json.data.zoom)
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to fetch links:', err)
+      }
+    }
+    fetchLinks()
+  }, [])
 
   useEffect(() => {
     const fetchSchedules = async () => {
-      const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+      const token =
+        localStorage.getItem('token') || localStorage.getItem('accessToken')
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'https://staging-launching-api.bncc.net/api';
-        
-        let regionId = 1; // Default fallback region
+        const apiUrl =
+          import.meta.env.VITE_API_URL ||
+          'https://staging-launching-api.bncc.net/api'
+
+        let regionId = 1 // Default fallback region
         if (token) {
           const profileRes = await fetch(`${apiUrl}/profile`, {
             headers: { Authorization: `Bearer ${token}` },
-          });
+          })
           if (profileRes.ok) {
-            const profileJson = await profileRes.json();
-            const fetchedRegionId = profileJson?.data?.registration?.regionId || profileJson?.data?.registration?.region?.id;
+            const profileJson = await profileRes.json()
+            const fetchedRegionId =
+              profileJson?.data?.registration?.regionId ||
+              profileJson?.data?.registration?.region?.id
             if (fetchedRegionId) {
-              regionId = fetchedRegionId;
+              regionId = fetchedRegionId
             }
           }
         }
 
-        const schedulesRes = await fetch(`${apiUrl}/lookup/schedules?regionId=${regionId}`);
+        const schedulesRes = await fetch(
+          `${apiUrl}/lookup/schedules?regionId=${regionId}`,
+        )
         if (schedulesRes.ok) {
-          const schedulesJson = await schedulesRes.json();
-          const list = schedulesJson?.data || schedulesJson;
+          const schedulesJson = await schedulesRes.json()
+          const list = schedulesJson?.data || schedulesJson
           if (Array.isArray(list) && list.length > 0) {
-            setAvailableSchedules(list);
+            setAvailableSchedules(list)
           }
         }
       } catch (err) {
-        console.warn('Failed to fetch schedules, using fallback:', err);
+        console.warn('Failed to fetch schedules, using fallback:', err)
       }
-    };
-    fetchSchedules();
-  }, []);
+    }
+    fetchSchedules()
+  }, [])
 
-  const schedulesToUse = availableSchedules.length > 0 ? availableSchedules : DUMMY_SCHEDULES;
+  const schedulesToUse =
+    availableSchedules.length > 0 ? availableSchedules : DUMMY_SCHEDULES
 
   const handleConfirm = async () => {
-    if (!tempSchedule) return;
-    
-    const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+    if (!tempSchedule) return
+
+    const token =
+      localStorage.getItem('token') || localStorage.getItem('accessToken')
     if (token) {
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'https://staging-launching-api.bncc.net/api';
+        const apiUrl =
+          import.meta.env.VITE_API_URL ||
+          'https://staging-launching-api.bncc.net/api'
         const res = await fetch(`${apiUrl}/user/schedule`, {
           method: 'PUT',
           headers: {
@@ -88,31 +141,34 @@ export default function Schedule() {
           body: JSON.stringify({
             scheduleId: Number(tempSchedule.id),
           }),
-        });
+        })
         if (!res.ok) {
-          console.warn('Failed to update schedule in backend');
+          console.warn('Failed to update schedule in backend')
         }
       } catch (err) {
-        console.warn('Error updating schedule in backend:', err);
+        console.warn('Error updating schedule in backend:', err)
       }
     }
-    
-    setUserSchedule(tempSchedule);
-    setTempSchedule(null);
-    setPopupOpen(true);
-  };
+
+    setUserSchedule(tempSchedule)
+    setTempSchedule(null)
+    setPopupOpen(true)
+  }
 
   const openWhatsApp = (number) => {
-    const formatted = number.startsWith('0') ? number.slice(1) : number;
-    window.open(`https://wa.me/62${formatted}`, '_blank', 'noopener,noreferrer');
-  };
+    const formatted = number.startsWith('0') ? number.slice(1) : number
+    window.open(`https://wa.me/62${formatted}`, '_blank', 'noopener,noreferrer')
+  }
 
   const handleJoinNow = () => {
+    if (!joinLink) return
+
     if (setUserStatus) {
-      setUserStatus('registration');
+      setUserStatus('registration')
     }
-    navigate('/dashboard/registration');
-  };
+    // Changed to window.open for external links instead of router navigate
+    window.open(joinLink, '_blank', 'noopener,noreferrer')
+  }
 
   return (
     <>
@@ -124,7 +180,7 @@ export default function Schedule() {
           <div className="flex flex-col w-full gap-4 xl:gap-5">
             {/* Current Schedule Info */}
             <Card className="flex flex-col p-10 rounded-xl border-white border-[3px]">
-              <h1 className="text-xl font-bold sm:text-3xl  w-fit">
+              <h1 className="text-xl font-bold sm:text-3xl w-fit">
                 Join Our Launch!
               </h1>
               <p className="pt-2 xl:pt-5 text-xs sm:text-lg">
@@ -132,22 +188,40 @@ export default function Schedule() {
               </p>
               <ul className="flex flex-col gap-2 py-5">
                 <li className="flex flex-row items-center gap-3">
-                  <img src={IconSchedule} alt="Schedule" className="w-[15px] sm:w-[30px]" />
+                  <img
+                    src={IconSchedule}
+                    alt="Schedule"
+                    className="w-[15px] sm:w-[30px]"
+                  />
                   <p className="font-bold text-xs sm:text-lg">
-                    {userSchedule ? formatDate(userSchedule.startTime) : 'No schedule selected yet.'}
+                    {userSchedule
+                      ? formatDate(userSchedule.startTime)
+                      : 'No schedule selected yet.'}
                   </p>
                 </li>
                 <li className="flex flex-row items-center gap-3">
-                  <img src={IconTime} alt="Clock" className="w-[15px] sm:w-[30px]" />
+                  <img
+                    src={IconTime}
+                    alt="Clock"
+                    className="w-[15px] sm:w-[30px]"
+                  />
                   <p className="font-bold text-xs sm:text-lg">
                     {userSchedule
-                      ? formatStartEndTime(userSchedule.startTime, userSchedule.endTime)
+                      ? formatStartEndTime(
+                          userSchedule.startTime,
+                          userSchedule.endTime,
+                        )
                       : 'No schedule selected yet.'}
                   </p>
                 </li>
               </ul>
               <div className="flex justify-center xl:block">
-                <Button className="" disabled={!userSchedule} onClick={handleJoinNow}>
+                {/* ── Button styling returned to normal to prevent 2-line break ── */}
+                <Button
+                  className={!joinLink ? 'opacity-50' : ''}
+                  disabled={!userSchedule || !joinLink}
+                  onClick={handleJoinNow}
+                >
                   Join Now!
                 </Button>
               </div>
@@ -155,7 +229,7 @@ export default function Schedule() {
 
             {/* Change Schedule */}
             <Card className="flex flex-col p-10 mt-0 rounded-xl border-white border-[3px] z-[99]">
-              <h1 className="text-xl font-bold sm:text-3xl  w-fit">
+              <h1 className="text-xl font-bold sm:text-3xl w-fit">
                 Change Your Schedule?
               </h1>
               <p className="pt-2 xl:pt-5 text-xs sm:text-lg flex flex-col gap-1">
@@ -180,7 +254,10 @@ export default function Schedule() {
 
           {/* ── Right Column ── */}
           <div className="flex flex-col w-full gap-4 xl:gap-5">
-            <Calendar schedules={schedulesToUse} userScheduleId={userSchedule?.id} />
+            <Calendar
+              schedules={schedulesToUse}
+              userScheduleId={userSchedule?.id}
+            />
 
             {/* Contact Person */}
             <ContactPerson />
@@ -188,5 +265,5 @@ export default function Schedule() {
         </div>
       </div>
     </>
-  );
+  )
 }
