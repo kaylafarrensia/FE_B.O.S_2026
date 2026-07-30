@@ -63,6 +63,10 @@ export default function Users() {
   const [showWhatsAppModal, setShowWhatsAppModal] = useState(false)
   const [showViewMessageModal, setShowViewMessageModal] = useState(false)
 
+  const [selectedUserIds, setSelectedUserIds] = useState([])
+  const [bulkStatus, setBulkStatus] = useState('')
+  const [bulkLoading, setBulkLoading] = useState(false)
+
   const [whatsAppMessage, setWhatsAppMessage] = useState(
     `Halo, {nama}!
 
@@ -214,13 +218,25 @@ Panitia BNCC Launching`,
   const createMutation = useMutation({
     mutationFn: (form) => {
       const payload = { ...form }
-      // Clean up empty / 0 values for optional foreign keys before sending
-      if (!payload.regionId) delete payload.regionId
-      if (!payload.facultyId) delete payload.facultyId
-      if (!payload.majorId) delete payload.majorId
-      if (!payload.lntCourseId) delete payload.lntCourseId
-      if (!payload.scheduleId) delete payload.scheduleId
-      if (payload.isJapres === null || payload.isJapres === undefined) delete payload.isJapres
+      // Ensure required numeric IDs are numbers
+      if (payload.regionId) payload.regionId = Number(payload.regionId)
+      else delete payload.regionId
+
+      if (payload.facultyId) payload.facultyId = Number(payload.facultyId)
+      else delete payload.facultyId
+
+      if (payload.majorId) payload.majorId = Number(payload.majorId)
+      else delete payload.majorId
+
+      if (payload.lntCourseId) payload.lntCourseId = Number(payload.lntCourseId)
+      else delete payload.lntCourseId
+
+      if (payload.scheduleId) payload.scheduleId = Number(payload.scheduleId)
+      else delete payload.scheduleId
+
+      if (payload.isJapres === null || payload.isJapres === undefined || payload.isJapres === '') delete payload.isJapres
+      else payload.isJapres = Number(payload.isJapres)
+
       return createUser(payload)
     },
     onMutate: () => setCreateLoading(true),
@@ -405,6 +421,80 @@ Panitia BNCC Launching`,
     (pageIndex - 1) * itemsPerPage,
     pageIndex * itemsPerPage,
   )
+
+  const isAllSelected =
+    pagedData.length > 0 &&
+    pagedData.every((row) => selectedUserIds.includes(row.ID))
+
+  const handleSelectAll = (e) => {
+    if (e.target.checked) {
+      const pageIds = pagedData.map((row) => row.ID)
+      setSelectedUserIds((prev) => Array.from(new Set([...prev, ...pageIds])))
+    } else {
+      const pageIds = pagedData.map((row) => row.ID)
+      setSelectedUserIds((prev) => prev.filter((id) => !pageIds.includes(id)))
+    }
+  }
+
+  const handleSelectUser = (userId, checked) => {
+    if (checked) {
+      setSelectedUserIds((prev) => [...prev, userId])
+    } else {
+      setSelectedUserIds((prev) => prev.filter((id) => id !== userId))
+    }
+  }
+
+  const handleBulkStatusUpdate = async () => {
+    if (!bulkStatus || selectedUserIds.length === 0) return
+    setBulkLoading(true)
+    try {
+      await Promise.all(
+        selectedUserIds.map((id) => updateUser({ id, status: bulkStatus })),
+      )
+      setSelectedUserIds([])
+      setBulkStatus('')
+      refetch()
+      setAlert({
+        type: 'success',
+        message: 'Successfully updated status for selected users.',
+      })
+      setTimeout(() => setAlert(null), 3000)
+    } catch (err) {
+      console.error(err)
+      setError(err)
+      setShowErrorModal(true)
+    } finally {
+      setBulkLoading(false)
+    }
+  }
+
+  const tableColumns = [
+    {
+      title: (
+        <input
+          type="checkbox"
+          checked={isAllSelected}
+          onChange={handleSelectAll}
+          className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 cursor-pointer"
+        />
+      ),
+      itemAlign: 'center',
+      headerAlign: 'center',
+      width: '40px',
+      itemWrapper: (value, rowData) => {
+        const isChecked = selectedUserIds.includes(rowData?.ID)
+        return (
+          <input
+            type="checkbox"
+            checked={isChecked}
+            onChange={(e) => handleSelectUser(rowData?.ID, e.target.checked)}
+            className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 cursor-pointer"
+          />
+        )
+      },
+    },
+    ...usersColumns,
+  ]
 
   const handleRetry = () => {
     setShowErrorModal(false)
@@ -1265,7 +1355,37 @@ Panitia BNCC Launching`,
           onChange={(e) => setSearchQuery(e.target.value)}
           className="py-2 px-4 w-full md:w-[400px] border rounded"
         />
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center flex-wrap">
+          {selectedUserIds.length > 0 && (
+            <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-lg mr-2">
+              <span className="text-sm font-semibold text-blue-800">
+                {selectedUserIds.length} selected
+              </span>
+              <select
+                className="border p-1 text-sm rounded bg-white text-gray-700 font-medium"
+                value={bulkStatus}
+                onChange={(e) => setBulkStatus(e.target.value)}
+              >
+                <option value="">Select Status</option>
+                <option value="email_verified">Email Verified</option>
+                <option value="email_unverified">Email Unverified</option>
+                <option value="done_launching">Done Launching</option>
+                <option value="confirm_launching">Confirm Launching</option>
+                <option value="letter_error">Letter Error</option>
+                <option value="letter_verified">Letter Verified</option>
+                <option value="done_reregist">Done Re-Registration</option>
+                <option value="closed">Closed</option>
+              </select>
+              <button
+                type="button"
+                onClick={handleBulkStatusUpdate}
+                disabled={!bulkStatus || bulkLoading}
+                className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1.5 rounded disabled:opacity-50 font-medium cursor-pointer"
+              >
+                {bulkLoading ? 'Updating...' : 'Apply'}
+              </button>
+            </div>
+          )}
           <button
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
             onClick={() => setShowCreateModal(true)}
@@ -1295,7 +1415,7 @@ Panitia BNCC Launching`,
       <div className="flex flex-row gap-7 min-w-fit px-6">
         <div className="p-5 rounded-[8px] bg-white w-full">
           <Table
-            columns={usersColumns}
+            columns={tableColumns}
             data={pagedData}
             loading={isLoading}
             striped={true}
