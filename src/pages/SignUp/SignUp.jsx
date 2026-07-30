@@ -966,10 +966,8 @@ export default function SignUp() {
 
             <button
               onClick={() => navigate('/auth/signin')}
+              style={{ color: '#FFFFFF' }}
               className="w-full max-w-[170px] py-3 rounded-xl text-white font-bold text-sm sm:text-base shadow-md transition-all cursor-pointer hover:opacity-90 active:scale-[0.98]"
-              style={{
-                background: 'linear-gradient(135deg, #1B5198 0%, #2A6DC2 100%)',
-              }}
             >
               Sign In
             </button>

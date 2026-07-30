@@ -96,46 +96,69 @@ function Dashboard() {
     return params.get('status') || 'schedule'
   })
 
+  // Keep path sync clean without overriding custom subpaths
   useEffect(() => {
-    if (location.pathname === '/dashboard/re-registration') {
+    if (location.pathname.startsWith('/dashboard/re-registration')) {
       setUserStatus('done_launching')
-    } else if (location.pathname === '/dashboard/registration') {
+    } else if (location.pathname.startsWith('/dashboard/registration')) {
       setUserStatus('registration')
-    } else if (location.pathname === '/dashboard/confirm') {
-      setUserStatus('schedule')
     }
   }, [location.pathname])
 
   const tabs = useMemo(() => {
     let firstTab
-    // If we are explicitly on the confirm page, show SCHEDULE pointing to /dashboard/confirm
-    if (location.pathname.startsWith('/dashboard/confirm')) {
+    const path = location.pathname
+
+    // Explicitly map paths to their proper navbar label and destination
+    if (
+      path.startsWith('/dashboard/confirm') ||
+      path.startsWith('/dashboard/schedule')
+    ) {
       firstTab = {
         label: 'SCHEDULE',
         icon: IconCalendar,
         iconWhite: IconCalendarWhite,
-        path: '/dashboard/confirm',
+        path: path.startsWith('/dashboard/confirm')
+          ? '/dashboard/confirm'
+          : '/dashboard/schedule',
       }
-    } else if (userStatus === 'schedule') {
-      firstTab = {
-        label: 'SCHEDULE',
-        icon: IconCalendar,
-        iconWhite: IconCalendarWhite,
-        path: '/dashboard/schedule',
-      }
-    } else if (userStatus === 'registration') {
+    } else if (path.startsWith('/dashboard/registration')) {
       firstTab = {
         label: 'REGIST',
         icon: IconCalendar,
         iconWhite: IconCalendarWhite,
         path: '/dashboard/registration',
       }
-    } else {
+    } else if (path.startsWith('/dashboard/re-registration')) {
       firstTab = {
         label: 'RE-REGIST',
         icon: IconCalendar,
         iconWhite: IconCalendarWhite,
         path: '/dashboard/re-registration',
+      }
+    } else {
+      // Fallback based on user status
+      if (userStatus === 'registration') {
+        firstTab = {
+          label: 'REGIST',
+          icon: IconCalendar,
+          iconWhite: IconCalendarWhite,
+          path: '/dashboard/registration',
+        }
+      } else if (userStatus === 'done_launching') {
+        firstTab = {
+          label: 'RE-REGIST',
+          icon: IconCalendar,
+          iconWhite: IconCalendarWhite,
+          path: '/dashboard/re-registration',
+        }
+      } else {
+        firstTab = {
+          label: 'SCHEDULE',
+          icon: IconCalendar,
+          iconWhite: IconCalendarWhite,
+          path: '/dashboard/schedule',
+        }
       }
     }
 
