@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import Card from '../../components/ui/Card.jsx';
 import Button from '../../components/ui/Button.jsx';
@@ -27,21 +27,76 @@ const DUMMY_SCHEDULES = [
   { id: 2, title: 'Session 2', startTime: '2026-08-15T09:00:00Z', endTime: '2026-08-15T12:00:00Z' },
 ];
 
-const DUMMY_CONTACT = {
-  name: 'BNCC Official',
-  line: '211guyli',
-  wa: '6285178100246',
-};
-
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function Schedule() {
   const navigate = useNavigate();
   const [popupOpen, setPopupOpen] = useState(false);
   const [tempSchedule, setTempSchedule] = useState(null);
   const { userSchedule, setUserSchedule, setUserStatus } = useOutletContext();
+  const [availableSchedules, setAvailableSchedules] = useState([]);
 
-  const handleConfirm = () => {
+  useEffect(() => {
+    const fetchSchedules = async () => {
+      const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'https://staging-launching-api.bncc.net/api';
+        
+        let regionId = 1; // Default fallback region
+        if (token) {
+          const profileRes = await fetch(`${apiUrl}/profile`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (profileRes.ok) {
+            const profileJson = await profileRes.json();
+            const fetchedRegionId = profileJson?.data?.registration?.regionId || profileJson?.data?.registration?.region?.id;
+            if (fetchedRegionId) {
+              regionId = fetchedRegionId;
+            }
+          }
+        }
+
+        const schedulesRes = await fetch(`${apiUrl}/lookup/schedules?regionId=${regionId}`);
+        if (schedulesRes.ok) {
+          const schedulesJson = await schedulesRes.json();
+          const list = schedulesJson?.data || schedulesJson;
+          if (Array.isArray(list) && list.length > 0) {
+            setAvailableSchedules(list);
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to fetch schedules, using fallback:', err);
+      }
+    };
+    fetchSchedules();
+  }, []);
+
+  const schedulesToUse = availableSchedules.length > 0 ? availableSchedules : DUMMY_SCHEDULES;
+
+  const handleConfirm = async () => {
     if (!tempSchedule) return;
+    
+    const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+    if (token) {
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'https://staging-launching-api.bncc.net/api';
+        const res = await fetch(`${apiUrl}/user/schedule`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            scheduleId: Number(tempSchedule.id),
+          }),
+        });
+        if (!res.ok) {
+          console.warn('Failed to update schedule in backend');
+        }
+      } catch (err) {
+        console.warn('Error updating schedule in backend:', err);
+      }
+    }
+    
     setUserSchedule(tempSchedule);
     setTempSchedule(null);
     setPopupOpen(true);
@@ -108,7 +163,7 @@ export default function Schedule() {
                 <span>No worries! Pick a new schedule that suits you.</span>
               </p>
               <ScheduleDropdown
-                schedules={DUMMY_SCHEDULES}
+                schedules={schedulesToUse}
                 onSelect={setTempSchedule}
               />
               <div className="flex justify-start xl:block">
@@ -125,7 +180,7 @@ export default function Schedule() {
 
           {/* ── Right Column ── */}
           <div className="flex flex-col w-full gap-4 xl:gap-5">
-            <Calendar schedules={DUMMY_SCHEDULES} userScheduleId={userSchedule?.id} />
+            <Calendar schedules={schedulesToUse} userScheduleId={userSchedule?.id} />
 
             {/* Contact Person */}
             <ContactPerson />

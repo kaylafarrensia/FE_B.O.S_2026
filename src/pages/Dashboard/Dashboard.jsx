@@ -28,6 +28,28 @@ function Dashboard() {
     }
   }, [navigate]);
 
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+      if (!token) return;
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'https://staging-launching-api.bncc.net/api';
+        const res = await fetch(`${apiUrl}/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const json = await res.json();
+          if (json?.data?.registration?.schedule) {
+            setUserSchedule(json.data.registration.schedule);
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to load profile schedule:', err);
+      }
+    };
+    fetchProfile();
+  }, []);
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [userSchedule, setUserSchedule] = useState({
     id: 2,

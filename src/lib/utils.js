@@ -27,49 +27,49 @@ export const formatDateTime = (dateTimeString) => {
 export const formatScheduleDisplay = (schedule) => {
   if (!schedule || !schedule.startTime) return '';
   const date = new Date(schedule.startTime);
-  const hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  const hari = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const bulan = [
-    'Januari',
-    'Februari',
-    'Maret',
+    'January',
+    'February',
+    'March',
     'April',
-    'Mei',
-    'Juni',
-    'Juli',
-    'Agustus',
+    'May',
+    'June',
+    'July',
+    'August',
     'September',
-    'Oktober',
+    'October',
     'November',
-    'Desember',
+    'December',
   ];
-  const hariTanggal = `${hari[date.getDay()]}, ${date.getDate()} ${bulan[date.getMonth()]} ${date.getFullYear()}`;
+  const hariTanggal = `${hari[date.getDay()]}, ${bulan[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
   const pad = (n) => n.toString().padStart(2, '0');
   const s = new Date(schedule.startTime);
   const e = new Date(schedule.endTime);
   const jam = `${pad(s.getHours())}.${pad(s.getMinutes())} - ${pad(e.getHours())}.${pad(e.getMinutes())} WIB`;
-  return `${hariTanggal} ${jam}`;
+  return `${hariTanggal} (${jam})`;
 };
 
-// Format: Jumat, 16 September 2024
+// Format: Saturday, August 15, 2026
 export function formatDate(dateString) {
   if (!dateString) return '';
   const date = new Date(dateString);
-  const hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  const hari = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const bulan = [
-    'Januari',
-    'Februari',
-    'Maret',
+    'January',
+    'February',
+    'March',
     'April',
-    'Mei',
-    'Juni',
-    'Juli',
-    'Agustus',
+    'May',
+    'June',
+    'July',
+    'August',
     'September',
-    'Oktober',
+    'October',
     'November',
-    'Desember',
+    'December',
   ];
-  return `${hari[date.getDay()]}, ${date.getDate()} ${bulan[date.getMonth()]} ${date.getFullYear()}`;
+  return `${hari[date.getDay()]}, ${bulan[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
 }
 
 // Format: 19.00 - 21.00 WIB
