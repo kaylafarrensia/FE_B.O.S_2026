@@ -1,6 +1,7 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import CustomCursor from '../../components/ui/CustomCursor.jsx';
 import IconCalendar from '../../assets/icons/IconCalendar.svg';
 import IconCalendarWhite from '../../assets/icons/IconCalendarWhite.svg';
 import IconTrophy from '../../assets/icons/IconTrophy.svg';
@@ -13,7 +14,6 @@ import BNCCBlue from '../../assets/images/BnccBlue.png';
 import Card from '../../components/ui/Card.jsx';
 import BubbleBackground from '../../components/ui/BubbleBackground.jsx';
 import PerspectiveGrid from '../../components/ui/PerspectiveGrid.jsx';
-import CustomCursor from '../../components/ui/CustomCursor.jsx';
 
 // Dummy user status - bisa diganti saat backend tersedia
 const DUMMY_STATUS = 'schedule'; // 'schedule' | 'payment' | 'registration'
@@ -28,19 +28,63 @@ function Dashboard() {
     startTime: '2026-08-15T09:00:00Z',
     endTime: '2026-08-15T12:00:00Z',
   });
+  const [registrationFiles, setRegistrationFiles] = useState({
+    binusianCard: null,
+    memberLetter: null,
+  });
+  const [reRegistrationInputs, setReRegistrationInputs] = useState({
+    linkedin: '',
+    github: '',
+    course: '',
+  });
+  const [registrationOutcome, setRegistrationOutcome] = useState('initial');
+  const [reRegistrationSubmitted, setReRegistrationSubmitted] = useState(false);
   const pillWidth = 180;
   const [pillStyle, setPillStyle] = useState({ left: 0 });
   const tabRefs = useRef([]);
   const cardRef = useRef(null);
 
+  const [userStatus, setUserStatus] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('status') || 'schedule';
+  });
+
+  // Promote userStatus based on visited path to keep state consistent
+  useEffect(() => {
+    if (location.pathname === '/dashboard/re-registration') {
+      setUserStatus('done_launching');
+    } else if (location.pathname === '/dashboard/registration') {
+      setUserStatus('registration');
+    }
+  }, [location.pathname]);
+
   const tabs = useMemo(() => {
-    return [
-      {
+    let firstTab;
+    if (userStatus === 'schedule') {
+      firstTab = {
         label: 'SCHEDULE',
         icon: IconCalendar,
         iconWhite: IconCalendarWhite,
         path: '/dashboard/schedule',
-      },
+      };
+    } else if (userStatus === 'registration') {
+      firstTab = {
+        label: 'REGIST',
+        icon: IconCalendar,
+        iconWhite: IconCalendarWhite,
+        path: '/dashboard/registration',
+      };
+    } else {
+      firstTab = {
+        label: 'RE-REGIST',
+        icon: IconCalendar,
+        iconWhite: IconCalendarWhite,
+        path: '/dashboard/re-registration',
+      };
+    }
+
+    return [
+      firstTab,
       {
         label: 'JAPRES',
         icon: IconTrophy,
@@ -54,7 +98,7 @@ function Dashboard() {
         path: '/dashboard/profile',
       },
     ];
-  }, []);
+  }, [userStatus]);
 
   const updatePillPosition = (path) => {
     const activeIndex = tabs.findIndex((t) => t.path === path);
@@ -68,9 +112,15 @@ function Dashboard() {
   useEffect(() => {
     const normalizedPath = location.pathname.replace(/\/+$/, '');
     if (normalizedPath === '/dashboard') {
-      navigate('/dashboard/schedule', { replace: true });
+      let defaultPath = '/dashboard/schedule';
+      if (userStatus === 'registration') {
+        defaultPath = '/dashboard/registration';
+      } else if (userStatus === 'done_launching') {
+        defaultPath = '/dashboard/re-registration';
+      }
+      navigate(defaultPath, { replace: true });
     }
-  }, [location.pathname, navigate]);
+  }, [location.pathname, navigate, userStatus]);
 
   useEffect(() => {
     setIsSidebarOpen(false);
@@ -81,13 +131,13 @@ function Dashboard() {
   }, [location.pathname, tabs]);
 
   return (
-    <div className="dashboard-page relative min-h-screen overflow-hidden">
+    <div className="dashboard-page relative z-0 min-h-screen flex flex-col overflow-hidden">
       <CustomCursor />
       <PerspectiveGrid className="opacity-85" />
       <BubbleBackground />
 
       {/* Mobile top bar */}
-      <div className="xl:hidden fixed top-0 left-0 right-0 z-[1000] flex flex-row justify-between items-center px-8 py-3 border-white border-2 backdrop-blur-md bg-white/30">
+      <div className="xl:hidden fixed top-0 left-0 w-full z-50 flex flex-row justify-between items-center px-8 py-4 bg-white/5 backdrop-blur-lg border-b border-white/10">
         <img
           src={BNCCBlue}
           alt="BNCC Logo"
@@ -154,7 +204,7 @@ function Dashboard() {
       </motion.div>
 
       {/* Desktop Nav */}
-      <ul className="hidden xl:flex fixed top-0 left-0 right-0 z-[1000] flex-row justify-between items-center px-[10vw] pt-4 pb-4 backdrop-blur-md bg-white/30">
+      <ul className="hidden xl:flex fixed top-0 left-0 w-full z-50 flex flex-row justify-between items-center px-[10vw] py-4 bg-white/5 backdrop-blur-lg border-b border-white/10">
         <img
           src={BNCCBlue}
           alt="BNCC Logo"
@@ -199,8 +249,21 @@ function Dashboard() {
         </div>
       </ul>
 
-      <div className="pt-[60px] xl:pt-[90px]">
-        <Outlet context={{ userSchedule, setUserSchedule }} />
+      <div className="flex-grow flex flex-col pt-[72px] xl:pt-28 min-h-0 overflow-y-auto">
+        <Outlet context={{
+          userSchedule,
+          setUserSchedule,
+          userStatus,
+          setUserStatus,
+          registrationFiles,
+          setRegistrationFiles,
+          reRegistrationInputs,
+          setReRegistrationInputs,
+          registrationOutcome,
+          setRegistrationOutcome,
+          reRegistrationSubmitted,
+          setReRegistrationSubmitted
+        }} />
       </div>
     </div>
   );

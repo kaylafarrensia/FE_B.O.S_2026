@@ -62,7 +62,7 @@ function Profile() {
 
   return (
     <div className="relative">
-      <div className="flex justify-center w-full py-5 xl:py-15 px-6 xl:px-[10vw]">
+      <div className="flex justify-center w-full pt-3 pb-8 xl:py-15 px-6 xl:px-[10vw]">
         <div className="w-full">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 xl:gap-5 items-start">
             {/* Left Column */}

@@ -1,8 +1,10 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import ComingSoon from './pages/ComingSoon/ComingSoon.jsx'
 import Home from './pages/Home/Home.jsx'
+import ReRegistration from './pages/ReRegistration/ReRegistration.jsx'
 import Dashboard from './pages/Dashboard/Dashboard.jsx'
 import Schedule from './pages/Dashboard/Schedule.jsx'
+import Registration from './pages/Dashboard/Registration.jsx'
 import Japres from './pages/Dashboard/Japres.jsx'
 import Profile from './pages/Dashboard/Profile.jsx'
 import SignIn from './pages/SignIn/SignIn.jsx'
@@ -25,8 +27,12 @@ function App() {
       {/* User / Landing routes */}
       <Route path="/comingsoon" element={<ComingSoon />} />
       <Route path="/" element={<Home />} />
+      <Route path="/re-registration" element={<Navigate to="/dashboard/re-registration" replace />} />
+      <Route path="/registration" element={<Navigate to="/dashboard/registration" replace />} />
       <Route path="/dashboard" element={<Dashboard />}>
         <Route path="schedule" element={<Schedule />} />
+        <Route path="registration" element={<Registration />} />
+        <Route path="re-registration" element={<ReRegistration />} />
         <Route path="japres" element={<Japres />} />
         <Route path="profile" element={<Profile />} />
       </Route>

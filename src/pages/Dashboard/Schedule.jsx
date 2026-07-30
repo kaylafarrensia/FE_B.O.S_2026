@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useNavigate } from 'react-router-dom';
 import Card from '../../components/ui/Card.jsx';
 import Button from '../../components/ui/Button.jsx';
 import IconSchedule from '../../assets/icons/IconSchedule.svg';
@@ -35,9 +35,10 @@ const DUMMY_CONTACT = {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function Schedule() {
+  const navigate = useNavigate();
   const [popupOpen, setPopupOpen] = useState(false);
   const [tempSchedule, setTempSchedule] = useState(null);
-  const { userSchedule, setUserSchedule } = useOutletContext();
+  const { userSchedule, setUserSchedule, setUserStatus } = useOutletContext();
 
   const handleConfirm = () => {
     if (!tempSchedule) return;
@@ -51,12 +52,19 @@ export default function Schedule() {
     window.open(`https://wa.me/62${formatted}`, '_blank', 'noopener,noreferrer');
   };
 
+  const handleJoinNow = () => {
+    if (setUserStatus) {
+      setUserStatus('registration');
+    }
+    navigate('/dashboard/registration');
+  };
+
   return (
     <>
       {popupOpen && <SavedPopup setIsOpen={setPopupOpen} />}
 
       <div className="relative">
-        <div className="flex flex-col xl:flex-row justify-center w-full py-5 xl:py-15 px-6 xl:px-[10vw] gap-4 xl:gap-5">
+        <div className="flex flex-col xl:flex-row justify-center w-full pt-3 pb-8 xl:py-15 px-6 xl:px-[10vw] gap-4 xl:gap-5">
           {/* ── Left Column ── */}
           <div className="flex flex-col w-full gap-4 xl:gap-5">
             {/* Current Schedule Info */}
@@ -84,7 +92,7 @@ export default function Schedule() {
                 </li>
               </ul>
               <div className="flex justify-center xl:block">
-                <Button className="" disabled={!userSchedule}>
+                <Button className="" disabled={!userSchedule} onClick={handleJoinNow}>
                   Join Now!
                 </Button>
               </div>

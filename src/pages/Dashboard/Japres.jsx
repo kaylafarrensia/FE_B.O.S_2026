@@ -41,7 +41,7 @@ export default function Japres() {
 
   return (
     <div className="relative z-0">
-      <main className="relative px-6 py-16 sm:px-12 sm:py-24 xl:px-[10vw] xl:py-32 overflow-x-clip">
+      <main className="relative px-6 pt-3 pb-16 sm:px-12 sm:py-24 xl:px-[10vw] xl:py-32 overflow-x-clip">
         {/* ── Page Header ── */}
         <header className="flex flex-col items-center justify-center gap-6 sm:gap-9 xl:gap-10 mb-14 sm:mb-[88px] xl:mb-24 text-center">
           <motion.div

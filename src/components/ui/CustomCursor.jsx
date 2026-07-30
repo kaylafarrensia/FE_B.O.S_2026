@@ -39,7 +39,7 @@ export default function CustomCursor() {
 
     const overHandler = (e) => {
       const interactive = e.target.closest(
-        'a, button, [role="button"], input, textarea, select, [data-cursor-hover]',
+        'a, button, [role="button"], input, textarea, select, [data-cursor-hover], .cursor-pointer',
       )
       setIsHovering(Boolean(interactive))
     }
