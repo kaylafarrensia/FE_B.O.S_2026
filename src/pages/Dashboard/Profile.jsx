@@ -29,7 +29,6 @@ const DUMMY_USER = {
   },
 }
 
-
 function formatTime(startIso, endIso) {
   if (!startIso) return '-'
   const s = new Date(startIso)
@@ -45,16 +44,17 @@ function formatTime(startIso, endIso) {
 }
 
 function renderEmail(email) {
-  if (!email) return '';
-  const parts = email.split('@');
+  if (!email) return ''
+  const parts = email.split('@')
   if (parts.length === 2) {
     return (
       <>
-        {parts[0]}@<wbr />{parts[1]}
+        {parts[0]}@<wbr />
+        {parts[1]}
       </>
-    );
+    )
   }
-  return email;
+  return email
 }
 
 function Profile() {
@@ -64,12 +64,14 @@ function Profile() {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const token = localStorage.getItem('token') || localStorage.getItem('accessToken')
+      const token =
+        localStorage.getItem('token') || localStorage.getItem('accessToken')
       if (!token) return
 
       setLoading(true)
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
+        const apiUrl =
+          import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
         const res = await fetch(`${apiUrl}/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         })
@@ -82,22 +84,43 @@ function Profile() {
               registration: {
                 ...DUMMY_USER.registration,
                 ...json.data.registration,
-                whatsappNumber: json.data.registration?.whatsappNumber || DUMMY_USER.registration.whatsappNumber,
-                lineId: json.data.registration?.lineId || DUMMY_USER.registration.lineId,
+                whatsappNumber:
+                  json.data.registration?.whatsappNumber ||
+                  DUMMY_USER.registration.whatsappNumber,
+                lineId:
+                  json.data.registration?.lineId ||
+                  DUMMY_USER.registration.lineId,
                 nim: json.data.registration?.nim || DUMMY_USER.registration.nim,
-                bnccId: json.data.registration?.bnccId || DUMMY_USER.registration.bnccId,
-                lntCourse: json.data.registration?.lntCourse || DUMMY_USER.registration.lntCourse,
-                faculty: json.data.registration?.faculty || DUMMY_USER.registration.faculty,
-                major: json.data.registration?.major || DUMMY_USER.registration.major,
-                region: json.data.registration?.region || DUMMY_USER.registration.region,
-                linkedinUrl: json.data.registration?.linkedinUrl || DUMMY_USER.registration.linkedinUrl,
-                githubUrl: json.data.registration?.githubUrl || DUMMY_USER.registration.githubUrl,
-              }
+                bnccId:
+                  json.data.registration?.bnccId ||
+                  DUMMY_USER.registration.bnccId,
+                lntCourse:
+                  json.data.registration?.lntCourse ||
+                  DUMMY_USER.registration.lntCourse,
+                faculty:
+                  json.data.registration?.faculty ||
+                  DUMMY_USER.registration.faculty,
+                major:
+                  json.data.registration?.major ||
+                  DUMMY_USER.registration.major,
+                region:
+                  json.data.registration?.region ||
+                  DUMMY_USER.registration.region,
+                linkedinUrl:
+                  json.data.registration?.linkedinUrl ||
+                  DUMMY_USER.registration.linkedinUrl,
+                githubUrl:
+                  json.data.registration?.githubUrl ||
+                  DUMMY_USER.registration.githubUrl,
+              },
             })
           }
         }
       } catch (err) {
-        console.warn('Failed to load profile from backend, using mock data:', err)
+        console.warn(
+          'Failed to load profile from backend, using mock data:',
+          err,
+        )
       } finally {
         setLoading(false)
       }
@@ -258,7 +281,7 @@ function Profile() {
                           window.open(
                             user.registration.suratMember,
                             '_blank',
-                            'noopener,noreferrer'
+                            'noopener,noreferrer',
                           )
                         }
                       >
@@ -298,7 +321,7 @@ function Profile() {
                           window.open(
                             user.registration.binusianCard,
                             '_blank',
-                            'noopener,noreferrer'
+                            'noopener,noreferrer',
                           )
                         }
                       >

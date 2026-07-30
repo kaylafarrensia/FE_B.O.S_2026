@@ -1,20 +1,21 @@
-import { useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import IconSchedule from '../../../assets/icons/IconSchedule.svg';
-import { formatDate, formatStartEndTime } from '../../../utils/index.js';
+import { useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import IconSchedule from '../../../assets/icons/IconSchedule.svg'
+import { formatDate, formatStartEndTime } from '../../../utils/index.js'
 
-const DATE_LABEL_CLASS = 'font-semibold text-xs sm:text-base xl:text-lg text-[#251369]';
-const TIME_LABEL_CLASS = 'text-xs sm:text-base xl:text-lg text-gray-500';
+const DATE_LABEL_CLASS =
+  'font-semibold text-xs sm:text-base xl:text-lg text-[#251369]'
+const TIME_LABEL_CLASS = 'text-xs sm:text-base xl:text-lg text-gray-500'
 
 export default function ScheduleDropdown({ schedules, onSelect }) {
-  const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState(null);
+  const [open, setOpen] = useState(false)
+  const [selected, setSelected] = useState(null)
 
   const handleSelect = (schedule) => {
-    setSelected(schedule);
-    onSelect(schedule);
-    setOpen(false);
-  };
+    setSelected(schedule)
+    onSelect(schedule)
+    setOpen(false)
+  }
 
   return (
     <div className="relative w-full text-left py-5">
@@ -28,7 +29,9 @@ export default function ScheduleDropdown({ schedules, onSelect }) {
           <img src={IconSchedule} alt="" className="w-5 mr-3" />
           {selected ? (
             <div className="flex-1 flex items-center justify-between text-left">
-              <span className={DATE_LABEL_CLASS}>{formatDate(selected.startTime)}</span>
+              <span className={DATE_LABEL_CLASS}>
+                {formatDate(selected.startTime)}
+              </span>
               <span className={`${TIME_LABEL_CLASS} mr-2`}>
                 {formatStartEndTime(selected.startTime, selected.endTime)}
               </span>
@@ -44,7 +47,12 @@ export default function ScheduleDropdown({ schedules, onSelect }) {
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
           </svg>
         </button>
 
@@ -69,7 +77,7 @@ export default function ScheduleDropdown({ schedules, onSelect }) {
                     {formatDate(schedule.startTime)}
                   </span>
                   <span className={TIME_LABEL_CLASS}>
-                    {formatStartEndTime(schedule.startTime, schedule.endTime)}
+                    {formatStartEndTime(schedfule.startTime, schedule.endTime)}
                   </span>
                 </div>
               ))}
@@ -78,5 +86,5 @@ export default function ScheduleDropdown({ schedules, onSelect }) {
         </AnimatePresence>
       </div>
     </div>
-  );
+  )
 }
