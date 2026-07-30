@@ -966,20 +966,12 @@ export default function SignUp() {
 
             <button
               onClick={() => navigate('/auth/signin')}
-              className="w-full max-w-[170px] py-3 rounded-xl font-bold text-sm sm:text-base shadow-md transition-all cursor-pointer hover:opacity-90 active:scale-[0.98]"
+              className="w-full max-w-[170px] py-3 rounded-xl font-bold text-sm sm:text-base text-white shadow-md transition-all cursor-pointer hover:opacity-90 active:scale-[0.98]"
               style={{
                 background: 'linear-gradient(135deg, #1B5198 0%, #2A6DC2 100%)',
-                color: '#FFFFFF',
               }}
             >
-              <span
-                style={{
-                  color: '#FFFFFF',
-                  cssText: 'color: #FFFFFF !important',
-                }}
-              >
-                Sign In
-              </span>
+              Sign In
             </button>
           </div>
         </div>
