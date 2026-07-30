@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import IcBnccWhitebg from '../../assets/icons/ic-bncc-whitebg.svg'
 import IconClose from '../../assets/icons/IconClose.svg'
 import {
@@ -193,6 +194,7 @@ function HamburgerButton({ isOpen, onClick }) {
 }
 
 function MobileMenu({ isOpen, links, onClose, headerHeight, activeSection }) {
+  const navigate = useNavigate()
   const handleClick = (event, href) => {
     event.preventDefault()
     onClose()
@@ -249,7 +251,7 @@ function MobileMenu({ isOpen, links, onClose, headerHeight, activeSection }) {
                 className="flex items-center justify-end p-4 rounded-lg transition-all duration-300 bg-gradient-to-r from-[#0C4076] to-[#2474C0] text-white font-bold tracking-[2.5px] uppercase text-sm sm:text-lg mt-4 cursor-pointer hover:from-[#062547] hover:to-[#164C82] shadow-md shadow-[#0C4076]/30"
                 onClick={() => {
                   onClose()
-                  window.location.hash = '#signin'
+                  navigate('/signin')
                 }}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -265,6 +267,7 @@ function MobileMenu({ isOpen, links, onClose, headerHeight, activeSection }) {
 }
 
 export default function Navbar() {
+  const navigate = useNavigate()
   const [isOpen, setIsOpen] = useState(false)
   const activeSection = useActiveSection(NAV_LINKS)
   const isScrolled = useScrolled()
@@ -325,11 +328,11 @@ export default function Navbar() {
             variants={fadeInUp}
             className="flex items-center justify-end gap-8 lg:gap-16"
           >
-            <motion.a
+            <motion.button
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.96 }}
-              href="#signin"
-              className="relative hidden h-[42px] w-[115px] items-center justify-center overflow-hidden rounded-sm bg-[linear-gradient(135deg,#0C4076_0%,#4489D4_100%)] font-semibold text-white transition-shadow duration-300 hover:shadow-[0_6px_20px_rgba(12,64,118,0.35)] lg:flex"
+              onClick={() => navigate('/signin')}
+              className="relative hidden h-[42px] w-[115px] items-center justify-center overflow-hidden rounded-sm bg-[linear-gradient(135deg,#0C4076_0%,#4489D4_100%)] font-semibold text-white transition-shadow duration-300 hover:shadow-[0_6px_20px_rgba(12,64,118,0.35)] lg:flex cursor-pointer border-none"
             >
               <motion.span
                 aria-hidden
@@ -338,7 +341,7 @@ export default function Navbar() {
                 transition={{ duration: 0.6, ease: 'easeInOut' }}
               />
               <span className="relative">Sign In</span>
-            </motion.a>
+            </motion.button>
 
             <HamburgerButton isOpen={isOpen} onClick={toggleMenu} />
           </motion.div>

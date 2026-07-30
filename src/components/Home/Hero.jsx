@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 import Badge from '../ComingSoon/Badge.jsx'
 import PatternTop from '../common/effects/PatternTop.jsx'
 import PatternBottom from '../common/effects/PatternBottom.jsx'
@@ -74,6 +75,7 @@ function CornerHandle({ className, active = false }) {
 }
 
 export default function Hero() {
+  const navigate = useNavigate()
   const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
@@ -174,14 +176,14 @@ export default function Hero() {
             <p className="text-secondary font-regular text-sm sm:text-lg">
               Interested in joining us?
             </p>
-            <motion.a
+            <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              href="#signup"
-              className="inline-flex items-center justify-center rounded-md bg-[linear-gradient(135deg,#0C4076_0%,#4489D4_100%)] text-white font-semibold text-sm transition-all duration-300 hover:brightness-105 px-10 py-3 sm:px-14 sm:py-3.5"
+              onClick={() => navigate('/signup')}
+              className="inline-flex items-center justify-center rounded-md bg-[linear-gradient(135deg,#0C4076_0%,#4489D4_100%)] text-white font-semibold text-sm transition-all duration-300 hover:brightness-105 px-10 py-3 sm:px-14 sm:py-3.5 cursor-pointer border-none"
             >
               SIGN UP NOW!
-            </motion.a>
+            </motion.button>
 
             <motion.div
               animate={floatIdle(1)}
