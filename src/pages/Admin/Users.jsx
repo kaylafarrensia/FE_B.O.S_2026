@@ -228,14 +228,21 @@ Panitia BNCC Launching`,
         majorId: Number(form.majorId),
         lntCourseId: Number(form.lntCourseId),
         scheduleId: Number(form.scheduleId),
+        binusEmail: `${String(form.nim || '').trim()}@binus.ac.id`,
+        confirmPassword: String(form.password || ''),
+        heardFrom: null,
       }
 
+      // Map -1 (Pending) to 0 or handle cleanly for the backend validation schema
       if (
         form.isJapres !== null &&
         form.isJapres !== undefined &&
         form.isJapres !== ''
       ) {
-        payload.isJapres = Number(form.isJapres)
+        const val = Number(form.isJapres)
+        payload.isJapres = val === -1 ? 0 : val
+      } else {
+        payload.isJapres = 0
       }
 
       return createUser(payload)
