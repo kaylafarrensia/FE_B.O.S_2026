@@ -185,9 +185,13 @@ Panitia BNCC Launching`,
     },
     onError: (err) => {
       setEditLoading(false)
+      // Safely extract the exact backend message (whether it's a string or an array of messages)
+      const msg = err?.response?.data?.message
+      const backendError = Array.isArray(msg) ? msg.join(', ') : msg
       setAlert({
         type: 'error',
         message:
+          backendError ||
           err?.response?.data?.error ||
           err?.message ||
           'An unknown error occurred.',
@@ -220,9 +224,12 @@ Panitia BNCC Launching`,
     },
     onError: (err) => {
       setCreateLoading(false)
+      const msg = err?.response?.data?.message
+      const backendError = Array.isArray(msg) ? msg.join(', ') : msg
       setAlert({
         type: 'error',
         message:
+          backendError ||
           err?.response?.data?.error ||
           err?.message ||
           'An unknown error occurred.',
@@ -439,9 +446,16 @@ Panitia BNCC Launching`,
           <div className="bg-white p-8 rounded-lg shadow-xl text-center">
             <h3 className="text-xl font-bold mb-4">Error</h3>
             <p className="text-gray-600 mb-6">
-              {error?.response?.data?.error ||
-                error?.message ||
-                'An unknown error occurred.'}
+              {(() => {
+                const msg = error?.response?.data?.message
+                const backendError = Array.isArray(msg) ? msg.join(', ') : msg
+                return (
+                  backendError ||
+                  error?.response?.data?.error ||
+                  error?.message ||
+                  'An unknown error occurred.'
+                )
+              })()}
             </p>
             <div className="flex justify-center space-x-4">
               <button
