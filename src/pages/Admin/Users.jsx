@@ -180,12 +180,21 @@ Panitia BNCC Launching`,
   const editMutation = useMutation({
     mutationFn: (form) => {
       const payload = { ...form }
-      // Clean up empty / 0 values for optional foreign keys before sending
-      if (!payload.regionId) delete payload.regionId
-      if (!payload.facultyId) delete payload.facultyId
-      if (!payload.majorId) delete payload.majorId
-      if (!payload.lntCourseId) delete payload.lntCourseId
-      if (!payload.scheduleId) delete payload.scheduleId
+      if (!payload.regionId || Number(payload.regionId) <= 0) delete payload.regionId
+      else payload.regionId = Number(payload.regionId)
+
+      if (!payload.facultyId || Number(payload.facultyId) <= 0) delete payload.facultyId
+      else payload.facultyId = Number(payload.facultyId)
+
+      if (!payload.majorId || Number(payload.majorId) <= 0) delete payload.majorId
+      else payload.majorId = Number(payload.majorId)
+
+      if (!payload.lntCourseId || Number(payload.lntCourseId) <= 0) delete payload.lntCourseId
+      else payload.lntCourseId = Number(payload.lntCourseId)
+
+      if (!payload.scheduleId || Number(payload.scheduleId) <= 0) delete payload.scheduleId
+      else payload.scheduleId = Number(payload.scheduleId)
+
       return updateUser(payload)
     },
     onMutate: () => setEditLoading(true),
@@ -220,12 +229,13 @@ Panitia BNCC Launching`,
         nim: String(form.nim || '').trim(),
         lineId: String(form.lineId || '').trim(),
         whatsappNumber: String(form.whatsappNumber || '').trim(),
-        regionId: Number(form.regionId || 0),
-        facultyId: Number(form.facultyId || 0),
-        majorId: Number(form.majorId || 0),
-        lntCourseId: Number(form.lntCourseId || 0),
-        scheduleId: Number(form.scheduleId || 0),
       }
+
+      if (form.regionId && Number(form.regionId) > 0) payload.regionId = Number(form.regionId)
+      if (form.facultyId && Number(form.facultyId) > 0) payload.facultyId = Number(form.facultyId)
+      if (form.majorId && Number(form.majorId) > 0) payload.majorId = Number(form.majorId)
+      if (form.lntCourseId && Number(form.lntCourseId) > 0) payload.lntCourseId = Number(form.lntCourseId)
+      if (form.scheduleId && Number(form.scheduleId) > 0) payload.scheduleId = Number(form.scheduleId)
 
       if (form.isJapres !== null && form.isJapres !== undefined && form.isJapres !== '') {
         payload.isJapres = Number(form.isJapres)
