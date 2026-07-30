@@ -43,8 +43,7 @@ export default function ScheduleDropdown({ schedules, onSelect }) {
             </div>
           ) : (
             <span 
-              className="flex-1 text-left text-xs sm:text-sm md:text-base text-gray-400 truncate"
-              style={{ opacity: 0.6 }}
+              className="flex-1 text-left text-xs sm:text-sm md:text-base text-[#718096] truncate"
             >
               Select new schedule
             </span>

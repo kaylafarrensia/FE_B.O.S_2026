@@ -76,7 +76,7 @@ export default function DocumentSubmission({
               <input
                 value={japresUrl}
                 onChange={(e) => setJapresUrl(e.target.value)}
-                className="w-full px-6 py-3 text-[11px] sm:text-sm rounded-lg border border-white bg-white/50 focus:outline-none focus:ring-2 focus:ring-[#2474C0]"
+                className="w-full pl-6 pr-10 sm:pr-12 py-3 text-[11px] sm:text-sm rounded-lg border border-white bg-white/50 focus:outline-none focus:ring-2 focus:ring-[#2474C0]"
                 placeholder="e.g. https://drive.google.com/..."
               />
               <img
