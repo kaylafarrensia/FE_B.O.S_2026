@@ -29,34 +29,37 @@ export default function Users() {
   const [viewUser, setViewUser] = useState(null)
   const [viewLoading, setViewLoading] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
+
+  // Use '' instead of 0 so selects work nicely
   const [editForm, setEditForm] = useState({
     id: 0,
     name: '',
     email: '',
     nim: '',
-    regionId: 0,
+    regionId: '',
     lineId: '',
     whatsappNumber: '',
-    facultyId: 0,
-    majorId: 0,
-    lntCourseId: 0,
-    scheduleId: 0,
+    facultyId: '',
+    majorId: '',
+    lntCourseId: '',
+    scheduleId: '',
     status: '',
   })
   const [editLoading, setEditLoading] = useState(false)
   const [showCreateModal, setShowCreateModal] = useState(false)
+
   const [createForm, setCreateForm] = useState({
     fullName: '',
     email: '',
     password: '',
     nim: '',
-    regionId: 0,
+    regionId: '',
     lineId: '',
     whatsappNumber: '',
-    facultyId: 0,
-    majorId: 0,
-    lntCourseId: 0,
-    scheduleId: 0,
+    facultyId: '',
+    majorId: '',
+    lntCourseId: '',
+    scheduleId: '',
     isJapres: null,
   })
   const [createLoading, setCreateLoading] = useState(false)
@@ -76,7 +79,7 @@ Panitia BNCC Launching`,
   const [tempWhatsAppMessage, setTempWhatsAppMessage] =
     useState(whatsAppMessage)
 
-  // Separate lookup queries for edit form and create form
+  // Only pass valid numeric IDs to lookup queries
   const {
     regionQuery,
     facultyQuery,
@@ -84,8 +87,8 @@ Panitia BNCC Launching`,
     lntCourseQuery,
     scheduleQuery,
   } = useLookupQuery(
-    editForm.regionId || undefined,
-    editForm.facultyId || undefined,
+    Number(editForm.regionId) > 0 ? Number(editForm.regionId) : undefined,
+    Number(editForm.facultyId) > 0 ? Number(editForm.facultyId) : undefined,
   )
 
   const {
@@ -95,8 +98,8 @@ Panitia BNCC Launching`,
     lntCourseQuery: createLntCourseQuery,
     scheduleQuery: createScheduleQuery,
   } = useLookupQuery(
-    createForm.regionId || undefined,
-    createForm.facultyId || undefined,
+    Number(createForm.regionId) > 0 ? Number(createForm.regionId) : undefined,
+    Number(createForm.facultyId) > 0 ? Number(createForm.facultyId) : undefined,
   )
 
   const abortRef = useRef(null)
@@ -248,13 +251,13 @@ Panitia BNCC Launching`,
         email: '',
         password: '',
         nim: '',
-        regionId: 0,
+        regionId: '',
         lineId: '',
         whatsappNumber: '',
-        facultyId: 0,
-        majorId: 0,
-        lntCourseId: 0,
-        scheduleId: 0,
+        facultyId: '',
+        majorId: '',
+        lntCourseId: '',
+        scheduleId: '',
         isJapres: null,
       })
     },
@@ -350,11 +353,11 @@ Panitia BNCC Launching`,
                   nim: reg.nim,
                   lineId: reg.lineId,
                   whatsappNumber: reg.whatsappNumber,
-                  regionId: reg.region?.id ?? 0,
-                  facultyId: reg.faculty?.id ?? 0,
-                  majorId: reg.major?.id ?? 0,
-                  lntCourseId: reg.lntCourse?.id ?? 0,
-                  scheduleId: reg.schedule?.id ?? 0,
+                  regionId: reg.region?.id ?? '',
+                  facultyId: reg.faculty?.id ?? '',
+                  majorId: reg.major?.id ?? '',
+                  lntCourseId: reg.lntCourse?.id ?? '',
+                  scheduleId: reg.schedule?.id ?? '',
                   status: user.status ?? '',
                 })
                 setShowEditModal(true)
@@ -785,15 +788,15 @@ Panitia BNCC Launching`,
               />
               <select
                 name="regionId"
-                value={editForm.regionId || ''}
+                value={editForm.regionId}
                 onChange={(e) => {
                   setEditForm({
                     ...editForm,
-                    regionId: Number(e.target.value),
-                    facultyId: 0,
-                    majorId: 0,
-                    lntCourseId: 0,
-                    scheduleId: 0,
+                    regionId: e.target.value,
+                    facultyId: '',
+                    majorId: '',
+                    lntCourseId: '',
+                    scheduleId: '',
                   })
                 }}
                 className="border p-2 rounded w-full"
@@ -808,12 +811,12 @@ Panitia BNCC Launching`,
               </select>
               <select
                 name="facultyId"
-                value={editForm.facultyId || ''}
+                value={editForm.facultyId}
                 onChange={(e) => {
                   setEditForm({
                     ...editForm,
-                    facultyId: Number(e.target.value),
-                    majorId: 0,
+                    facultyId: e.target.value,
+                    majorId: '',
                   })
                 }}
                 className="border p-2 rounded w-full"
@@ -829,11 +832,11 @@ Panitia BNCC Launching`,
               </select>
               <select
                 name="majorId"
-                value={editForm.majorId || ''}
+                value={editForm.majorId}
                 onChange={(e) => {
                   setEditForm({
                     ...editForm,
-                    majorId: Number(e.target.value),
+                    majorId: e.target.value,
                   })
                 }}
                 className="border p-2 rounded w-full"
@@ -849,11 +852,11 @@ Panitia BNCC Launching`,
               </select>
               <select
                 name="lntCourseId"
-                value={editForm.lntCourseId || ''}
+                value={editForm.lntCourseId}
                 onChange={(e) => {
                   setEditForm({
                     ...editForm,
-                    lntCourseId: Number(e.target.value),
+                    lntCourseId: e.target.value,
                   })
                 }}
                 className="border p-2 rounded w-full"
@@ -869,11 +872,11 @@ Panitia BNCC Launching`,
               </select>
               <select
                 name="scheduleId"
-                value={editForm.scheduleId || ''}
+                value={editForm.scheduleId}
                 onChange={(e) => {
                   setEditForm({
                     ...editForm,
-                    scheduleId: Number(e.target.value),
+                    scheduleId: e.target.value,
                   })
                 }}
                 className="border p-2 rounded w-full"
@@ -985,15 +988,15 @@ Panitia BNCC Launching`,
               />
               <select
                 name="regionId"
-                value={createForm.regionId ?? ''}
+                value={createForm.regionId}
                 onChange={(e) => {
                   setCreateForm({
                     ...createForm,
-                    regionId: Number(e.target.value),
-                    facultyId: undefined,
-                    majorId: undefined,
-                    lntCourseId: undefined,
-                    scheduleId: undefined,
+                    regionId: e.target.value,
+                    facultyId: '',
+                    majorId: '',
+                    lntCourseId: '',
+                    scheduleId: '',
                   })
                 }}
                 className="border p-2 rounded w-full"
@@ -1008,12 +1011,12 @@ Panitia BNCC Launching`,
               </select>
               <select
                 name="facultyId"
-                value={createForm.facultyId ?? ''}
+                value={createForm.facultyId}
                 onChange={(e) => {
                   setCreateForm({
                     ...createForm,
-                    facultyId: Number(e.target.value),
-                    majorId: undefined,
+                    facultyId: e.target.value,
+                    majorId: '',
                   })
                 }}
                 className="border p-2 rounded w-full"
@@ -1029,11 +1032,11 @@ Panitia BNCC Launching`,
               </select>
               <select
                 name="majorId"
-                value={createForm.majorId ?? ''}
+                value={createForm.majorId}
                 onChange={(e) => {
                   setCreateForm({
                     ...createForm,
-                    majorId: Number(e.target.value),
+                    majorId: e.target.value,
                   })
                 }}
                 className="border p-2 rounded w-full"
@@ -1049,11 +1052,11 @@ Panitia BNCC Launching`,
               </select>
               <select
                 name="lntCourseId"
-                value={createForm.lntCourseId ?? ''}
+                value={createForm.lntCourseId}
                 onChange={(e) => {
                   setCreateForm({
                     ...createForm,
-                    lntCourseId: Number(e.target.value),
+                    lntCourseId: e.target.value,
                   })
                 }}
                 className="border p-2 rounded w-full"
@@ -1069,11 +1072,11 @@ Panitia BNCC Launching`,
               </select>
               <select
                 name="scheduleId"
-                value={createForm.scheduleId ?? ''}
+                value={createForm.scheduleId}
                 onChange={(e) => {
                   setCreateForm({
                     ...createForm,
-                    scheduleId: Number(e.target.value),
+                    scheduleId: e.target.value,
                   })
                 }}
                 className="border p-2 rounded w-full"
