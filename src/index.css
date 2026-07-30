@@ -1,5 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
 @import 'tailwindcss';
 
@@ -7,8 +8,9 @@
   /* Fonts */
   --font-poppins: 'Poppins', sans-serif;
   --font-outfit: 'Outfit', sans-serif;
+  --font-montserrat: 'Montserrat', sans-serif;
 
-  /* HEAD Colors (Coming Soon Page) */
+  /* HEAD Colors (Dashboard/Main Page) */
   --color-persian-indigo: #0A2745;
   --color-bright-lavender: #FF332C;
   --color-baby-blue: #99C4F4;
@@ -21,6 +23,18 @@
 
   --color-base: #010103;
   --color-base-2: #eaf5ff;
+
+  /* feat/auth Colors & duplicates */
+  --color-persianIndigo: #251369;
+  --color-lavenderPurple: #9084CD;
+  --color-lavender-purple: #9084CD;
+  --color-lavenderPurpleLight: #AFA1E0;
+  --color-light-periwinkle: #C0B4FA;
+  --color-sky-blue: #7FD8F9;
+  --color-pale-cyan: #9AFCF2;
+  --color-royal-purple: #814791;
+  --color-lavender-mist: #B8D8EF;
+  --color-error: #FF624C;
 }
 
 :root {
@@ -68,7 +82,50 @@ body {
   color: transparent;
 }
 
-/* Shared and Page Specific Classes */
+/* Dashboard Page Specific Custom Styles */
+.dashboard-page {
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg,
+      rgba(234, 245, 255, 0.15) 0%,
+      rgba(172, 214, 255, 0.15) 15%,
+      rgba(68, 137, 212, 0.15) 49%,
+      rgba(16, 94, 169, 0.15) 81%,
+      rgba(10, 39, 69, 0.15) 100%), #FFFFFF;
+  background-attachment: fixed;
+  color: var(--color-persian-indigo, #251369);
+}
+
+.dashboard-page h1,
+.dashboard-page h2 {
+  font-family: 'Outfit', sans-serif;
+  background: linear-gradient(90deg,
+      #0A2745 0%,
+      #2474C0 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* Scoped variables and defaults for Authentication pages */
+.auth-page {
+  font-family: 'Montserrat', 'Poppins', sans-serif !important;
+  --color-persian-indigo: #251369 !important;
+  --color-bright-lavender: #D59DE8 !important;
+  --color-lavender-white: #F6F5FF !important;
+}
+
+@media (pointer: fine) {
+  body.has-custom-cursor {
+    cursor: none;
+  }
+  body.has-custom-cursor a,
+  body.has-custom-cursor button,
+  body.has-custom-cursor [role='button'] {
+    cursor: none;
+  }
+}
+
 img {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -139,14 +196,6 @@ img {
     inset -1px -1px 1px 1px rgba(255, 255, 255, 0.5);
 }
 
-.background-blur-circles div,
-.ellipse-background,
-.bobbing {
-  will-change: transform, filter;
-  transform: translateZ(0);
-  backface-visibility: hidden;
-}
-
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -191,17 +240,6 @@ img {
   background: var(--gradient-bg);
 }
 
-@media (pointer: fine) {
-  body.has-custom-cursor {
-    cursor: none;
-  }
-  body.has-custom-cursor a,
-  body.has-custom-cursor button,
-  body.has-custom-cursor [role='button'] {
-    cursor: none;
-  }
-}
-
 ::-webkit-scrollbar {
   width: 12px;
   height: 10px;
@@ -219,4 +257,30 @@ img {
 
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, #2474c0 0%, #0a2745 100%);
+}
+
+/* feat/auth wave background classes */
+.wave-bg {
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.wave-bg-1 { background-image: url('@/assets/images/Wave1.svg'); }
+.wave-bg-2 { background-image: url('@/assets/images/Wave2.svg'); }
+.wave-bg-3 { background-image: url('@/assets/images/Wave3.svg'); }
+.wave-bg-4 { background-image: url('@/assets/images/Wave4.svg'); }
+.wave-bg-5 { background-image: url('@/assets/images/Wave5.svg'); }
+.wave-bg-6 { background-image: url('@/assets/images/Wave6.svg'); }
+.wave-bg-7 { background-image: url('@/assets/images/Wave7.svg'); }
+.wave-bg-8 { background-image: url('@/assets/images/Wave8.svg'); }
+.wave-bg-9 { background-image: url('@/assets/images/Wave9.svg'); }
+.wave-bg-10 { background-image: url('@/assets/images/Wave10.svg'); }
+
+.background-blur-circles div,
+.ellipse-background,
+.bobbing {
+  will-change: transform, filter;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
