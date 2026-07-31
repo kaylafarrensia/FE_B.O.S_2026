@@ -26,7 +26,7 @@ const HOVER_GLASS_STYLE = {
 export default function Japres() {
   const [hasReadGuideline, setHasReadGuideline] = useState(false)
   const [japresUrl, setJapresUrl] = useState('')
-  const [currentStatus, setCurrentStatus] = useState('Not Submitted')
+  const [currentStatus, setCurrentStatus] = useState('NOT_SUBMITTED')
   const [submittedAt, setSubmittedAt] = useState(null)
   const [hoveredIdx, setHoveredIdx] = useState(null)
   const [submitting, setSubmitting] = useState(false)
@@ -35,7 +35,7 @@ export default function Japres() {
   const apiUrl =
     import.meta.env.VITE_API_URL || 'https://launching-api.bncc.net/api'
 
-  // Fetch status function
+  // Fetch status dari backend
   const loadStatus = async () => {
     const token = getToken()
     if (!token) return
@@ -48,8 +48,8 @@ export default function Japres() {
         const json = await res.json()
         const data = json?.data
         if (data) {
-          if (data.status) setCurrentStatus(data.status)
-          if (data.updatedAt) setSubmittedAt(data.updatedAt)
+          setCurrentStatus(data.status || 'NOT_SUBMITTED')
+          setSubmittedAt(data.updatedAt || data.submittedAt || null)
           if (data.japresUrl) setJapresUrl(data.japresUrl)
         }
       }
@@ -95,14 +95,8 @@ export default function Japres() {
         return
       }
 
-      // Immediately set UI to Pending
-      setCurrentStatus('Pending')
-      setSubmittedAt(new Date().toISOString())
-
-      // Refresh status in background
-      setTimeout(() => {
-        loadStatus()
-      }, 500)
+      // Ambil data status terbaru langsung dari backend
+      await loadStatus()
     } catch (err) {
       console.error('Error submitting JaPres:', err)
       setSubmitError('Terjadi kesalahan jaringan. Silakan coba lagi.')
@@ -250,9 +244,9 @@ export default function Japres() {
           </div>
         </Card>
 
-        {/* Grid Section */}
+        {/* Section Grid */}
         <section className="grid w-full grid-cols-1 gap-4 sm:gap-6 xl:grid-cols-2">
-          {/* Left Column */}
+          {/* Kolom Kiri */}
           <div className="space-y-4 sm:space-y-6">
             <GuidelineSection
               hasReadGuideline={hasReadGuideline}
@@ -270,7 +264,7 @@ export default function Japres() {
             />
           </div>
 
-          {/* Right Column */}
+          {/* Kolom Kanan */}
           <div className="space-y-4 sm:space-y-6">
             <TimelineSection overrideToday="2026-08-17" />
             <ApplicationStatus status={currentStatus} />
