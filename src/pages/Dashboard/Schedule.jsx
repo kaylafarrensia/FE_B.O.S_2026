@@ -14,15 +14,9 @@ import ContactPerson from './Japres/ContactPerson.jsx'
 const DUMMY_SCHEDULES = [
   {
     id: 1,
-    title: 'Session 1',
-    startTime: '2026-08-14T09:00:00Z',
-    endTime: '2026-08-14T12:00:00Z',
-  },
-  {
-    id: 2,
-    title: 'Session 2',
-    startTime: '2026-08-15T09:00:00Z',
-    endTime: '2026-08-15T12:00:00Z',
+    title: '',
+    startTime: '',
+    endTime: '',
   },
 ]
 
