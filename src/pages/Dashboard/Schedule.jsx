@@ -26,6 +26,9 @@ const DUMMY_SCHEDULES = [
   },
 ]
 
+const getToken = () =>
+  localStorage.getItem('token') || localStorage.getItem('accessToken')
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function Schedule() {
   const navigate = useNavigate()
@@ -34,12 +37,13 @@ export default function Schedule() {
   const { userSchedule, setUserSchedule, setUserStatus } = useOutletContext()
   const [availableSchedules, setAvailableSchedules] = useState([])
   const [joinLink, setJoinLink] = useState('')
+  const [saveError, setSaveError] = useState('')
+  const [saving, setSaving] = useState(false)
 
   // Fetch the link from the /links API endpoint
   useEffect(() => {
     const fetchLinks = async () => {
-      const token =
-        localStorage.getItem('token') || localStorage.getItem('accessToken')
+      const token = getToken()
       if (!token) return
 
       try {
@@ -64,29 +68,58 @@ export default function Schedule() {
 
   // Fetch schedules with safe region handling and fallback
   useEffect(() => {
-    const fetchCurrentSchedule = async () => {
-      const token =
-        localStorage.getItem('token') || localStorage.getItem('accessToken')
-      if (!token) return
-
+    const fetchSchedules = async () => {
+      const token = getToken()
       try {
         const apiUrl =
           import.meta.env.VITE_API_URL || 'https://launching-api.bncc.net/api'
-        const res = await fetch(`${apiUrl}/profile`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        if (res.ok) {
-          const json = await res.json()
-          const currentSchedule = json?.data?.registration?.schedule
-          if (currentSchedule) {
-            setUserSchedule(currentSchedule)
+
+        let regionId = null
+        let profileData = null
+        if (token) {
+          const profileRes = await fetch(`${apiUrl}/profile`, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          if (profileRes.ok) {
+            const profileJson = await profileRes.json()
+            profileData = profileJson?.data
+            regionId =
+              profileData?.registration?.regionId ||
+              profileData?.registration?.region?.id
           }
         }
+
+        // ── IMPORTANT: sync userSchedule with what backend actually has ──
+        // Adjust this path to match your real /profile response shape.
+        // Log it once, check the console, then fix the path below.
+        console.log('[Schedule] /profile data:', profileData)
+        const currentSchedule =
+          profileData?.registration?.schedule || profileData?.schedule || null
+        if (currentSchedule) {
+          setUserSchedule(currentSchedule)
+        }
+
+        // Build URL safely: only append regionId if it exists to avoid 400 errors
+        const schedulesUrl = regionId
+          ? `${apiUrl}/lookup/schedules?regionId=${regionId}`
+          : `${apiUrl}/lookup/schedules`
+
+        const schedulesRes = await fetch(schedulesUrl)
+        if (schedulesRes.ok) {
+          const schedulesJson = await schedulesRes.json()
+          const list = schedulesJson?.data || schedulesJson
+          if (Array.isArray(list) && list.length > 0) {
+            setAvailableSchedules(list)
+            return
+          }
+        }
+        setAvailableSchedules(DUMMY_SCHEDULES)
       } catch (err) {
-        console.warn('Failed to fetch current schedule:', err)
+        console.warn('Failed to fetch schedules, using fallback:', err)
+        setAvailableSchedules(DUMMY_SCHEDULES)
       }
     }
-    fetchCurrentSchedule()
+    fetchSchedules()
   }, [])
 
   const schedulesToUse =
@@ -95,17 +128,20 @@ export default function Schedule() {
   const handleConfirm = async () => {
     if (!tempSchedule) return
 
-    const token =
-      localStorage.getItem('token') || localStorage.getItem('accessToken')
+    setSaveError('')
+    const token = getToken()
 
     if (!token) {
-      console.warn('No token, cannot save schedule')
+      console.error('[Schedule] No token found — cannot save schedule')
+      setSaveError('Sesi login kamu habis. Silakan login ulang.')
       return
     }
 
+    setSaving(true)
     try {
       const apiUrl =
         import.meta.env.VITE_API_URL || 'https://launching-api.bncc.net/api'
+
       const res = await fetch(`${apiUrl}/user/schedule`, {
         method: 'PUT',
         headers: {
@@ -117,20 +153,27 @@ export default function Schedule() {
         }),
       })
 
+      const body = await res.json().catch(() => null)
+      console.log('[Schedule] PUT /user/schedule status:', res.status, body)
+
       if (!res.ok) {
-        const errBody = await res.json().catch(() => null)
-        console.error('Failed to update schedule in backend:', errBody)
-        alert('Gagal menyimpan jadwal. Coba lagi.') // atau pakai toast/UI komponen lain
-        return // <- jangan lanjut update state kalau gagal
+        setSaveError(
+          body?.message || 'Gagal menyimpan jadwal. Silakan coba lagi.',
+        )
+        return // do NOT update local state — backend didn't save it
       }
 
-      // Hanya update UI kalau backend beneran berhasil
-      setUserSchedule(tempSchedule)
+      // Only trust local state after backend confirms success.
+      // If the PUT response already returns the updated schedule object,
+      // prefer that over tempSchedule to guarantee it matches backend.
+      setUserSchedule(body?.data ?? tempSchedule)
       setTempSchedule(null)
       setPopupOpen(true)
     } catch (err) {
-      console.error('Error updating schedule in backend:', err)
-      alert('Terjadi kesalahan jaringan. Coba lagi.')
+      console.error('[Schedule] Error updating schedule in backend:', err)
+      setSaveError('Terjadi kesalahan jaringan. Silakan coba lagi.')
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -213,13 +256,18 @@ export default function Schedule() {
                 onSelect={setTempSchedule}
                 selectedSchedule={tempSchedule}
               />
+              {saveError && (
+                <p className="text-red-500 text-xs sm:text-sm pb-2">
+                  {saveError}
+                </p>
+              )}
               <div className="flex justify-start xl:block">
                 <Button
-                  className={!tempSchedule ? 'opacity-50' : ''}
+                  className={!tempSchedule || saving ? 'opacity-50' : ''}
                   onClick={handleConfirm}
-                  disabled={!tempSchedule}
+                  disabled={!tempSchedule || saving}
                 >
-                  Submit
+                  {saving ? 'Saving...' : 'Submit'}
                 </Button>
               </div>
             </Card>
