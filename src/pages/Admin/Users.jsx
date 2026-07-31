@@ -331,7 +331,8 @@ Panitia BNCC Launching`,
       user?.registrations ||
       {}
 
-    let extractedBinusEmail =
+    // Strictly reads actual BINUS email returned by backend SQL (no auto-generated fallbacks)
+    const extractedBinusEmail =
       user?.binus_email ||
       reg?.binus_email ||
       user?.binusEmail ||
@@ -339,26 +340,10 @@ Panitia BNCC Launching`,
       user?.binusianEmail ||
       reg?.binusianEmail ||
       user?.email_binus ||
-      reg?.email_binus
+      reg?.email_binus ||
+      '-'
 
     const nimValue = reg?.nim || user?.nim || ''
-
-    if (
-      !extractedBinusEmail ||
-      extractedBinusEmail === '-' ||
-      String(extractedBinusEmail).trim() === ''
-    ) {
-      if (
-        user?.email &&
-        String(user.email).toLowerCase().endsWith('@binus.ac.id')
-      ) {
-        extractedBinusEmail = user.email
-      } else if (nimValue && String(nimValue).trim() !== '') {
-        extractedBinusEmail = `${String(nimValue).trim()}@binus.ac.id`
-      } else {
-        extractedBinusEmail = '-'
-      }
-    }
 
     return {
       ID: user?.id ?? '-',
