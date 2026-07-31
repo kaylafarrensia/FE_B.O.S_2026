@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Card from '../../components/ui/Card.jsx'
 import IconTrophy from '../../assets/icons/IconTrophy.svg'
@@ -7,10 +7,6 @@ import DocumentSubmission from './Japres/DocumentSubmission.jsx'
 import TimelineSection from './Japres/TimelineSection.jsx'
 import ApplicationStatus from './Japres/ApplicationStatus.jsx'
 import ContactPerson from './Japres/ContactPerson.jsx'
-
-// Helper to retrieve auth token
-const getToken = () =>
-  localStorage.getItem('token') || localStorage.getItem('accessToken')
 
 const REASONS = [
   { num: '01', text: 'Get 100% or 75% discount on registration' },
@@ -24,6 +20,18 @@ const HOVER_GLASS_STYLE = {
   '--glass-stroke': 'rgba(255, 255, 255, 0.35)',
 }
 
+const API_BASE =
+  import.meta.env.VITE_API_URL || 'https://launching-api.bncc.net/api'
+
+const getToken = () =>
+  localStorage.getItem('token') || localStorage.getItem('accessToken')
+
+// ApplicationStatus.jsx / DocumentSubmission.jsx key their styling off these
+// EXACT strings: 'Not Submitted' | 'Pending' | 'Rejected' | 'Accepted Gold' | 'Accepted Silver'.
+// The API already returns these same values, so just pass them through as-is.
+// Only fall back to 'Not Submitted' when there's no record yet.
+const mapStatus = (apiStatus) => apiStatus || 'Not Submitted'
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function Japres() {
   const [hasReadGuideline, setHasReadGuideline] = useState(false)
@@ -33,54 +41,54 @@ export default function Japres() {
     submittedAt: null,
   })
   const [hoveredIdx, setHoveredIdx] = useState(null)
+  const [loadingStatus, setLoadingStatus] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
 
-  const apiUrl =
-    import.meta.env.VITE_API_URL || 'https://launching-api.bncc.net/api'
+  // ── Fetch current status from backend on mount (fixes reset-on-refresh) ──
+  useEffect(() => {
+    const fetchStatus = async () => {
+      const token = getToken()
+      if (!token) {
+        setLoadingStatus(false)
+        return
+      }
 
-  // ── Helper to Fetch Latest Status ──
-  const fetchJapresStatus = useCallback(async () => {
-    const token = getToken()
-    if (!token) return
+      try {
+        const res = await fetch(`${API_BASE}/japres/status`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
 
-    try {
-      const res = await fetch(`${apiUrl}/japres/status`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+        // No submission yet: backend may respond 404 or success:false — treat as "Not Submitted"
+        if (!res.ok) {
+          setLoadingStatus(false)
+          return
+        }
 
-      if (res.ok) {
         const json = await res.json()
-        const data = json?.data
-
-        if (data) {
+        if (json?.success && json?.data) {
           setCurrentStatus({
-            status: data.status || 'Not Submitted',
-            submittedAt: data.updatedAt || null,
+            status: mapStatus(json.data.status),
+            submittedAt: json.data.updatedAt ?? null,
           })
-
-          if (data.japresUrl) {
-            setJapresUrl(data.japresUrl)
+          if (json.data.japresUrl) {
+            setJapresUrl(json.data.japresUrl)
           }
         }
+      } catch (err) {
+        console.warn('Failed to fetch Japres status:', err)
+      } finally {
+        setLoadingStatus(false)
       }
-    } catch (err) {
-      console.warn('Failed to fetch JaPres status:', err)
     }
-  }, [apiUrl])
+    fetchStatus()
+  }, [])
 
-  // Initial Fetch on Mount
-  useEffect(() => {
-    fetchJapresStatus()
-  }, [fetchJapresStatus])
-
-  // ── Handle Submit ──
   const handleSubmit = async () => {
     if (!japresUrl.trim()) return
 
     setSubmitError('')
     const token = getToken()
-
     if (!token) {
       setSubmitError('Sesi login kamu habis. Silakan login ulang.')
       return
@@ -88,36 +96,30 @@ export default function Japres() {
 
     setSubmitting(true)
     try {
-      const res = await fetch(`${apiUrl}/japres/submit`, {
+      const res = await fetch(`${API_BASE}/japres/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          japresUrl: japresUrl.trim(),
-        }),
+        body: JSON.stringify({ japresUrl: japresUrl.trim() }),
       })
 
-      const body = await res.json().catch(() => null)
+      const json = await res.json().catch(() => null)
 
-      if (!res.ok) {
-        setSubmitError(
-          body?.message || 'Gagal mengirimkan berkas. Silakan coba lagi.',
-        )
-        return
+      if (!res.ok || !json?.success) {
+        setSubmitError(json?.message || 'Gagal mengirim link JaPres.')
+        return // don't touch local state — backend didn't save it
       }
 
-      // 1. Set temporary local status while refreshing
+      // Trust backend response, not the value typed locally
       setCurrentStatus({
-        status: 'Pending',
-        submittedAt: new Date().toISOString(),
+        status: mapStatus(json.data.status),
+        submittedAt: json.data.updatedAt ?? new Date().toISOString(),
       })
-
-      // 2. Fetch fresh status from GET /japres/status to synchronize accurately
-      await fetchJapresStatus()
+      setJapresUrl(json.data.japresUrl ?? '')
     } catch (err) {
-      console.error('Error submitting JaPres:', err)
+      console.error('Error submitting Japres:', err)
       setSubmitError('Terjadi kesalahan jaringan. Silakan coba lagi.')
     } finally {
       setSubmitting(false)
@@ -148,6 +150,7 @@ export default function Japres() {
           </motion.div>
 
           <h1 className="text-2xl sm:text-4xl md:text-5xl xl:text-[62px] font-bold font-outfit text-persian-indigo text-center select-none max-w-full">
+            {/* Left Cursor */}
             <span
               className="inline-block relative shrink-0 align-middle w-[0.12em] sm:w-[0.16em] h-[1.6em] bg-[#2474C0] rounded-full"
               style={{ marginRight: '0px' }}
@@ -165,6 +168,7 @@ export default function Japres() {
               />
             </span>
 
+            {/* Text Highlight Block */}
             <span
               className="inline px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg sm:rounded-xl"
               style={{
@@ -177,6 +181,7 @@ export default function Japres() {
               BNCC Achievement Track (JaPres)
             </span>
 
+            {/* Right Cursor */}
             <span
               className="inline-block relative shrink-0 align-middle w-[0.12em] sm:w-[0.16em] h-[1.6em] bg-[#2474C0] rounded-full"
               style={{ marginLeft: '0px' }}
@@ -205,7 +210,7 @@ export default function Japres() {
                 className="relative w-5 sm:w-9 xl:w-12"
                 alt="Trophy Icon"
               />
-              <h2 className="text-xl font-bold sm:text-4xl w-fit">
+              <h2 className="text-xl font-bold sm:text-4xl  w-fit">
                 Get to Know JaPres!
               </h2>
             </header>
@@ -280,6 +285,7 @@ export default function Japres() {
               onSubmit={handleSubmit}
               submitting={submitting}
               submitError={submitError}
+              loadingStatus={loadingStatus}
             />
           </div>
 

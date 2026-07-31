@@ -27,6 +27,9 @@ export default function DocumentSubmission({
   status,
   submittedAt,
   onSubmit,
+  submitting = false,
+  submitError = '',
+  loadingStatus = false,
 }) {
   return (
     <Card className="flex flex-col px-7 py-6 sm:px-14 sm:py-10 xl:px-16 xl:py-12 rounded-xl border-white border-[3px]">
@@ -41,7 +44,7 @@ export default function DocumentSubmission({
               <span
                 className={`text-xs sm:text-lg leading-none w-fit min-w-fit h-fit px-3 py-2 md:px-5 rounded-full ${getStatusStyling(status)}`}
               >
-                {status}
+                {loadingStatus ? 'Loading...' : status}
               </span>
             </div>
             <div className="flex items-center gap-2 md:gap-4">
@@ -76,7 +79,8 @@ export default function DocumentSubmission({
               <input
                 value={japresUrl}
                 onChange={(e) => setJapresUrl(e.target.value)}
-                className="w-full pl-6 pr-10 sm:pr-12 py-3 text-[11px] sm:text-sm rounded-lg border border-white bg-white/50 focus:outline-none focus:ring-2 focus:ring-[#2474C0]"
+                disabled={submitting}
+                className="w-full pl-6 pr-10 sm:pr-12 py-3 text-[11px] sm:text-sm rounded-lg border border-white bg-white/50 focus:outline-none focus:ring-2 focus:ring-[#2474C0] disabled:opacity-60"
                 placeholder="e.g. https://drive.google.com/..."
               />
               <img
@@ -85,6 +89,11 @@ export default function DocumentSubmission({
                 className="absolute -translate-y-1/2 top-1/2 right-4 size-3 sm:size-5"
               />
             </div>
+            {submitError && (
+              <p className="text-red-500 text-[11px] sm:text-sm">
+                {submitError}
+              </p>
+            )}
           </div>
 
           {/* Last Upload Status */}
@@ -105,10 +114,10 @@ export default function DocumentSubmission({
         <div className="self-center">
           <Button
             onClick={onSubmit}
-            disabled={!japresUrl.trim() || !hasReadGuideline}
+            disabled={!japresUrl.trim() || !hasReadGuideline || submitting}
             className="px-8 py-2 sm:px-10 sm:py-3 mx-auto w-fit"
           >
-            SUBMIT
+            {submitting ? 'SUBMITTING...' : 'SUBMIT'}
           </Button>
         </div>
       </div>
