@@ -30,6 +30,11 @@ export default function Users() {
   const [viewLoading, setViewLoading] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
 
+  // ── Cross-Page Selection & Bulk Status State ──
+  const [selectedUserIds, setSelectedUserIds] = useState(new Set())
+  const [bulkStatus, setBulkStatus] = useState('')
+  const [bulkLoading, setBulkLoading] = useState(false)
+
   // Edit form state
   const [editForm, setEditForm] = useState({
     id: 0,
@@ -178,6 +183,83 @@ Panitia BNCC Launching`,
       abortRef.current?.abort()
     }
   }, [])
+
+  // ── Checkbox Selection Handlers ──
+  const toggleSelectUser = (id) => {
+    setSelectedUserIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) {
+        next.delete(id)
+      } else {
+        next.add(id)
+      }
+      return next
+    })
+  }
+
+  const toggleSelectAllOnCurrentPage = (pageUsers) => {
+    const pageUserIds = pageUsers.map((u) => u.id).filter(Boolean)
+    const allSelected = pageUserIds.every((id) => selectedUserIds.has(id))
+
+    setSelectedUserIds((prev) => {
+      const next = new Set(prev)
+      if (allSelected) {
+        pageUserIds.forEach((id) => next.delete(id))
+      } else {
+        pageUserIds.forEach((id) => next.add(id))
+      }
+      return next
+    })
+  }
+
+  // ── Bulk Status Update Mutation ──
+  const bulkStatusMutation = useMutation({
+    mutationFn: async ({ ids, status }) => {
+      // Executes updates concurrently for all selected IDs
+      const promises = Array.from(ids).map((id) => updateUser({ id, status }))
+      return Promise.all(promises)
+    },
+    onMutate: () => setBulkLoading(true),
+    onSuccess: () => {
+      setBulkLoading(false)
+      setAlert({
+        type: 'success',
+        message: `Successfully updated status for ${selectedUserIds.size} users.`,
+      })
+      setSelectedUserIds(new Set())
+      setBulkStatus('')
+      refetch()
+    },
+    onError: (err) => {
+      setBulkLoading(false)
+      const msg = err?.response?.data?.message
+      const backendError = Array.isArray(msg) ? msg.join(', ') : msg
+      setAlert({
+        type: 'error',
+        message:
+          backendError ||
+          err?.response?.data?.error ||
+          err?.message ||
+          'Failed to perform bulk status update.',
+      })
+    },
+  })
+
+  const handleBulkStatusSubmit = () => {
+    if (!bulkStatus) {
+      setAlert({ type: 'error', message: 'Please select a status to apply.' })
+      return
+    }
+    if (selectedUserIds.size === 0) {
+      setAlert({ type: 'error', message: 'No users selected.' })
+      return
+    }
+
+    bulkStatusMutation.mutate({
+      ids: selectedUserIds,
+      status: bulkStatus,
+    })
+  }
 
   const mutation = useMutation({
     mutationFn: (id) => {
@@ -331,7 +413,6 @@ Panitia BNCC Launching`,
       user?.registrations ||
       {}
 
-    // Strictly reads actual BINUS email returned by backend SQL (no auto-generated fallbacks)
     const extractedBinusEmail =
       user?.binus_email ||
       reg?.binus_email ||
@@ -344,8 +425,17 @@ Panitia BNCC Launching`,
       '-'
 
     const nimValue = reg?.nim || user?.nim || ''
+    const userId = user?.id
 
     return {
+      Select: (
+        <input
+          type="checkbox"
+          checked={selectedUserIds.has(userId)}
+          onChange={() => toggleSelectUser(userId)}
+          className="w-4 h-4 cursor-pointer accent-blue-600"
+        />
+      ),
       ID: user?.id ?? '-',
       'BNCC ID': reg?.bnccId || '-',
       'Full Name': user?.name || '-',
@@ -475,6 +565,25 @@ Panitia BNCC Launching`,
     }
   })
 
+  // Add Dynamic Selection Column to Column List
+  const updatedColumns = [
+    {
+      Header: (
+        <input
+          type="checkbox"
+          checked={
+            rawUsers.length > 0 &&
+            rawUsers.every((u) => selectedUserIds.has(u.id))
+          }
+          onChange={() => toggleSelectAllOnCurrentPage(rawUsers)}
+          className="w-4 h-4 cursor-pointer accent-blue-600"
+        />
+      ),
+      accessor: 'Select',
+    },
+    ...(usersColumns || []),
+  ]
+
   // Client-side fallback search
   const filteredRows = searchQuery
     ? allRows.filter((row) =>
@@ -514,7 +623,6 @@ Panitia BNCC Launching`,
   const handleEditSubmit = (e) => {
     e.preventDefault()
 
-    // Frontend Validations for Edit
     if (
       editForm.whatsappNumber &&
       !/^\d{9,13}$/.test(editForm.whatsappNumber)
@@ -552,7 +660,6 @@ Panitia BNCC Launching`,
   const handleCreateSubmit = (e) => {
     e.preventDefault()
 
-    // Sign-Up Page Validations applied to Create Form
     if (createForm.fullName.trim().length < 3) {
       setAlert({
         type: 'error',
@@ -961,7 +1068,7 @@ Panitia BNCC Launching`,
         </div>
       )}
 
-      {/* Create User Modal with Validations */}
+      {/* Create User Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-10 pb-10 overflow-y-auto">
           <form
@@ -1336,6 +1443,52 @@ Panitia BNCC Launching`,
         </div>
       )}
 
+      {/* ── BULK ACTION FLOATING TOOLBAR ── */}
+      {selectedUserIds.size > 0 && (
+        <div className="mx-6 p-4 bg-blue-50 border border-blue-200 rounded-xl flex flex-wrap items-center justify-between gap-4 shadow-sm animate-fadeIn">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-blue-900 text-sm">
+              {selectedUserIds.size} user{selectedUserIds.size > 1 ? 's' : ''}{' '}
+              selected across all pages
+            </span>
+            <button
+              onClick={() => setSelectedUserIds(new Set())}
+              className="text-xs text-blue-600 underline ml-2 hover:text-blue-800"
+              type="button"
+            >
+              Deselect All
+            </button>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <select
+              value={bulkStatus}
+              onChange={(e) => setBulkStatus(e.target.value)}
+              className="border p-2 rounded-lg text-sm bg-white"
+            >
+              <option value="">Select Bulk Status...</option>
+              <option value="email_verified">Email Verified</option>
+              <option value="email_unverified">Email Unverified</option>
+              <option value="done_launching">Done Launching</option>
+              <option value="confirm_launching">Confirm Launching</option>
+              <option value="letter_error">Letter Error</option>
+              <option value="letter_verified">Letter Verified</option>
+              <option value="done_reregist">Done Re-Registration</option>
+              <option value="closed">Closed</option>
+            </select>
+
+            <button
+              onClick={handleBulkStatusSubmit}
+              disabled={bulkLoading || !bulkStatus}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+              type="button"
+            >
+              {bulkLoading ? <Loader /> : 'Apply Bulk Status'}
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-row flex-wrap items-center gap-4 min-w-fit px-6">
         <input
           type="text"
@@ -1378,7 +1531,7 @@ Panitia BNCC Launching`,
       <div className="flex flex-row gap-7 min-w-fit px-6">
         <div className="p-5 rounded-[8px] bg-white w-full">
           <Table
-            columns={usersColumns}
+            columns={updatedColumns}
             data={pagedData}
             loading={isLoading}
             striped={true}
