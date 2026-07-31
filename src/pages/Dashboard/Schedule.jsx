@@ -10,18 +10,7 @@ import ScheduleDropdown from './Schedule/ScheduleDropdown.jsx'
 import SavedPopup from './Schedule/SavedPopup.jsx'
 import ContactPerson from './Japres/ContactPerson.jsx'
 
-// ── Dummy Data (replace with API when backend is ready) ───────────────────────
-const DUMMY_USER = {
-  name: 'John Doe',
-  email: 'johndoe@gmail.com',
-  schedule: {
-    id: 2,
-    startTime: '2026-08-15T09:00:00Z',
-    endTime: '2026-08-15T12:00:00Z',
-  },
-  region: { id: 2, name: 'Jakarta' },
-}
-
+// ── Dummy Data Fallback ───────────────────────────────────────────────────────
 const DUMMY_SCHEDULES = [
   {
     id: 1,
@@ -44,8 +33,6 @@ export default function Schedule() {
   const [tempSchedule, setTempSchedule] = useState(null)
   const { userSchedule, setUserSchedule, setUserStatus } = useOutletContext()
   const [availableSchedules, setAvailableSchedules] = useState([])
-
-  // State to hold the dynamic Zoom link from your backend
   const [joinLink, setJoinLink] = useState('')
 
   // Fetch the link from the /links API endpoint
@@ -53,21 +40,19 @@ export default function Schedule() {
     const fetchLinks = async () => {
       const token =
         localStorage.getItem('token') || localStorage.getItem('accessToken')
+      if (!token) return
+
       try {
         const apiUrl =
-          import.meta.env.VITE_API_URL ||
-          'https://staging-launching-api.bncc.net/api'
+          import.meta.env.VITE_API_URL || 'https://launching-api.bncc.net/api'
 
-        if (token) {
-          const res = await fetch(`${apiUrl}/links`, {
-            headers: { Authorization: `Bearer ${token}` },
-          })
-          if (res.ok) {
-            const json = await res.json()
-            // Pulling the 'zoom' link from the backend link management
-            if (json?.data?.zoom) {
-              setJoinLink(json.data.zoom)
-            }
+        const res = await fetch(`${apiUrl}/links`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        if (res.ok) {
+          const json = await res.json()
+          if (json?.data?.zoom) {
+            setJoinLink(json.data.zoom)
           }
         }
       } catch (err) {
@@ -77,43 +62,46 @@ export default function Schedule() {
     fetchLinks()
   }, [])
 
+  // Fetch schedules with safe region handling and fallback
   useEffect(() => {
     const fetchSchedules = async () => {
       const token =
         localStorage.getItem('token') || localStorage.getItem('accessToken')
       try {
         const apiUrl =
-          import.meta.env.VITE_API_URL ||
-          'https://staging-launching-api.bncc.net/api'
+          import.meta.env.VITE_API_URL || 'https://launching-api.bncc.net/api'
 
-        let regionId = 1 // Default fallback region
+        let regionId = null
         if (token) {
           const profileRes = await fetch(`${apiUrl}/profile`, {
             headers: { Authorization: `Bearer ${token}` },
           })
           if (profileRes.ok) {
             const profileJson = await profileRes.json()
-            const fetchedRegionId =
+            regionId =
               profileJson?.data?.registration?.regionId ||
               profileJson?.data?.registration?.region?.id
-            if (fetchedRegionId) {
-              regionId = fetchedRegionId
-            }
           }
         }
 
-        const schedulesRes = await fetch(
-          `${apiUrl}/lookup/schedules?regionId=${regionId}`,
-        )
+        // Build URL safely: only append regionId if it exists to avoid 400 errors
+        const schedulesUrl = regionId
+          ? `${apiUrl}/lookup/schedules?regionId=${regionId}`
+          : `${apiUrl}/lookup/schedules`
+
+        const schedulesRes = await fetch(schedulesUrl)
         if (schedulesRes.ok) {
           const schedulesJson = await schedulesRes.json()
           const list = schedulesJson?.data || schedulesJson
           if (Array.isArray(list) && list.length > 0) {
             setAvailableSchedules(list)
+            return
           }
         }
+        setAvailableSchedules(DUMMY_SCHEDULES)
       } catch (err) {
         console.warn('Failed to fetch schedules, using fallback:', err)
+        setAvailableSchedules(DUMMY_SCHEDULES)
       }
     }
     fetchSchedules()
@@ -130,8 +118,7 @@ export default function Schedule() {
     if (token) {
       try {
         const apiUrl =
-          import.meta.env.VITE_API_URL ||
-          'https://staging-launching-api.bncc.net/api'
+          import.meta.env.VITE_API_URL || 'https://launching-api.bncc.net/api'
         const res = await fetch(`${apiUrl}/user/schedule`, {
           method: 'PUT',
           headers: {
@@ -155,18 +142,12 @@ export default function Schedule() {
     setPopupOpen(true)
   }
 
-  const openWhatsApp = (number) => {
-    const formatted = number.startsWith('0') ? number.slice(1) : number
-    window.open(`https://wa.me/62${formatted}`, '_blank', 'noopener,noreferrer')
-  }
-
   const handleJoinNow = () => {
     if (!joinLink) return
 
     if (setUserStatus) {
       setUserStatus('registration')
     }
-    // Changed to window.open for external links instead of router navigate
     window.open(joinLink, '_blank', 'noopener,noreferrer')
   }
 
@@ -216,7 +197,6 @@ export default function Schedule() {
                 </li>
               </ul>
               <div className="flex justify-center xl:block">
-                {/* ── Button styling returned to normal to prevent 2-line break ── */}
                 <Button
                   className={!joinLink ? 'opacity-50' : ''}
                   disabled={!userSchedule || !joinLink}

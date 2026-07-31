@@ -1,43 +1,46 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import Card from '../../components/ui/Card.jsx';
-import IconTrophy from '../../assets/icons/IconTrophy.svg';
-import GuidelineSection from './Japres/GuidelineSection.jsx';
-import DocumentSubmission from './Japres/DocumentSubmission.jsx';
-import TimelineSection from './Japres/TimelineSection.jsx';
-import ApplicationStatus from './Japres/ApplicationStatus.jsx';
-import ContactPerson from './Japres/ContactPerson.jsx';
+import { useState } from 'react'
+import { motion } from 'framer-motion'
+import Card from '../../components/ui/Card.jsx'
+import IconTrophy from '../../assets/icons/IconTrophy.svg'
+import GuidelineSection from './Japres/GuidelineSection.jsx'
+import DocumentSubmission from './Japres/DocumentSubmission.jsx'
+import TimelineSection from './Japres/TimelineSection.jsx'
+import ApplicationStatus from './Japres/ApplicationStatus.jsx'
+import ContactPerson from './Japres/ContactPerson.jsx'
 
 // ── Dummy Data (replace with API when backend is ready) ───────────────────────
 const DUMMY_JAPRES_STATUS = {
   status: 'Not Submitted',
   submittedAt: null,
-};
+}
 
 const REASONS = [
   { num: '01', text: 'Get 100% or 75% discount on registration' },
   { num: '02', text: 'Recognize and reward your achievements' },
   { num: '03', text: 'Stand out and secure your BNCC spot' },
-];
+]
 
 const HOVER_GLASS_STYLE = {
   '--glass-from': 'rgba(27, 79, 140, 0.95)',
   '--glass-to': 'rgba(46, 109, 180, 0.9)',
   '--glass-stroke': 'rgba(255, 255, 255, 0.35)',
-};
+}
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function Japres() {
-  const [hasReadGuideline, setHasReadGuideline] = useState(false);
-  const [japresUrl, setJapresUrl] = useState('');
-  const [currentStatus, setCurrentStatus] = useState(DUMMY_JAPRES_STATUS);
-  const [hoveredIdx, setHoveredIdx] = useState(null);
+  const [hasReadGuideline, setHasReadGuideline] = useState(false)
+  const [japresUrl, setJapresUrl] = useState('')
+  const [currentStatus, setCurrentStatus] = useState(DUMMY_JAPRES_STATUS)
+  const [hoveredIdx, setHoveredIdx] = useState(null)
 
   const handleSubmit = () => {
-    if (!japresUrl.trim()) return;
-    setCurrentStatus({ status: 'Pending', submittedAt: new Date().toISOString() });
-    setJapresUrl('');
-  };
+    if (!japresUrl.trim()) return
+    setCurrentStatus({
+      status: 'Pending',
+      submittedAt: new Date().toISOString(),
+    })
+    setJapresUrl('')
+  }
 
   return (
     <div className="relative z-0">
@@ -46,7 +49,14 @@ export default function Japres() {
         <header className="flex flex-col items-center justify-center gap-6 sm:gap-9 xl:gap-10 mb-14 sm:mb-[88px] xl:mb-24 text-center">
           <motion.div
             animate={{ scale: [1, 1.07, 1] }}
-            transition={{ duration: 4, repeat: Infinity, repeatDelay: 3, ease: 'easeInOut', times: [0, 0.2, 0.4], delay: 3 }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              repeatDelay: 3,
+              ease: 'easeInOut',
+              times: [0, 0.2, 0.4],
+              delay: 3,
+            }}
           >
             <Card className="py-2 px-7 sm:px-12 sm:py-4 rounded-xl border-white border-[3px] w-fit">
               <h2 className="text-sm font-semibold sm:text-[22px] xl:text-2xl">
@@ -111,25 +121,30 @@ export default function Japres() {
         <Card className="relative mb-14 sm:mb-20 flex flex-col items-start p-8 gap-7 sm:px-16 sm:py-14 xl:px-24 xl:py-20 md:gap-8 sm:gap-10 xl:gap-15 rounded-xl border-white border-[3px]">
           <div className="flex flex-col items-start gap-4 sm:gap-7 xl:gap-8">
             <header className="flex items-center justify-center gap-2 xl:gap-6">
-              <img src={IconTrophy} className="relative w-5 sm:w-9 xl:w-12" alt="Trophy Icon" />
+              <img
+                src={IconTrophy}
+                className="relative w-5 sm:w-9 xl:w-12"
+                alt="Trophy Icon"
+              />
               <h2 className="text-xl font-bold sm:text-4xl  w-fit">
                 Get to Know JaPres!
               </h2>
             </header>
             <p className="relative text-xs leading-5 sm:leading-10 sm:text-lg xl:text-xl">
-              The Achievement Track (Jalur Prestasi or JaPres) is a special selection
-              pathway for prospective BNCC members who have shown outstanding skills,
-              portfolios, or achievements in the fields of technology, design, leadership,
-              or community involvement. Successful applicants will receive a{' '}
-              <span className="font-bold">discount of up to 100%</span> on the BNCC
-              registration fee.
+              The Achievement Track (Jalur Prestasi or JaPres) is a special
+              selection pathway for prospective BNCC members who have shown
+              outstanding skills, portfolios, or achievements in the fields of
+              technology, design, leadership, or community involvement.
+              Successful applicants will receive a{' '}
+              <span className="font-bold">discount of up to 100%</span> on the
+              BNCC registration fee.
             </p>
           </div>
 
           <div className="relative z-10 flex flex-col-reverse items-center justify-between w-full gap-7 sm:gap-10 xl:flex-row lg:px-24">
             <ol className="flex flex-col gap-4 sm:gap-5 list-none w-full">
               {REASONS.map(({ num, text }, idx) => {
-                const isHovered = hoveredIdx === idx;
+                const isHovered = hoveredIdx === idx
                 return (
                   <li key={num}>
                     <Card
@@ -155,7 +170,7 @@ export default function Japres() {
                       </p>
                     </Card>
                   </li>
-                );
+                )
               })}
             </ol>
             <div className="flex flex-col items-center w-1/2 gap-4 sm:gap-7 md:w-full md:justify-center">
@@ -189,12 +204,12 @@ export default function Japres() {
 
           {/* Right: Timeline + Status + Contact */}
           <div className="space-y-4 sm:space-y-6">
-            <TimelineSection overrideToday="2026-08-17" />  {/* testing: pura-pura hari ini 18 Agustus */}
+            <TimelineSection overrideToday="2026-08-17" />
             <ApplicationStatus status={currentStatus.status} />
             <ContactPerson />
           </div>
         </section>
       </main>
     </div>
-  );
+  )
 }

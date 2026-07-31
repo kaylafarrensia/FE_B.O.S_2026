@@ -27,8 +27,7 @@ export default function Confirmation() {
       if (!token) return
       try {
         const apiUrl =
-          import.meta.env.VITE_API_URL ||
-          'https://staging-launching-api.bncc.net/api'
+          import.meta.env.VITE_API_URL || 'https://launching-api.bncc.net/api'
         const res = await fetch(`${apiUrl}/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         })
@@ -52,8 +51,7 @@ export default function Confirmation() {
       const token =
         localStorage.getItem('token') || localStorage.getItem('accessToken')
       const apiUrl =
-        import.meta.env.VITE_API_URL ||
-        'https://staging-launching-api.bncc.net/api'
+        import.meta.env.VITE_API_URL || 'https://launching-api.bncc.net/api'
       const res = await fetch(`${apiUrl}/user/status`, {
         method: 'PUT',
         headers: {
@@ -124,7 +122,6 @@ export default function Confirmation() {
               </div>
 
               <div className="py-2">
-                {/* ── Changed mb-4 to mb-2 and fixed sm:text-l to sm:text-lg ── */}
                 <p className="text-base sm:text-lg font-medium text-slate-800 mb-2">
                   Were you able to attend the schedule above?
                 </p>
@@ -135,7 +132,6 @@ export default function Confirmation() {
                     onChange={(e) => setChecked(e.target.checked)}
                     className="w-5 h-5 rounded border-gray-400 text-[#2474C0] focus:ring-[#2474C0] cursor-pointer"
                   />
-                  {/* ── Fixed sm:text-l to sm:text-lg here too ── */}
                   <span className="font-medium text-base sm:text-lg text-slate-900">
                     Yes, I was.
                   </span>
