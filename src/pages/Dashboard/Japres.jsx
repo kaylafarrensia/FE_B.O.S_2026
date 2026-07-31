@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import Card from '../../components/ui/Card.jsx'
 import IconTrophy from '../../assets/icons/IconTrophy.svg'
@@ -8,7 +8,7 @@ import TimelineSection from './Japres/TimelineSection.jsx'
 import ApplicationStatus from './Japres/ApplicationStatus.jsx'
 import ContactPerson from './Japres/ContactPerson.jsx'
 
-// Helper untuk mengambil token
+// Helper to retrieve auth token
 const getToken = () =>
   localStorage.getItem('token') || localStorage.getItem('accessToken')
 
@@ -39,41 +39,42 @@ export default function Japres() {
   const apiUrl =
     import.meta.env.VITE_API_URL || 'https://launching-api.bncc.net/api'
 
-  // ── 1. Fetch Status dari GET /api/japres/status ──
-  useEffect(() => {
-    const fetchJapresStatus = async () => {
-      const token = getToken()
-      if (!token) return
+  // ── Helper to Fetch Latest Status ──
+  const fetchJapresStatus = useCallback(async () => {
+    const token = getToken()
+    if (!token) return
 
-      try {
-        const res = await fetch(`${apiUrl}/japres/status`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+    try {
+      const res = await fetch(`${apiUrl}/japres/status`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
 
-        if (res.ok) {
-          const json = await res.json()
-          const data = json?.data
+      if (res.ok) {
+        const json = await res.json()
+        const data = json?.data
 
-          if (data) {
-            setCurrentStatus({
-              status: data.status || 'Not Submitted',
-              submittedAt: data.updatedAt || null,
-            })
+        if (data) {
+          setCurrentStatus({
+            status: data.status || 'Not Submitted',
+            submittedAt: data.updatedAt || null,
+          })
 
-            if (data.japresUrl) {
-              setJapresUrl(data.japresUrl)
-            }
+          if (data.japresUrl) {
+            setJapresUrl(data.japresUrl)
           }
         }
-      } catch (err) {
-        console.warn('Failed to fetch JaPres status:', err)
       }
+    } catch (err) {
+      console.warn('Failed to fetch JaPres status:', err)
     }
-
-    fetchJapresStatus()
   }, [apiUrl])
 
-  // ── 2. Submit Link ke POST /api/japres/submit ──
+  // Initial Fetch on Mount
+  useEffect(() => {
+    fetchJapresStatus()
+  }, [fetchJapresStatus])
+
+  // ── Handle Submit ──
   const handleSubmit = async () => {
     if (!japresUrl.trim()) return
 
@@ -94,7 +95,7 @@ export default function Japres() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          japresUrl: japresUrl.trim(), // Key disesuaikan dengan API (japresUrl)
+          japresUrl: japresUrl.trim(),
         }),
       })
 
@@ -107,16 +108,14 @@ export default function Japres() {
         return
       }
 
-      // Update state setelah berhasil submit
-      if (body?.data) {
-        setCurrentStatus({
-          status: body.data.status || 'Pending',
-          submittedAt: body.data.updatedAt || new Date().toISOString(),
-        })
-        if (body.data.japresUrl) {
-          setJapresUrl(body.data.japresUrl)
-        }
-      }
+      // 1. Set temporary local status while refreshing
+      setCurrentStatus({
+        status: 'Pending',
+        submittedAt: new Date().toISOString(),
+      })
+
+      // 2. Fetch fresh status from GET /japres/status to synchronize accurately
+      await fetchJapresStatus()
     } catch (err) {
       console.error('Error submitting JaPres:', err)
       setSubmitError('Terjadi kesalahan jaringan. Silakan coba lagi.')
@@ -149,7 +148,6 @@ export default function Japres() {
           </motion.div>
 
           <h1 className="text-2xl sm:text-4xl md:text-5xl xl:text-[62px] font-bold font-outfit text-persian-indigo text-center select-none max-w-full">
-            {/* Left Cursor */}
             <span
               className="inline-block relative shrink-0 align-middle w-[0.12em] sm:w-[0.16em] h-[1.6em] bg-[#2474C0] rounded-full"
               style={{ marginRight: '0px' }}
@@ -167,7 +165,6 @@ export default function Japres() {
               />
             </span>
 
-            {/* Text Highlight Block */}
             <span
               className="inline px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg sm:rounded-xl"
               style={{
@@ -180,7 +177,6 @@ export default function Japres() {
               BNCC Achievement Track (JaPres)
             </span>
 
-            {/* Right Cursor */}
             <span
               className="inline-block relative shrink-0 align-middle w-[0.12em] sm:w-[0.16em] h-[1.6em] bg-[#2474C0] rounded-full"
               style={{ marginLeft: '0px' }}
