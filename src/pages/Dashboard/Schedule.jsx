@@ -64,47 +64,29 @@ export default function Schedule() {
 
   // Fetch schedules with safe region handling and fallback
   useEffect(() => {
-    const fetchSchedules = async () => {
+    const fetchCurrentSchedule = async () => {
       const token =
         localStorage.getItem('token') || localStorage.getItem('accessToken')
+      if (!token) return
+
       try {
         const apiUrl =
           import.meta.env.VITE_API_URL || 'https://launching-api.bncc.net/api'
-
-        let regionId = null
-        if (token) {
-          const profileRes = await fetch(`${apiUrl}/profile`, {
-            headers: { Authorization: `Bearer ${token}` },
-          })
-          if (profileRes.ok) {
-            const profileJson = await profileRes.json()
-            regionId =
-              profileJson?.data?.registration?.regionId ||
-              profileJson?.data?.registration?.region?.id
+        const res = await fetch(`${apiUrl}/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        if (res.ok) {
+          const json = await res.json()
+          const currentSchedule = json?.data?.registration?.schedule
+          if (currentSchedule) {
+            setUserSchedule(currentSchedule)
           }
         }
-
-        // Build URL safely: only append regionId if it exists to avoid 400 errors
-        const schedulesUrl = regionId
-          ? `${apiUrl}/lookup/schedules?regionId=${regionId}`
-          : `${apiUrl}/lookup/schedules`
-
-        const schedulesRes = await fetch(schedulesUrl)
-        if (schedulesRes.ok) {
-          const schedulesJson = await schedulesRes.json()
-          const list = schedulesJson?.data || schedulesJson
-          if (Array.isArray(list) && list.length > 0) {
-            setAvailableSchedules(list)
-            return
-          }
-        }
-        setAvailableSchedules(DUMMY_SCHEDULES)
       } catch (err) {
-        console.warn('Failed to fetch schedules, using fallback:', err)
-        setAvailableSchedules(DUMMY_SCHEDULES)
+        console.warn('Failed to fetch current schedule:', err)
       }
     }
-    fetchSchedules()
+    fetchCurrentSchedule()
   }, [])
 
   const schedulesToUse =
@@ -115,31 +97,41 @@ export default function Schedule() {
 
     const token =
       localStorage.getItem('token') || localStorage.getItem('accessToken')
-    if (token) {
-      try {
-        const apiUrl =
-          import.meta.env.VITE_API_URL || 'https://launching-api.bncc.net/api'
-        const res = await fetch(`${apiUrl}/user/schedule`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            scheduleId: Number(tempSchedule.id),
-          }),
-        })
-        if (!res.ok) {
-          console.warn('Failed to update schedule in backend')
-        }
-      } catch (err) {
-        console.warn('Error updating schedule in backend:', err)
-      }
+
+    if (!token) {
+      console.warn('No token, cannot save schedule')
+      return
     }
 
-    setUserSchedule(tempSchedule)
-    setTempSchedule(null) // Clears the dropdown selection after submit
-    setPopupOpen(true)
+    try {
+      const apiUrl =
+        import.meta.env.VITE_API_URL || 'https://launching-api.bncc.net/api'
+      const res = await fetch(`${apiUrl}/user/schedule`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          scheduleId: Number(tempSchedule.id),
+        }),
+      })
+
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => null)
+        console.error('Failed to update schedule in backend:', errBody)
+        alert('Gagal menyimpan jadwal. Coba lagi.') // atau pakai toast/UI komponen lain
+        return // <- jangan lanjut update state kalau gagal
+      }
+
+      // Hanya update UI kalau backend beneran berhasil
+      setUserSchedule(tempSchedule)
+      setTempSchedule(null)
+      setPopupOpen(true)
+    } catch (err) {
+      console.error('Error updating schedule in backend:', err)
+      alert('Terjadi kesalahan jaringan. Coba lagi.')
+    }
   }
 
   const handleJoinNow = () => {
