@@ -34,6 +34,9 @@ export default function Schedule() {
   const [saveError, setSaveError] = useState('')
   const [saving, setSaving] = useState(false)
 
+  // Loading state to prevent stale schedule flicker on page refresh
+  const [loadingSchedule, setLoadingSchedule] = useState(true)
+
   // Fetch the link from the /links API endpoint
   useEffect(() => {
     const fetchLinks = async () => {
@@ -63,6 +66,7 @@ export default function Schedule() {
   // Fetch schedules with safe region handling and fallback
   useEffect(() => {
     const fetchSchedules = async () => {
+      setLoadingSchedule(true)
       const token = getToken()
       try {
         const apiUrl =
@@ -83,10 +87,7 @@ export default function Schedule() {
           }
         }
 
-        // ── IMPORTANT: sync userSchedule with what backend actually has ──
-        // Adjust this path to match your real /profile response shape.
-        // Log it once, check the console, then fix the path below.
-        console.log('[Schedule] /profile data:', profileData)
+        // Sync userSchedule with backend truth
         const currentSchedule =
           profileData?.registration?.schedule || profileData?.schedule || null
         if (currentSchedule) {
@@ -111,6 +112,8 @@ export default function Schedule() {
       } catch (err) {
         console.warn('Failed to fetch schedules, using fallback:', err)
         setAvailableSchedules(DUMMY_SCHEDULES)
+      } finally {
+        setLoadingSchedule(false)
       }
     }
     fetchSchedules()
@@ -136,7 +139,6 @@ export default function Schedule() {
       const apiUrl =
         import.meta.env.VITE_API_URL || 'https://launching-api.bncc.net/api'
 
-      // Updated endpoint path to /reschedule and method to PATCH
       const res = await fetch(`${apiUrl}/reschedule`, {
         method: 'PATCH',
         headers: {
@@ -203,9 +205,15 @@ export default function Schedule() {
                     className="w-[15px] sm:w-[30px]"
                   />
                   <p className="font-bold text-xs sm:text-lg">
-                    {userSchedule
-                      ? formatDate(userSchedule.startTime)
-                      : 'No schedule selected yet.'}
+                    {loadingSchedule ? (
+                      <span className="animate-pulse text-gray-400">
+                        Loading schedule...
+                      </span>
+                    ) : userSchedule ? (
+                      formatDate(userSchedule.startTime)
+                    ) : (
+                      'No schedule selected yet.'
+                    )}
                   </p>
                 </li>
                 <li className="flex flex-row items-center gap-3">
@@ -215,19 +223,25 @@ export default function Schedule() {
                     className="w-[15px] sm:w-[30px]"
                   />
                   <p className="font-bold text-xs sm:text-lg">
-                    {userSchedule
-                      ? formatStartEndTime(
-                          userSchedule.startTime,
-                          userSchedule.endTime,
-                        )
-                      : 'No schedule selected yet.'}
+                    {loadingSchedule ? (
+                      <span className="animate-pulse text-gray-400">
+                        Loading time...
+                      </span>
+                    ) : userSchedule ? (
+                      formatStartEndTime(
+                        userSchedule.startTime,
+                        userSchedule.endTime,
+                      )
+                    ) : (
+                      'No schedule selected yet.'
+                    )}
                   </p>
                 </li>
               </ul>
               <div className="flex justify-center xl:block">
                 <Button
-                  className={!joinLink ? 'opacity-50' : ''}
-                  disabled={!userSchedule || !joinLink}
+                  className={!joinLink || loadingSchedule ? 'opacity-50' : ''}
+                  disabled={!userSchedule || !joinLink || loadingSchedule}
                   onClick={handleJoinNow}
                 >
                   Join Now!

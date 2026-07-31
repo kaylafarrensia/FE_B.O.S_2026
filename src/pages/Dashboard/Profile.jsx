@@ -40,7 +40,7 @@ function formatTime(startIso, endIso) {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false,
-      timeZone: 'Asia/Jakarta', // Displays UTC+7 (WIB)
+      timeZone: 'Asia/Jakarta',
     })
   return `${fmt(s)} – ${fmt(e)} WIB`
 }
@@ -61,7 +61,7 @@ function renderEmail(email) {
 
 function Profile() {
   const [user, setUser] = useState(DUMMY_USER)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true) // Initialized to TRUE to prevent glitch
   const context = useOutletContext() || {}
   const userSchedule = context.userSchedule
 
@@ -70,7 +70,10 @@ function Profile() {
       const token =
         localStorage.getItem('token') || localStorage.getItem('accessToken')
 
-      if (!token) return
+      if (!token) {
+        setLoading(false)
+        return
+      }
 
       setLoading(true)
       try {
@@ -130,6 +133,12 @@ function Profile() {
               githubUrl:
                 data.registration?.githubUrl ||
                 DUMMY_USER.registration.githubUrl,
+              suratMember:
+                data.registration?.suratMember ||
+                DUMMY_USER.registration.suratMember,
+              binusianCard:
+                data.registration?.binusianCard ||
+                DUMMY_USER.registration.binusianCard,
             },
           })
         }
@@ -142,6 +151,11 @@ function Profile() {
 
     fetchProfile()
   }, [])
+
+  // Helper text to show pulse skeleton when fetching profile
+  const Skeleton = () => (
+    <span className="animate-pulse text-gray-400">Loading...</span>
+  )
 
   return (
     <div className="relative">
@@ -159,25 +173,29 @@ function Profile() {
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">Full Name</p>
                     <p className="text-sm sm:text-lg font-semibold">
-                      {user.name}
+                      {loading ? <Skeleton /> : user.name || '-'}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">WhatsApp Number</p>
                     <p className="text-sm sm:text-lg font-semibold">
-                      {user.registration.whatsappNumber}
+                      {loading ? (
+                        <Skeleton />
+                      ) : (
+                        user.registration.whatsappNumber || '-'
+                      )}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">Line ID</p>
                     <p className="text-sm sm:text-lg font-semibold">
-                      {user.registration.lineId}
+                      {loading ? <Skeleton /> : user.registration.lineId || '-'}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">Email</p>
                     <p className="text-sm sm:text-lg font-semibold break-words">
-                      {renderEmail(user.email)}
+                      {loading ? <Skeleton /> : renderEmail(user.email)}
                     </p>
                   </div>
                 </div>
@@ -194,22 +212,28 @@ function Profile() {
                       BNCC Launching Schedule
                     </p>
                     <p className="text-sm sm:text-lg font-semibold break-words">
-                      {userSchedule?.startTime
-                        ? formatDate(userSchedule.startTime)
-                        : '-'}
-                      <br />
-                      {userSchedule?.startTime
-                        ? formatTime(
+                      {userSchedule?.startTime ? (
+                        <>
+                          {formatDate(userSchedule.startTime)}
+                          <br />
+                          {formatTime(
                             userSchedule.startTime,
                             userSchedule.endTime,
-                          )
-                        : '-'}
+                          )}
+                        </>
+                      ) : (
+                        '-'
+                      )}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">LnT Course</p>
                     <p className="text-sm sm:text-lg font-semibold break-words">
-                      {user.registration.lntCourse?.title || '-'}
+                      {loading ? (
+                        <Skeleton />
+                      ) : (
+                        user.registration.lntCourse?.title || '-'
+                      )}
                     </p>
                   </div>
                 </div>
@@ -227,37 +251,49 @@ function Profile() {
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">NIM</p>
                     <p className="text-sm sm:text-lg font-semibold">
-                      {user.registration.nim || '-'}
+                      {loading ? <Skeleton /> : user.registration.nim || '-'}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">Campus Region</p>
                     <p className="text-sm sm:text-lg font-semibold">
-                      {user.registration.region?.name || '-'}
+                      {loading ? (
+                        <Skeleton />
+                      ) : (
+                        user.registration.region?.name || '-'
+                      )}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">BNCC ID</p>
                     <p className="text-sm sm:text-lg font-semibold">
-                      {user.registration.bnccId || '-'}
+                      {loading ? <Skeleton /> : user.registration.bnccId || '-'}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">Faculty</p>
                     <p className="text-sm sm:text-lg font-semibold">
-                      {user.registration.faculty?.name || '-'}
+                      {loading ? (
+                        <Skeleton />
+                      ) : (
+                        user.registration.faculty?.name || '-'
+                      )}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">Binus Email</p>
                     <p className="text-sm sm:text-lg font-semibold break-words">
-                      {renderEmail(user.binusEmail)}
+                      {loading ? <Skeleton /> : renderEmail(user.binusEmail)}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">Major</p>
                     <p className="text-sm sm:text-lg font-semibold">
-                      {user.registration.major?.name || '-'}
+                      {loading ? (
+                        <Skeleton />
+                      ) : (
+                        user.registration.major?.name || '-'
+                      )}
                     </p>
                   </div>
                 </div>
@@ -272,28 +308,37 @@ function Profile() {
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">LinkedIn URL</p>
                     <p className="text-sm sm:text-lg font-semibold">
-                      {user.registration.linkedinUrl &&
-                      user.registration.linkedinUrl !== 'https://' &&
-                      user.registration.linkedinUrl !== 'null' &&
-                      user.registration.linkedinUrl.trim() !== ''
-                        ? user.registration.linkedinUrl
-                        : '-'}
+                      {loading ? (
+                        <Skeleton />
+                      ) : user.registration.linkedinUrl &&
+                        user.registration.linkedinUrl !== 'https://' &&
+                        user.registration.linkedinUrl !== 'null' &&
+                        user.registration.linkedinUrl.trim() !== '' ? (
+                        user.registration.linkedinUrl
+                      ) : (
+                        '-'
+                      )}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">Github URL</p>
                     <p className="text-sm sm:text-lg font-semibold">
-                      {user.registration.githubUrl &&
-                      user.registration.githubUrl !== 'https://' &&
-                      user.registration.githubUrl !== 'null' &&
-                      user.registration.githubUrl.trim() !== ''
-                        ? user.registration.githubUrl
-                        : '-'}
+                      {loading ? (
+                        <Skeleton />
+                      ) : user.registration.githubUrl &&
+                        user.registration.githubUrl !== 'https://' &&
+                        user.registration.githubUrl !== 'null' &&
+                        user.registration.githubUrl.trim() !== '' ? (
+                        user.registration.githubUrl
+                      ) : (
+                        '-'
+                      )}
                     </p>
                   </div>
                   <div className="gap-2 flex flex-col w-full">
                     <p className="text-sm text-gray-500">Member Letter</p>
-                    {user.registration.suratMember &&
+                    {!loading &&
+                    user.registration.suratMember &&
                     user.registration.suratMember !== 'null' &&
                     user.registration.suratMember.trim() !== '' ? (
                       <Button
@@ -334,7 +379,8 @@ function Profile() {
                   </div>
                   <div className="gap-2 flex flex-col w-full">
                     <p className="text-sm text-gray-500">Binusian Card</p>
-                    {user.registration.binusianCard &&
+                    {!loading &&
+                    user.registration.binusianCard &&
                     user.registration.binusianCard !== 'null' &&
                     user.registration.binusianCard.trim() !== '' ? (
                       <Button

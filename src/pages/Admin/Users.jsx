@@ -325,18 +325,40 @@ Panitia BNCC Launching`,
 
   // Map raw users into table row objects safely
   const allRows = rawUsers.map((user) => {
-    const reg = user?.registrations?.[0] || user?.registration || {}
+    const reg =
+      (Array.isArray(user?.registrations) ? user?.registrations[0] : null) ||
+      user?.registration ||
+      user?.registrations ||
+      {}
 
-    const extractedBinusEmail =
+    let extractedBinusEmail =
+      user?.binus_email ||
+      reg?.binus_email ||
       user?.binusEmail ||
       reg?.binusEmail ||
       user?.binusianEmail ||
       reg?.binusianEmail ||
-      user?.binus_email ||
-      reg?.binus_email ||
-      user?.emailBinus ||
-      reg?.emailBinus ||
-      '-'
+      user?.email_binus ||
+      reg?.email_binus
+
+    const nimValue = reg?.nim || user?.nim || ''
+
+    if (
+      !extractedBinusEmail ||
+      extractedBinusEmail === '-' ||
+      String(extractedBinusEmail).trim() === ''
+    ) {
+      if (
+        user?.email &&
+        String(user.email).toLowerCase().endsWith('@binus.ac.id')
+      ) {
+        extractedBinusEmail = user.email
+      } else if (nimValue && String(nimValue).trim() !== '') {
+        extractedBinusEmail = `${String(nimValue).trim()}@binus.ac.id`
+      } else {
+        extractedBinusEmail = '-'
+      }
+    }
 
     return {
       ID: user?.id ?? '-',
@@ -362,9 +384,9 @@ Panitia BNCC Launching`,
       ) : (
         '-'
       ),
-      NIM: reg?.nim || '-',
-      'LnT Course': reg?.lntCourse?.title || '-',
-      'Launching Schedule': reg?.schedule?.title || '-',
+      NIM: nimValue || '-',
+      'LnT Course': reg?.lntCourse?.title || reg?.lntCourse?.name || '-',
+      'Launching Schedule': reg?.schedule?.title || reg?.schedule?.name || '-',
       Major: reg?.major?.name || '-',
       Faculty: reg?.faculty?.name || '-',
       Region: reg?.region?.name || '-',
@@ -408,7 +430,7 @@ Panitia BNCC Launching`,
                 email: user?.email || '',
                 binusEmail:
                   extractedBinusEmail !== '-' ? extractedBinusEmail : '',
-                nim: reg?.nim || '',
+                nim: nimValue || '',
                 lineId: reg?.lineId || '',
                 whatsappNumber: reg?.whatsappNumber || '',
                 regionId: reg?.region?.id ?? '',
@@ -680,8 +702,10 @@ Panitia BNCC Launching`,
                 </div>
                 <div>
                   <b>Binus Email:</b>{' '}
-                  {viewUser.binusEmail ||
+                  {viewUser.binus_email ||
+                    viewUser.binusEmail ||
                     viewUser.binusianEmail ||
+                    viewUser.registrations?.[0]?.binus_email ||
                     viewUser.registrations?.[0]?.binusEmail ||
                     viewUser.registrations?.[0]?.binusianEmail ||
                     '-'}
