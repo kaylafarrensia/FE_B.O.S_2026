@@ -14,7 +14,8 @@ const selectionHandlePositions = {
 const inputClasses =
   'w-full rounded-lg px-3.5 py-2 pr-10 text-xs sm:text-sm text-[#0A2745] placeholder-[#81A8CE]/80 outline-none transition-all bg-[#EBF5FF]/50 border border-[#99C4F4] focus:bg-[#EBF5FF]/70 focus:border-[#207CDB] focus:ring-2 focus:ring-[#207CDB]/20'
 
-const labelClass = 'block text-[11px] sm:text-xs font-semibold text-[#0A2745] mb-1.5'
+const labelClass =
+  'block text-[11px] sm:text-xs font-semibold text-[#0A2745] mb-1.5'
 
 const focusRingClasses =
   'focus-visible:outline-[3px] focus-visible:outline-[#0c65b7] focus-visible:outline-offset-[3px]'
@@ -66,7 +67,10 @@ function SelectionHandle({ position }) {
 function BoundingBox({ children }) {
   return (
     <div className="relative inline-block">
-      <div className="absolute inset-0 border-2 border-[#207CDB]" aria-hidden="true">
+      <div
+        className="absolute inset-0 border-2 border-[#207CDB]"
+        aria-hidden="true"
+      >
         <SelectionHandle position="top-left" />
         <SelectionHandle position="top-right" />
         <SelectionHandle position="bottom-left" />
@@ -104,13 +108,19 @@ export default function ResetPassword() {
   const [errorMsg, setErrorMsg] = useState('')
   const [linkError, setLinkError] = useState('')
 
+  // ── Mobile-Safe URL Parameter Extraction ──
   const searchParams = new URLSearchParams(location.search)
-  const token = searchParams.get('token') || ''
-  const email = searchParams.get('email') || ''
+  const rawToken = searchParams.get('token') || ''
+  const rawEmail = searchParams.get('email') || ''
+
+  const token = decodeURIComponent(rawToken).trim().replace(/\/$/, '')
+  const email = decodeURIComponent(rawEmail).trim().toLowerCase()
 
   const newPassword = watch('newPassword', '')
   const isPasswordValid =
-    newPassword.length >= 8 && /[A-Z]/.test(newPassword) && /[a-z]/.test(newPassword)
+    newPassword.length >= 8 &&
+    /[A-Z]/.test(newPassword) &&
+    /[a-z]/.test(newPassword)
 
   useEffect(() => {
     if (!token) {
@@ -127,7 +137,7 @@ export default function ResetPassword() {
             'Reset password token is empty, invalid, or expired.'
           setLinkError(msg)
         },
-      }
+      },
     )
     // eslint-disable-next-line
   }, [token])
@@ -135,7 +145,9 @@ export default function ResetPassword() {
   const onSubmit = (data) => {
     setErrorMsg('')
     if (!isPasswordValid) {
-      setErrorMsg('Password must be at least 8 characters long with uppercase & lowercase.')
+      setErrorMsg(
+        'Password must be at least 8 characters long with uppercase & lowercase.',
+      )
       return
     }
     const payload = {
@@ -175,7 +187,6 @@ export default function ResetPassword() {
         aria-labelledby="reset-password-title"
       >
         <div className="w-full flex flex-col items-center flex-1 justify-center lg:justify-start">
-
           {/* Badge — in flow, centered */}
           <header className="relative z-[3] flex items-center justify-center whitespace-nowrap rounded-[5px] border-2 border-white/85 border-b-white/40 bg-[rgb(249_252_255_/_58%)] px-3.5 sm:px-5 py-1.5 sm:py-2 text-center font-outfit text-xs sm:text-sm leading-tight font-semibold tracking-[-0.02em] shadow-[inset_0_1px_0_rgb(255_255_255_/_72%),0_2px_8px_rgb(20_76_130_/_10%)] backdrop-blur-[8px]">
             <span className="text-[#0A2745]">BNCC OPENING&nbsp;</span>
@@ -241,7 +252,9 @@ export default function ResetPassword() {
                 </button>
               </div>
               {errors.newPassword && (
-                <p className="mt-1 text-[10px] text-red-500">{errors.newPassword.message}</p>
+                <p className="mt-1 text-[10px] text-red-500">
+                  {errors.newPassword.message}
+                </p>
               )}
             </div>
 
@@ -254,7 +267,8 @@ export default function ResetPassword() {
                 <input
                   {...register('confirmPassword', {
                     required: 'Please confirm your password',
-                    validate: (v) => v === newPassword || 'Passwords do not match',
+                    validate: (v) =>
+                      v === newPassword || 'Passwords do not match',
                   })}
                   className={inputClasses}
                   id="confirmPassword"
@@ -265,26 +279,35 @@ export default function ResetPassword() {
                 <button
                   className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-[#4C88C7] hover:text-[#0D2A4E] transition-colors"
                   type="button"
-                  aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                  aria-label={
+                    showConfirmPassword ? 'Hide password' : 'Show password'
+                  }
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   <EyeIcon open={showConfirmPassword} />
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="mt-1 text-[10px] text-red-500">{errors.confirmPassword.message}</p>
+                <p className="mt-1 text-[10px] text-red-500">
+                  {errors.confirmPassword.message}
+                </p>
               )}
             </div>
 
             {errorMsg && (
-              <p className="text-center text-[10px] text-red-500 font-semibold">{errorMsg}</p>
+              <p className="text-center text-[10px] text-red-500 font-semibold">
+                {errorMsg}
+              </p>
             )}
 
             {/* Reset button */}
             <button
               disabled={resetPasswordMutation.isPending || !!linkError}
               className={`w-full py-2.5 rounded-lg text-white font-semibold text-xs sm:text-sm cursor-pointer shadow-md hover:opacity-95 transition-opacity disabled:opacity-50 ${focusRingClasses}`}
-              style={{ background: 'linear-gradient(135deg, #1B5198 0%, #2A6DC2 100%)' }}
+              style={{
+                background: 'linear-gradient(135deg, #1B5198 0%, #2A6DC2 100%)',
+                color: '#FFFFFF',
+              }}
               type="submit"
             >
               {resetPasswordMutation.isPending ? 'Resetting…' : 'Reset'}
@@ -299,7 +322,6 @@ export default function ResetPassword() {
               </span>
             </BoundingBox>
           </div>
-
         </div>
 
         <BnccMark />
@@ -310,15 +332,24 @@ export default function ResetPassword() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
             className="absolute inset-0 transition-opacity duration-300"
-            style={{ background: 'rgba(15, 35, 65, 0.30)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
+            style={{
+              background: 'rgba(15, 35, 65, 0.30)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+            }}
             onClick={() => setSuccessVisible(false)}
           />
-          <div
-            className="relative z-10 w-full max-w-[22rem] sm:max-w-[26rem] rounded-[22px] border border-white/90 bg-white/40 backdrop-blur-2xl px-6 sm:px-9 py-8 sm:py-10 flex flex-col items-center text-center shadow-[0_20px_50px_rgba(10,39,69,0.25)]"
-          >
+          <div className="relative z-10 w-full max-w-[22rem] sm:max-w-[26rem] rounded-[22px] border border-white/90 bg-white/40 backdrop-blur-2xl px-6 sm:px-9 py-8 sm:py-10 flex flex-col items-center text-center shadow-[0_20px_50px_rgba(10,39,69,0.25)]">
             <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-full bg-[#22C55E] flex items-center justify-center mb-6 shadow-[0_8px_20px_rgba(34,197,94,0.35)]">
-              <svg className="w-10 h-10 text-white stroke-current stroke-[3.5] fill-none" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              <svg
+                className="w-10 h-10 text-white stroke-current stroke-[3.5] fill-none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
             </div>
 
@@ -329,7 +360,10 @@ export default function ResetPassword() {
             <button
               onClick={() => navigate('/auth/signin')}
               className="w-full max-w-[220px] py-3 rounded-xl text-white font-bold text-sm sm:text-base shadow-md transition-all cursor-pointer hover:opacity-90 active:scale-[0.98]"
-              style={{ background: 'linear-gradient(135deg, #1B5198 0%, #2A6DC2 100%)' }}
+              style={{
+                background: 'linear-gradient(135deg, #1B5198 0%, #2A6DC2 100%)',
+                color: '#FFFFFF',
+              }}
               type="button"
             >
               Return to Sign In Page
