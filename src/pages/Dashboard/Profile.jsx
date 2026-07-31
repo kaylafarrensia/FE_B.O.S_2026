@@ -9,6 +9,7 @@ import { formatDate } from '../../utils/index.js'
 const DUMMY_USER = {
   name: 'John Doe',
   email: 'johndoe123@gmail.com',
+  binusEmail: '',
   registration: {
     whatsappNumber: '0831-0050-1534',
     lineId: 'johndoeline',
@@ -29,6 +30,7 @@ const DUMMY_USER = {
   },
 }
 
+// ── Formats time specifically in WIB (Asia/Jakarta, UTC+7) ─────────────────────
 function formatTime(startIso, endIso) {
   if (!startIso) return '-'
   const s = new Date(startIso)
@@ -38,13 +40,13 @@ function formatTime(startIso, endIso) {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false,
-      timeZone: 'UTC',
+      timeZone: 'Asia/Jakarta',
     })
   return `${fmt(s)} – ${fmt(e)} WIB`
 }
 
 function renderEmail(email) {
-  if (!email) return ''
+  if (!email || email === 'null' || email.trim() === '') return '-'
   const parts = email.split('@')
   if (parts.length === 2) {
     return (
@@ -77,48 +79,55 @@ function Profile() {
         })
         if (res.ok) {
           const json = await res.json()
-          if (json?.data) {
-            setUser({
-              name: json.data.fullName || json.data.name || DUMMY_USER.name,
-              email: json.data.email || DUMMY_USER.email,
-              registration: {
-                ...DUMMY_USER.registration,
-                ...json.data.registration,
-                whatsappNumber:
-                  json.data.registration?.whatsappNumber ||
-                  DUMMY_USER.registration.whatsappNumber,
-                lineId:
-                  json.data.registration?.lineId ||
-                  DUMMY_USER.registration.lineId,
-                nim: json.data.registration?.nim || DUMMY_USER.registration.nim,
-                bnccId: json.data.registration?.bnccId ?? null,
-                lntCourse:
-                  json.data.registration?.lntCourse ||
-                  DUMMY_USER.registration.lntCourse,
-                faculty:
-                  json.data.registration?.faculty ||
-                  DUMMY_USER.registration.faculty,
-                major:
-                  json.data.registration?.major ||
-                  DUMMY_USER.registration.major,
-                region:
-                  json.data.registration?.region ||
-                  DUMMY_USER.registration.region,
-                linkedinUrl:
-                  json.data.registration?.linkedinUrl ||
-                  DUMMY_USER.registration.linkedinUrl,
-                githubUrl:
-                  json.data.registration?.githubUrl ||
-                  DUMMY_USER.registration.githubUrl,
-              },
-            })
-          }
+          const data = json?.data || json
+
+          // Debug log to check exact response keys in browser console
+          console.log('[Profile] Full GET /profile response:', data)
+
+          // Flexible fallback checks for binusEmail key variations
+          const fetchedBinusEmail =
+            data.binusEmail ||
+            data.binus_email ||
+            data.emailBinus ||
+            data.binusianEmail ||
+            data.registration?.binusEmail ||
+            data.registration?.binus_email ||
+            data.registration?.emailBinus ||
+            ''
+
+          setUser({
+            name: data.fullName || data.name || DUMMY_USER.name,
+            email: data.email || DUMMY_USER.email,
+            binusEmail: fetchedBinusEmail,
+            registration: {
+              ...DUMMY_USER.registration,
+              ...data.registration,
+              whatsappNumber:
+                data.registration?.whatsappNumber ||
+                DUMMY_USER.registration.whatsappNumber,
+              lineId:
+                data.registration?.lineId || DUMMY_USER.registration.lineId,
+              nim: data.registration?.nim || DUMMY_USER.registration.nim,
+              bnccId: data.registration?.bnccId ?? null,
+              lntCourse:
+                data.registration?.lntCourse ||
+                DUMMY_USER.registration.lntCourse,
+              faculty:
+                data.registration?.faculty || DUMMY_USER.registration.faculty,
+              major: data.registration?.major || DUMMY_USER.registration.major,
+              region:
+                data.registration?.region || DUMMY_USER.registration.region,
+              linkedinUrl:
+                data.registration?.linkedinUrl ||
+                DUMMY_USER.registration.linkedinUrl,
+              githubUrl:
+                data.registration?.githubUrl ||
+                DUMMY_USER.registration.githubUrl,
+            },
+          })
         }
       } catch (err) {
-        console.warn(
-          'Failed to load profile from backend, using mock data:',
-          err,
-        )
+        console.warn('Failed to load profile from backend:', err)
       } finally {
         setLoading(false)
       }
@@ -178,15 +187,22 @@ function Profile() {
                       BNCC Launching Schedule
                     </p>
                     <p className="text-sm sm:text-lg font-semibold break-words">
-                      {formatDate(userSchedule.startTime)}
+                      {userSchedule?.startTime
+                        ? formatDate(userSchedule.startTime)
+                        : '-'}
                       <br />
-                      {formatTime(userSchedule.startTime, userSchedule.endTime)}
+                      {userSchedule?.startTime
+                        ? formatTime(
+                            userSchedule.startTime,
+                            userSchedule.endTime,
+                          )
+                        : '-'}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">LnT Course</p>
                     <p className="text-sm sm:text-lg font-semibold break-words">
-                      {user.registration.lntCourse.title}
+                      {user.registration.lntCourse?.title || '-'}
                     </p>
                   </div>
                 </div>
@@ -197,7 +213,7 @@ function Profile() {
             <div className="flex flex-col gap-4 xl:gap-5 w-full">
               {/* Student Credentials */}
               <Card className="border-white border-2 rounded-2xl px-6 sm:px-10 py-10">
-                <h1 className="font-bold pb-8 text-lg sm:text-3xl text-center text-">
+                <h1 className="font-bold pb-8 text-lg sm:text-3xl text-center">
                   STUDENT CREDENTIALS
                 </h1>
                 <div className="grid grid-cols-2 gap-5 justify-start items-start">
@@ -210,7 +226,7 @@ function Profile() {
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">Campus Region</p>
                     <p className="text-sm sm:text-lg font-semibold">
-                      {user.registration.region.name || '-'}
+                      {user.registration.region?.name || '-'}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2">
@@ -222,7 +238,7 @@ function Profile() {
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">Faculty</p>
                     <p className="text-sm sm:text-lg font-semibold">
-                      {user.registration.faculty.name || '-'}
+                      {user.registration.faculty?.name || '-'}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2">
@@ -234,7 +250,7 @@ function Profile() {
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">Major</p>
                     <p className="text-sm sm:text-lg font-semibold">
-                      {user.registration.major.name || '-'}
+                      {user.registration.major?.name || '-'}
                     </p>
                   </div>
                 </div>
