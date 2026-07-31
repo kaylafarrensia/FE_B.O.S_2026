@@ -8,6 +8,9 @@ import TimelineSection from './Japres/TimelineSection.jsx'
 import ApplicationStatus from './Japres/ApplicationStatus.jsx'
 import ContactPerson from './Japres/ContactPerson.jsx'
 
+const getToken = () =>
+  localStorage.getItem('token') || localStorage.getItem('accessToken')
+
 const REASONS = [
   { num: '01', text: 'Get 100% or 75% discount on registration' },
   { num: '02', text: 'Recognize and reward your achievements' },
@@ -20,68 +23,43 @@ const HOVER_GLASS_STYLE = {
   '--glass-stroke': 'rgba(255, 255, 255, 0.35)',
 }
 
-const API_BASE =
-  import.meta.env.VITE_API_URL || 'https://launching-api.bncc.net/api'
-
-const getToken = () =>
-  localStorage.getItem('token') || localStorage.getItem('accessToken')
-
-// ApplicationStatus.jsx / DocumentSubmission.jsx key their styling off these
-// EXACT strings: 'Not Submitted' | 'Pending' | 'Rejected' | 'Accepted Gold' | 'Accepted Silver'.
-// The API already returns these same values, so just pass them through as-is.
-// Only fall back to 'Not Submitted' when there's no record yet.
-const mapStatus = (apiStatus) => apiStatus || 'Not Submitted'
-
-// ── Page ──────────────────────────────────────────────────────────────────────
 export default function Japres() {
   const [hasReadGuideline, setHasReadGuideline] = useState(false)
   const [japresUrl, setJapresUrl] = useState('')
-  const [currentStatus, setCurrentStatus] = useState({
-    status: 'Not Submitted',
-    submittedAt: null,
-  })
+  const [currentStatus, setCurrentStatus] = useState('Not Submitted')
+  const [submittedAt, setSubmittedAt] = useState(null)
   const [hoveredIdx, setHoveredIdx] = useState(null)
-  const [loadingStatus, setLoadingStatus] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
 
-  // ── Fetch current status from backend on mount (fixes reset-on-refresh) ──
-  useEffect(() => {
-    const fetchStatus = async () => {
-      const token = getToken()
-      if (!token) {
-        setLoadingStatus(false)
-        return
-      }
+  const apiUrl =
+    import.meta.env.VITE_API_URL || 'https://launching-api.bncc.net/api'
 
-      try {
-        const res = await fetch(`${API_BASE}/japres/status`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+  // Fetch status function
+  const loadStatus = async () => {
+    const token = getToken()
+    if (!token) return
 
-        // No submission yet: backend may respond 404 or success:false — treat as "Not Submitted"
-        if (!res.ok) {
-          setLoadingStatus(false)
-          return
-        }
-
+    try {
+      const res = await fetch(`${apiUrl}/japres/status`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (res.ok) {
         const json = await res.json()
-        if (json?.success && json?.data) {
-          setCurrentStatus({
-            status: mapStatus(json.data.status),
-            submittedAt: json.data.updatedAt ?? null,
-          })
-          if (json.data.japresUrl) {
-            setJapresUrl(json.data.japresUrl)
-          }
+        const data = json?.data
+        if (data) {
+          if (data.status) setCurrentStatus(data.status)
+          if (data.updatedAt) setSubmittedAt(data.updatedAt)
+          if (data.japresUrl) setJapresUrl(data.japresUrl)
         }
-      } catch (err) {
-        console.warn('Failed to fetch Japres status:', err)
-      } finally {
-        setLoadingStatus(false)
       }
+    } catch (err) {
+      console.warn('Failed to load JaPres status:', err)
     }
-    fetchStatus()
+  }
+
+  useEffect(() => {
+    loadStatus()
   }, [])
 
   const handleSubmit = async () => {
@@ -89,6 +67,7 @@ export default function Japres() {
 
     setSubmitError('')
     const token = getToken()
+
     if (!token) {
       setSubmitError('Sesi login kamu habis. Silakan login ulang.')
       return
@@ -96,30 +75,36 @@ export default function Japres() {
 
     setSubmitting(true)
     try {
-      const res = await fetch(`${API_BASE}/japres/submit`, {
+      const res = await fetch(`${apiUrl}/japres/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ japresUrl: japresUrl.trim() }),
+        body: JSON.stringify({
+          japresUrl: japresUrl.trim(),
+        }),
       })
 
-      const json = await res.json().catch(() => null)
+      const body = await res.json().catch(() => null)
 
-      if (!res.ok || !json?.success) {
-        setSubmitError(json?.message || 'Gagal mengirim link JaPres.')
-        return // don't touch local state — backend didn't save it
+      if (!res.ok) {
+        setSubmitError(
+          body?.message || 'Gagal mengirimkan berkas. Silakan coba lagi.',
+        )
+        return
       }
 
-      // Trust backend response, not the value typed locally
-      setCurrentStatus({
-        status: mapStatus(json.data.status),
-        submittedAt: json.data.updatedAt ?? new Date().toISOString(),
-      })
-      setJapresUrl(json.data.japresUrl ?? '')
+      // Immediately set UI to Pending
+      setCurrentStatus('Pending')
+      setSubmittedAt(new Date().toISOString())
+
+      // Refresh status in background
+      setTimeout(() => {
+        loadStatus()
+      }, 500)
     } catch (err) {
-      console.error('Error submitting Japres:', err)
+      console.error('Error submitting JaPres:', err)
       setSubmitError('Terjadi kesalahan jaringan. Silakan coba lagi.')
     } finally {
       setSubmitting(false)
@@ -129,7 +114,7 @@ export default function Japres() {
   return (
     <div className="relative z-0">
       <main className="relative px-6 pt-3 pb-16 sm:px-12 sm:py-24 xl:px-[10vw] xl:py-32 overflow-x-clip">
-        {/* ── Page Header ── */}
+        {/* Header */}
         <header className="flex flex-col items-center justify-center gap-6 sm:gap-9 xl:gap-10 mb-14 sm:mb-[88px] xl:mb-24 text-center">
           <motion.div
             animate={{ scale: [1, 1.07, 1] }}
@@ -150,7 +135,6 @@ export default function Japres() {
           </motion.div>
 
           <h1 className="text-2xl sm:text-4xl md:text-5xl xl:text-[62px] font-bold font-outfit text-persian-indigo text-center select-none max-w-full">
-            {/* Left Cursor */}
             <span
               className="inline-block relative shrink-0 align-middle w-[0.12em] sm:w-[0.16em] h-[1.6em] bg-[#2474C0] rounded-full"
               style={{ marginRight: '0px' }}
@@ -168,7 +152,6 @@ export default function Japres() {
               />
             </span>
 
-            {/* Text Highlight Block */}
             <span
               className="inline px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg sm:rounded-xl"
               style={{
@@ -181,7 +164,6 @@ export default function Japres() {
               BNCC Achievement Track (JaPres)
             </span>
 
-            {/* Right Cursor */}
             <span
               className="inline-block relative shrink-0 align-middle w-[0.12em] sm:w-[0.16em] h-[1.6em] bg-[#2474C0] rounded-full"
               style={{ marginLeft: '0px' }}
@@ -201,7 +183,7 @@ export default function Japres() {
           </h1>
         </header>
 
-        {/* ── About JaPres Section ── */}
+        {/* About JaPres */}
         <Card className="relative mb-14 sm:mb-20 flex flex-col items-start p-8 gap-7 sm:px-16 sm:py-14 xl:px-24 xl:py-20 md:gap-8 sm:gap-10 xl:gap-15 rounded-xl border-white border-[3px]">
           <div className="flex flex-col items-start gap-4 sm:gap-7 xl:gap-8">
             <header className="flex items-center justify-center gap-2 xl:gap-6">
@@ -210,7 +192,7 @@ export default function Japres() {
                 className="relative w-5 sm:w-9 xl:w-12"
                 alt="Trophy Icon"
               />
-              <h2 className="text-xl font-bold sm:text-4xl  w-fit">
+              <h2 className="text-xl font-bold sm:text-4xl w-fit">
                 Get to Know JaPres!
               </h2>
             </header>
@@ -268,9 +250,9 @@ export default function Japres() {
           </div>
         </Card>
 
-        {/* ── Main 2-Column Grid ── */}
+        {/* Grid Section */}
         <section className="grid w-full grid-cols-1 gap-4 sm:gap-6 xl:grid-cols-2">
-          {/* Left: Guideline + Submission */}
+          {/* Left Column */}
           <div className="space-y-4 sm:space-y-6">
             <GuidelineSection
               hasReadGuideline={hasReadGuideline}
@@ -280,19 +262,18 @@ export default function Japres() {
               japresUrl={japresUrl}
               setJapresUrl={setJapresUrl}
               hasReadGuideline={hasReadGuideline}
-              status={currentStatus.status}
-              submittedAt={currentStatus.submittedAt}
+              status={currentStatus}
+              submittedAt={submittedAt}
               onSubmit={handleSubmit}
               submitting={submitting}
               submitError={submitError}
-              loadingStatus={loadingStatus}
             />
           </div>
 
-          {/* Right: Timeline + Status + Contact */}
+          {/* Right Column */}
           <div className="space-y-4 sm:space-y-6">
             <TimelineSection overrideToday="2026-08-17" />
-            <ApplicationStatus status={currentStatus.status} />
+            <ApplicationStatus status={currentStatus} />
             <ContactPerson />
           </div>
         </section>
