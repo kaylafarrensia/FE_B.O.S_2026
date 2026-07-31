@@ -8,12 +8,14 @@ const DATE_LABEL_CLASS =
 const TIME_LABEL_CLASS =
   'text-[10px] sm:text-xs md:text-sm lg:text-base text-gray-500 whitespace-nowrap'
 
-export default function ScheduleDropdown({ schedules, onSelect }) {
+export default function ScheduleDropdown({
+  schedules,
+  onSelect,
+  selectedSchedule,
+}) {
   const [open, setOpen] = useState(false)
-  const [selected, setSelected] = useState(null)
 
   const handleSelect = (schedule) => {
-    setSelected(schedule)
     onSelect(schedule)
     setOpen(false)
   }
@@ -32,19 +34,20 @@ export default function ScheduleDropdown({ schedules, onSelect }) {
             alt=""
             className="w-4 sm:w-5 mr-2 sm:mr-3 shrink-0"
           />
-          {selected ? (
+          {selectedSchedule ? (
             <div className="flex-1 flex flex-col sm:flex-row sm:items-center sm:justify-between text-left min-w-0">
               <span className={DATE_LABEL_CLASS}>
-                {formatDate(selected.startTime)}
+                {formatDate(selectedSchedule.startTime)}
               </span>
               <span className={`${TIME_LABEL_CLASS} sm:mr-2`}>
-                {formatStartEndTime(selected.startTime, selected.endTime)}
+                {formatStartEndTime(
+                  selectedSchedule.startTime,
+                  selectedSchedule.endTime,
+                )}
               </span>
             </div>
           ) : (
-            <span 
-              className="flex-1 text-left text-xs sm:text-sm md:text-base text-[#718096] truncate"
-            >
+            <span className="flex-1 text-left text-xs sm:text-sm md:text-base text-[#718096] truncate">
               Select new schedule
             </span>
           )}

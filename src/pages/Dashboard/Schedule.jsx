@@ -138,7 +138,7 @@ export default function Schedule() {
     }
 
     setUserSchedule(tempSchedule)
-    setTempSchedule(null)
+    setTempSchedule(null) // Clears the dropdown selection after submit
     setPopupOpen(true)
   }
 
@@ -207,7 +207,7 @@ export default function Schedule() {
               </div>
             </Card>
 
-            {/* Change Schedule */}
+            {/* Change Schedule Card */}
             <Card className="flex flex-col p-10 mt-0 rounded-xl border-white border-[3px] z-[99]">
               <h1 className="text-xl font-bold sm:text-3xl w-fit">
                 Change Your Schedule?
@@ -219,10 +219,11 @@ export default function Schedule() {
               <ScheduleDropdown
                 schedules={schedulesToUse}
                 onSelect={setTempSchedule}
+                selectedSchedule={tempSchedule}
               />
               <div className="flex justify-start xl:block">
                 <Button
-                  className=""
+                  className={!tempSchedule ? 'opacity-50' : ''}
                   onClick={handleConfirm}
                   disabled={!tempSchedule}
                 >
