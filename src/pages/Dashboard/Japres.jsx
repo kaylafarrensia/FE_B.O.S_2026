@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Card from '../../components/ui/Card.jsx'
 import IconTrophy from '../../assets/icons/IconTrophy.svg'
@@ -8,11 +8,9 @@ import TimelineSection from './Japres/TimelineSection.jsx'
 import ApplicationStatus from './Japres/ApplicationStatus.jsx'
 import ContactPerson from './Japres/ContactPerson.jsx'
 
-// ── Dummy Data (replace with API when backend is ready) ───────────────────────
-const DUMMY_JAPRES_STATUS = {
-  status: 'Not Submitted',
-  submittedAt: null,
-}
+// Helper untuk mengambil token
+const getToken = () =>
+  localStorage.getItem('token') || localStorage.getItem('accessToken')
 
 const REASONS = [
   { num: '01', text: 'Get 100% or 75% discount on registration' },
@@ -30,16 +28,101 @@ const HOVER_GLASS_STYLE = {
 export default function Japres() {
   const [hasReadGuideline, setHasReadGuideline] = useState(false)
   const [japresUrl, setJapresUrl] = useState('')
-  const [currentStatus, setCurrentStatus] = useState(DUMMY_JAPRES_STATUS)
+  const [currentStatus, setCurrentStatus] = useState({
+    status: 'Not Submitted',
+    submittedAt: null,
+  })
   const [hoveredIdx, setHoveredIdx] = useState(null)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
 
-  const handleSubmit = () => {
+  const apiUrl =
+    import.meta.env.VITE_API_URL || 'https://launching-api.bncc.net/api'
+
+  // ── 1. Fetch Status dari GET /api/japres/status ──
+  useEffect(() => {
+    const fetchJapresStatus = async () => {
+      const token = getToken()
+      if (!token) return
+
+      try {
+        const res = await fetch(`${apiUrl}/japres/status`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+
+        if (res.ok) {
+          const json = await res.json()
+          const data = json?.data
+
+          if (data) {
+            setCurrentStatus({
+              status: data.status || 'Not Submitted',
+              submittedAt: data.updatedAt || null,
+            })
+
+            if (data.japresUrl) {
+              setJapresUrl(data.japresUrl)
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to fetch JaPres status:', err)
+      }
+    }
+
+    fetchJapresStatus()
+  }, [apiUrl])
+
+  // ── 2. Submit Link ke POST /api/japres/submit ──
+  const handleSubmit = async () => {
     if (!japresUrl.trim()) return
-    setCurrentStatus({
-      status: 'Pending',
-      submittedAt: new Date().toISOString(),
-    })
-    setJapresUrl('')
+
+    setSubmitError('')
+    const token = getToken()
+
+    if (!token) {
+      setSubmitError('Sesi login kamu habis. Silakan login ulang.')
+      return
+    }
+
+    setSubmitting(true)
+    try {
+      const res = await fetch(`${apiUrl}/japres/submit`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          japresUrl: japresUrl.trim(), // Key disesuaikan dengan API (japresUrl)
+        }),
+      })
+
+      const body = await res.json().catch(() => null)
+
+      if (!res.ok) {
+        setSubmitError(
+          body?.message || 'Gagal mengirimkan berkas. Silakan coba lagi.',
+        )
+        return
+      }
+
+      // Update state setelah berhasil submit
+      if (body?.data) {
+        setCurrentStatus({
+          status: body.data.status || 'Pending',
+          submittedAt: body.data.updatedAt || new Date().toISOString(),
+        })
+        if (body.data.japresUrl) {
+          setJapresUrl(body.data.japresUrl)
+        }
+      }
+    } catch (err) {
+      console.error('Error submitting JaPres:', err)
+      setSubmitError('Terjadi kesalahan jaringan. Silakan coba lagi.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -126,7 +209,7 @@ export default function Japres() {
                 className="relative w-5 sm:w-9 xl:w-12"
                 alt="Trophy Icon"
               />
-              <h2 className="text-xl font-bold sm:text-4xl  w-fit">
+              <h2 className="text-xl font-bold sm:text-4xl w-fit">
                 Get to Know JaPres!
               </h2>
             </header>
@@ -199,6 +282,8 @@ export default function Japres() {
               status={currentStatus.status}
               submittedAt={currentStatus.submittedAt}
               onSubmit={handleSubmit}
+              submitting={submitting}
+              submitError={submitError}
             />
           </div>
 
