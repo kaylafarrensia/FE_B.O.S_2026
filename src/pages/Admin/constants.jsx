@@ -1,5 +1,3 @@
-// import { ITableColumn } from '@/components';
-
 const statusMap = {
   email_verified: { color: 'bg-[#56BA28]', label: 'Email Verified' },
   email_unverified: { color: 'bg-[#FF1F25]', label: 'Email Unverified' },
@@ -11,7 +9,7 @@ const statusMap = {
   closed: { color: 'bg-[#251369]', label: 'Closed' },
   null: { color: 'bg-[#CED4DA]', label: 'N/A' },
   undefined: { color: 'bg-[#CED4DA]', label: 'N/A' },
-};
+}
 
 const paymentStatusMap = {
   pending: { color: 'bg-[#F4B81D]', label: 'Pending' },
@@ -20,7 +18,7 @@ const paymentStatusMap = {
   refunded: { color: 'bg-[#0057FC]', label: 'Refunded' },
   null: { color: 'bg-[#CED4DA]', label: 'N/A' },
   undefined: { color: 'bg-[#CED4DA]', label: 'N/A' },
-};
+}
 
 const japresStatusMap = {
   'accepted gold': { color: 'bg-[#FFD700]', label: 'Accepted Gold' },
@@ -29,7 +27,7 @@ const japresStatusMap = {
   pending: { color: 'bg-[#F4B81D]', label: 'Pending' },
   null: { color: 'bg-[#CED4DA]', label: 'N/A' },
   undefined: { color: 'bg-[#CED4DA]', label: 'N/A' },
-};
+}
 
 const blastStatusMap = {
   success: { color: 'bg-[#56BA28]', label: 'Success' },
@@ -37,7 +35,7 @@ const blastStatusMap = {
   pending: { color: 'bg-[#F4B81D]', label: 'Pending' },
   null: { color: 'bg-[#CED4DA]', label: 'N/A' },
   undefined: { color: 'bg-[#CED4DA]', label: 'N/A' },
-};
+}
 
 export const usersColumns = [
   { title: 'ID', itemAlign: 'center', headerAlign: 'center', width: '50px' },
@@ -48,11 +46,11 @@ export const usersColumns = [
     itemAlign: 'left',
     width: '200px',
     itemWrapper: (item) => {
-      const value = typeof item === 'string' ? item : String(item ?? '');
+      const value = typeof item === 'string' ? item : String(item ?? '')
       const status = statusMap[value.toLowerCase()] || {
         color: 'bg-gray-400',
-        label: value,
-      };
+        label: value || 'N/A',
+      }
       return (
         <span className="flex items-center gap-2">
           <span
@@ -60,10 +58,11 @@ export const usersColumns = [
           ></span>
           <span>{status.label}</span>
         </span>
-      );
+      )
     },
   },
   { title: 'Email', itemAlign: 'left', width: '160px' },
+  { title: 'Binus Email', itemAlign: 'left', width: '160px' },
   { title: 'LINE', itemAlign: 'left', width: '160px' },
   { title: 'WhatsApp', itemAlign: 'left', width: '160px' },
   { title: 'NIM', itemAlign: 'left', width: '160px' },
@@ -73,7 +72,7 @@ export const usersColumns = [
   { title: 'Faculty', itemAlign: 'left', width: '160px' },
   { title: 'Region', itemAlign: 'left', width: '160px' },
   { title: 'Actions', itemAlign: 'left', width: '140px' },
-];
+]
 
 export const documentsColumns = [
   { title: 'ID', itemAlign: 'center', headerAlign: 'center', width: '50px' },
@@ -84,7 +83,7 @@ export const documentsColumns = [
   { title: 'Binusian Card', itemAlign: 'left', width: '160px' },
   { title: 'LinkedIn', itemAlign: 'left', width: '160px' },
   { title: 'Github', itemAlign: 'left', width: '160px' },
-];
+]
 
 export const paymentColumns = [
   { title: 'ID', itemAlign: 'center', headerAlign: 'center', width: '50px' },
@@ -96,11 +95,11 @@ export const paymentColumns = [
     itemAlign: 'left',
     width: '200px',
     itemWrapper: (item) => {
-      const value = typeof item === 'string' ? item : String(item ?? '');
+      const value = typeof item === 'string' ? item : String(item ?? '')
       const status = japresStatusMap[value.toLowerCase()] || {
         color: 'bg-gray-400',
-        label: value,
-      };
+        label: value || 'N/A',
+      }
       return (
         <span className="flex items-center gap-2">
           <span
@@ -108,7 +107,7 @@ export const paymentColumns = [
           ></span>
           <span>{status.label}</span>
         </span>
-      );
+      )
     },
   },
   {
@@ -116,11 +115,11 @@ export const paymentColumns = [
     itemAlign: 'left',
     width: '200px',
     itemWrapper: (item) => {
-      const value = typeof item === 'string' ? item : String(item ?? '');
+      const value = typeof item === 'string' ? item : String(item ?? '')
       const status = paymentStatusMap[value.toLowerCase()] || {
         color: 'bg-gray-400',
-        label: value,
-      };
+        label: value || 'N/A',
+      }
       return (
         <span className="flex items-center gap-2">
           <span
@@ -128,14 +127,14 @@ export const paymentColumns = [
           ></span>
           <span>{status.label}</span>
         </span>
-      );
+      )
     },
   },
   { title: 'Order ID', itemAlign: 'left', width: '160px' },
   { title: 'Amount', itemAlign: 'left', width: '160px' },
   { title: 'Payment Proof', itemAlign: 'center', width: '100px' },
   { title: 'Actions', itemAlign: 'center', width: '60px' },
-];
+]
 
 export const japresColumns = [
   { title: 'ID', itemAlign: 'center', headerAlign: 'center', width: '50px' },
@@ -148,11 +147,11 @@ export const japresColumns = [
     itemAlign: 'left',
     width: '200px',
     itemWrapper: (item) => {
-      const value = typeof item === 'string' ? item : String(item ?? '');
+      const value = typeof item === 'string' ? item : String(item ?? '')
       const status = japresStatusMap[value.toLowerCase()] || {
         color: 'bg-gray-400',
-        label: value,
-      };
+        label: value || 'N/A',
+      }
       return (
         <span className="flex items-center gap-2">
           <span
@@ -160,12 +159,12 @@ export const japresColumns = [
           ></span>
           <span>{status.label}</span>
         </span>
-      );
+      )
     },
   },
   { title: 'Submit Date', itemAlign: 'left', width: '160px' },
   { title: 'Actions', itemAlign: 'center', width: '60px' },
-];
+]
 
 export const subscriptionColumns = [
   { title: 'ID', itemAlign: 'center', headerAlign: 'center', width: '50px' },
@@ -176,11 +175,11 @@ export const subscriptionColumns = [
     itemAlign: 'left',
     width: '200px',
     itemWrapper: (item) => {
-      const value = typeof item === 'string' ? item : String(item ?? '');
+      const value = typeof item === 'string' ? item : String(item ?? '')
       const status = blastStatusMap[value.toLowerCase()] || {
         color: 'bg-gray-400',
-        label: value,
-      };
+        label: value || 'N/A',
+      }
       return (
         <span className="flex items-center gap-2">
           <span
@@ -188,8 +187,8 @@ export const subscriptionColumns = [
           ></span>
           <span>{status.label}</span>
         </span>
-      );
+      )
     },
   },
   { title: 'Blast Time', itemAlign: 'left', width: '160px' },
-];
+]

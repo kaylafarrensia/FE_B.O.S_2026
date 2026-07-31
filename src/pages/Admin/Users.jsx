@@ -30,11 +30,12 @@ export default function Users() {
   const [viewLoading, setViewLoading] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
 
-  // Use '' instead of 0 so selects work nicely
+  // Edit form state
   const [editForm, setEditForm] = useState({
     id: 0,
     name: '',
     email: '',
+    binusEmail: '',
     nim: '',
     regionId: '',
     lineId: '',
@@ -48,9 +49,11 @@ export default function Users() {
   const [editLoading, setEditLoading] = useState(false)
   const [showCreateModal, setShowCreateModal] = useState(false)
 
+  // Create form state
   const [createForm, setCreateForm] = useState({
     fullName: '',
     email: '',
+    binusEmail: '',
     password: '',
     nim: '',
     regionId: '',
@@ -61,6 +64,7 @@ export default function Users() {
     lntCourseId: '',
     scheduleId: '',
     isJapres: null,
+    status: '',
   })
   const [createLoading, setCreateLoading] = useState(false)
   const [showWhatsAppModal, setShowWhatsAppModal] = useState(false)
@@ -79,60 +83,52 @@ Panitia BNCC Launching`,
   const [tempWhatsAppMessage, setTempWhatsAppMessage] =
     useState(whatsAppMessage)
 
-  // Only pass valid numeric IDs to lookup queries
-  const {
-    regionQuery,
-    facultyQuery,
-    majorQuery,
-    lntCourseQuery,
-    scheduleQuery,
-  } = useLookupQuery(
-    Number(editForm.regionId) > 0 ? Number(editForm.regionId) : undefined,
-    Number(editForm.facultyId) > 0 ? Number(editForm.facultyId) : undefined,
-  )
+  // Lookup queries with safe fallbacks
+  const editLookup =
+    useLookupQuery(
+      Number(editForm.regionId) > 0 ? Number(editForm.regionId) : undefined,
+      Number(editForm.facultyId) > 0 ? Number(editForm.facultyId) : undefined,
+    ) || {}
 
-  const {
-    regionQuery: createRegionQuery,
-    facultyQuery: createFacultyQuery,
-    majorQuery: createMajorQuery,
-    lntCourseQuery: createLntCourseQuery,
-    scheduleQuery: createScheduleQuery,
-  } = useLookupQuery(
-    Number(createForm.regionId) > 0 ? Number(createForm.regionId) : undefined,
-    Number(createForm.facultyId) > 0 ? Number(createForm.facultyId) : undefined,
-  )
+  const createLookup =
+    useLookupQuery(
+      Number(createForm.regionId) > 0 ? Number(createForm.regionId) : undefined,
+      Number(createForm.facultyId) > 0
+        ? Number(createForm.facultyId)
+        : undefined,
+    ) || {}
 
   const abortRef = useRef(null)
 
-  const regions = regionQuery.data || []
-  const faculties = (facultyQuery.data || []).filter(
+  const regions = editLookup.regionQuery?.data || []
+  const faculties = (editLookup.facultyQuery?.data || []).filter(
     (f) => !f.regionId || Number(f.regionId) === Number(editForm.regionId),
   )
-  const majors = (majorQuery.data || []).filter(
+  const majors = (editLookup.majorQuery?.data || []).filter(
     (m) => !m.facultyId || Number(m.facultyId) === Number(editForm.facultyId),
   )
-  const lntCourses = (lntCourseQuery.data || []).filter(
+  const lntCourses = (editLookup.lntCourseQuery?.data || []).filter(
     (c) => !c.regionId || Number(c.regionId) === Number(editForm.regionId),
   )
-  const schedules = (scheduleQuery.data || []).filter(
+  const schedules = (editLookup.scheduleQuery?.data || []).filter(
     (s) => !s.regionId || Number(s.regionId) === Number(editForm.regionId),
   )
 
-  const createRegions = createRegionQuery.data || []
-  const createFaculties = (createFacultyQuery.data || []).filter(
+  const createRegions = createLookup.regionQuery?.data || []
+  const createFaculties = (createLookup.facultyQuery?.data || []).filter(
     (f) => !f.regionId || Number(f.regionId) === Number(createForm.regionId),
   )
-  const createMajors = (createMajorQuery.data || []).filter(
+  const createMajors = (createLookup.majorQuery?.data || []).filter(
     (m) => !m.facultyId || Number(m.facultyId) === Number(createForm.facultyId),
   )
-  const createLntCourses = (createLntCourseQuery.data || []).filter(
+  const createLntCourses = (createLookup.lntCourseQuery?.data || []).filter(
     (c) => !c.regionId || Number(c.regionId) === Number(createForm.regionId),
   )
-  const createSchedules = (createScheduleQuery.data || []).filter(
+  const createSchedules = (createLookup.scheduleQuery?.data || []).filter(
     (s) => !s.regionId || Number(s.regionId) === Number(createForm.regionId),
   )
 
-  // ── SERVER-SIDE PAGINATED QUERY ──────────────────────────────────────────────
+  // ── USER DETAILS QUERY ────────────────────────────────────────────────────────
   const {
     data,
     isLoading,
@@ -141,17 +137,36 @@ Panitia BNCC Launching`,
     refetch,
   } = useQuery({
     queryKey: ['user-details', pageIndex, itemsPerPage, searchQuery],
-    queryFn: () =>
-      getUsersDetails({
-        page: pageIndex,
-        limit: itemsPerPage,
-        search: searchQuery,
-      }),
+    queryFn: () => {
+      // Handles both parametrized and non-parametrized getUsersDetails functions
+      try {
+        return getUsersDetails({
+          page: pageIndex,
+          limit: itemsPerPage,
+          search: searchQuery,
+        })
+      } catch (e) {
+        return getUsersDetails()
+      }
+    },
   })
 
-  // Extract total count returned by backend safely
+  // Safely extract raw user array from any response shape
+  const rawUsers = Array.isArray(data)
+    ? data
+    : Array.isArray(data?.data)
+      ? data.data
+      : Array.isArray(data?.users)
+        ? data.users
+        : []
+
+  // Extract total count safely
   const totalItems =
-    data?.pagination?.total || data?.meta?.total || data?.total || 0
+    data?.pagination?.total ||
+    data?.meta?.total ||
+    data?.total ||
+    rawUsers.length ||
+    0
 
   useEffect(() => {
     if (isError) {
@@ -229,6 +244,9 @@ Panitia BNCC Launching`,
       const payload = {
         fullName: String(form.fullName || '').trim(),
         email: String(form.email || '').trim(),
+        binusEmail:
+          String(form.binusEmail || '').trim() ||
+          `${String(form.nim || '').trim()}@binus.ac.id`,
         password: String(form.password || ''),
         nim: String(form.nim || '').trim(),
         lineId: String(form.lineId || '').trim(),
@@ -238,8 +256,8 @@ Panitia BNCC Launching`,
         majorId: Number(form.majorId),
         lntCourseId: Number(form.lntCourseId),
         scheduleId: Number(form.scheduleId),
-        binusEmail: `${String(form.nim || '').trim()}@binus.ac.id`,
         confirmPassword: String(form.password || ''),
+        status: form.status || 'email_unverified',
         heardFrom: null,
       }
 
@@ -265,6 +283,7 @@ Panitia BNCC Launching`,
       setCreateForm({
         fullName: '',
         email: '',
+        binusEmail: '',
         password: '',
         nim: '',
         regionId: '',
@@ -275,6 +294,7 @@ Panitia BNCC Launching`,
         lntCourseId: '',
         scheduleId: '',
         isJapres: null,
+        status: '',
       })
     },
     onError: (err) => {
@@ -297,135 +317,154 @@ Panitia BNCC Launching`,
     window.open(`https://wa.me/+62${number}?text=${formatText}`)
   }
 
-  // Directly map current page data from server response
-  const pagedData =
-    data?.data?.map((user) => {
-      const reg = user.registrations?.[0] || {}
-      return {
-        ID: user.id,
-        'BNCC ID': reg.bnccId || '-',
-        'Full Name': user.name || '-',
-        Status: user.status || '-',
-        Email: user.email || '-',
-        LINE: reg.lineId || '-',
-        WhatsApp: reg.whatsappNumber ? (
-          <a
-            href="#"
-            onClick={(e) => {
-              e.preventDefault()
-              const message = whatsAppMessage.replace('{nama}', user.name)
-              OpenWhatsApp(reg.whatsappNumber, message)
-            }}
-            className="text-blue-600 underline"
+  // Map raw users into table row objects safely
+  const allRows = rawUsers.map((user) => {
+    const reg = user?.registrations?.[0] || {}
+    return {
+      ID: user?.id ?? '-',
+      'BNCC ID': reg?.bnccId || '-',
+      'Full Name': user?.name || '-',
+      Status: user?.status || '-',
+      Email: user?.email || '-',
+      'Binus Email': reg?.binusEmail || user?.binusEmail || '-',
+      LINE: reg?.lineId || '-',
+      WhatsApp: reg?.whatsappNumber ? (
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault()
+            const message = whatsAppMessage.replace('{nama}', user?.name || '')
+            OpenWhatsApp(reg.whatsappNumber, message)
+          }}
+          className="text-blue-600 underline"
+        >
+          {reg.whatsappNumber}
+        </a>
+      ) : (
+        '-'
+      ),
+      NIM: reg?.nim || '-',
+      'LnT Course': reg?.lntCourse?.title || '-',
+      'Launching Schedule': reg?.schedule?.title || '-',
+      Major: reg?.major?.name || '-',
+      Faculty: reg?.faculty?.name || '-',
+      Region: reg?.region?.name || '-',
+      Actions: (
+        <div className="flex flex-row justify-between">
+          <button
+            onClick={() => handleViewUser(user?.id)}
+            aria-label="View"
+            className="mx-1"
           >
-            {reg.whatsappNumber}
-          </a>
-        ) : (
-          '-'
-        ),
-        NIM: reg.nim || '-',
-        'LnT Course': reg.lntCourse?.title || '-',
-        'Launching Schedule': reg.schedule?.title || '-',
-        Major: reg.major?.name || '-',
-        Faculty: reg.faculty?.name || '-',
-        Region: reg.region?.name || '-',
-        Actions: (
-          <div className="flex flex-row justify-between">
-            <button
-              onClick={() => handleViewUser(user.id)}
-              aria-label="View"
-              className="mx-1"
+            <svg
+              width={18}
+              height={18}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
             >
-              <svg
-                width={18}
-                height={18}
-                fill="none"
-                viewBox="0 0 24 24"
+              <path
+                d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"
                 stroke="currentColor"
-              >
-                <path
-                  d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="3"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-            <button
-              onClick={() => {
-                setEditForm({
-                  id: user.id,
-                  name: user.name,
-                  email: user.email,
-                  nim: reg.nim,
-                  lineId: reg.lineId,
-                  whatsappNumber: reg.whatsappNumber,
-                  regionId: reg.region?.id ?? '',
-                  facultyId: reg.faculty?.id ?? '',
-                  majorId: reg.major?.id ?? '',
-                  lntCourseId: reg.lntCourse?.id ?? '',
-                  scheduleId: reg.schedule?.id ?? '',
-                  status: user.status ?? '',
-                })
-                setShowEditModal(true)
-              }}
-              aria-label="Edit"
-              className="mx-1"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <circle
+                cx="12"
+                cy="12"
+                r="3"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+          <button
+            onClick={() => {
+              setEditForm({
+                id: user?.id ?? 0,
+                name: user?.name || '',
+                email: user?.email || '',
+                binusEmail: reg?.binusEmail || user?.binusEmail || '',
+                nim: reg?.nim || '',
+                lineId: reg?.lineId || '',
+                whatsappNumber: reg?.whatsappNumber || '',
+                regionId: reg?.region?.id ?? '',
+                facultyId: reg?.faculty?.id ?? '',
+                majorId: reg?.major?.id ?? '',
+                lntCourseId: reg?.lntCourse?.id ?? '',
+                scheduleId: reg?.schedule?.id ?? '',
+                status: user?.status ?? '',
+              })
+              setShowEditModal(true)
+            }}
+            aria-label="Edit"
+            className="mx-1"
+          >
+            <svg
+              width={18}
+              height={18}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
             >
-              <svg
-                width={18}
-                height={18}
-                fill="none"
-                viewBox="0 0 24 24"
+              <path
+                d="M16.862 3.487a2.07 2.07 0 0 1 2.93 2.93l-1.1 1.1-2.93-2.93 1.1-1.1zm-2.1 2.1 2.93 2.93-9.1 9.1H5.662v-3.03l9.1-9.1z"
                 stroke="currentColor"
-              >
-                <path
-                  d="M16.862 3.487a2.07 2.07 0 0 1 2.93 2.93l-1.1 1.1-2.93-2.93 1.1-1.1zm-2.1 2.1 2.93 2.93-9.1 9.1H5.662v-3.03l9.1-9.1z"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-            <button
-              onClick={() => {
-                setDeleteTarget(user.id)
-                setShowDeleteModal(true)
-              }}
-              aria-label="Delete"
-              className="mx-1"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+          <button
+            onClick={() => {
+              setDeleteTarget(user?.id)
+              setShowDeleteModal(true)
+            }}
+            aria-label="Delete"
+            className="mx-1"
+          >
+            <svg
+              width={18}
+              height={18}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
             >
-              <svg
-                width={18}
-                height={18}
-                fill="none"
-                viewBox="0 0 24 24"
+              <path
+                d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6m3 10v-6m4 6v-6"
                 stroke="currentColor"
-              >
-                <path
-                  d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6m3 10v-6m4 6v-6"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          </div>
-        ),
-      }
-    }) ?? []
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+      ),
+    }
+  })
+
+  // Client-side fallback search if backend returns unpaginated/unfiltered array
+  const filteredRows = searchQuery
+    ? allRows.filter((row) =>
+        String(row['Full Name'] || '')
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()),
+      )
+    : allRows
+
+  // If backend already paginated, use allRows; otherwise slice client-side
+  const pagedData =
+    data?.pagination || data?.meta
+      ? allRows
+      : filteredRows.slice(
+          (pageIndex - 1) * itemsPerPage,
+          pageIndex * itemsPerPage,
+        )
 
   const handleRetry = () => {
     setShowErrorModal(false)
@@ -461,10 +500,11 @@ Panitia BNCC Launching`,
   }
 
   const handleViewUser = async (userId) => {
+    if (!userId) return
     setViewLoading(true)
     try {
       const detail = await getUserDetail(String(userId))
-      setViewUser(detail.data?.[0] ?? detail.data ?? null)
+      setViewUser(detail?.data?.[0] ?? detail?.data ?? null)
       setShowViewModal(true)
     } catch (err) {
       setAlert({
@@ -518,6 +558,7 @@ Panitia BNCC Launching`,
         </div>
       )}
 
+      {/* View User Modal */}
       {showViewModal && (
         <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-10 pb-10 overflow-y-auto">
           <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl border border-gray-200 text-left min-w-[350px] max-w-[90vw] max-h-[85vh] overflow-y-auto">
@@ -529,81 +570,57 @@ Panitia BNCC Launching`,
             ) : viewUser ? (
               <div className="space-y-2 mb-6">
                 <div>
-                  <b>Name:</b> {viewUser.name}
+                  <b>Name:</b> {viewUser.name || '-'}
                 </div>
                 <div>
-                  <b>Email:</b> {viewUser.email}
+                  <b>Email:</b> {viewUser.email || '-'}
                 </div>
                 <div>
-                  <b>Status:</b> {viewUser.status}
+                  <b>Binus Email:</b>{' '}
+                  {viewUser.registrations?.[0]?.binusEmail ||
+                    viewUser.binusEmail ||
+                    '-'}
                 </div>
                 <div>
-                  <b>Role:</b> {viewUser.role}
+                  <b>Status:</b> {viewUser.status || '-'}
                 </div>
                 <div>
-                  <b>Created At:</b> {viewUser.createdAt}
+                  <b>Role:</b> {viewUser.role ?? '-'}
                 </div>
                 <div>
-                  <b>Updated At:</b> {viewUser.updatedAt}
+                  <b>Created At:</b> {viewUser.createdAt || '-'}
+                </div>
+                <div>
+                  <b>Updated At:</b> {viewUser.updatedAt || '-'}
                 </div>
                 {viewUser.registrations?.map((reg, idx) => (
                   <div key={idx} className="border-t pt-2 mt-2">
                     <div>
-                      <b>NIM:</b> {reg.nim}
+                      <b>NIM:</b> {reg?.nim || '-'}
                     </div>
                     <div>
-                      <b>BNCC ID:</b> {reg.bnccId}
+                      <b>BNCC ID:</b> {reg?.bnccId || '-'}
                     </div>
                     <div>
-                      <b>LINE:</b> {reg.lineId}
+                      <b>LINE:</b> {reg?.lineId || '-'}
                     </div>
                     <div>
-                      <b>WhatsApp:</b> {reg.whatsappNumber}
+                      <b>WhatsApp:</b> {reg?.whatsappNumber || '-'}
                     </div>
                     <div>
-                      <b>Region:</b> {reg.region?.name}
+                      <b>Region:</b> {reg?.region?.name || '-'}
                     </div>
                     <div>
-                      <b>Faculty:</b> {reg.faculty?.name}
+                      <b>Faculty:</b> {reg?.faculty?.name || '-'}
                     </div>
                     <div>
-                      <b>Major:</b> {reg.major?.name}
+                      <b>Major:</b> {reg?.major?.name || '-'}
                     </div>
                     <div>
-                      <b>LnT Course:</b> {reg.lntCourse?.title}
+                      <b>LnT Course:</b> {reg?.lntCourse?.title || '-'}
                     </div>
                     <div>
-                      <b>Schedule:</b> {reg.schedule?.title}
-                    </div>
-                    <div>
-                      <b>LinkedIn:</b>{' '}
-                      {reg.linkedinUrl ? (
-                        <a
-                          href={reg.linkedinUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 underline"
-                        >
-                          LinkedIn
-                        </a>
-                      ) : (
-                        '-'
-                      )}
-                    </div>
-                    <div>
-                      <b>Github:</b>{' '}
-                      {reg.githubUrl ? (
-                        <a
-                          href={reg.githubUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 underline"
-                        >
-                          Github
-                        </a>
-                      ) : (
-                        '-'
-                      )}
+                      <b>Schedule:</b> {reg?.schedule?.title || '-'}
                     </div>
                   </div>
                 ))}
@@ -626,6 +643,7 @@ Panitia BNCC Launching`,
         </div>
       )}
 
+      {/* Edit User Modal */}
       {showEditModal && (
         <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-10 pb-10 overflow-y-auto">
           <form
@@ -649,6 +667,13 @@ Panitia BNCC Launching`,
                 className="border p-2 rounded w-full"
                 placeholder="Email"
                 required
+              />
+              <input
+                name="binusEmail"
+                value={editForm.binusEmail || ''}
+                onChange={handleEditChange}
+                className="border p-2 rounded w-full"
+                placeholder="Binus Email"
               />
               <input
                 name="nim"
@@ -817,6 +842,7 @@ Panitia BNCC Launching`,
         </div>
       )}
 
+      {/* Create User Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-10 pb-10 overflow-y-auto">
           <form
@@ -838,8 +864,15 @@ Panitia BNCC Launching`,
                 value={createForm.email}
                 onChange={handleCreateChange}
                 className="border p-2 rounded w-full"
-                placeholder="Email"
+                placeholder="Personal Email"
                 required
+              />
+              <input
+                name="binusEmail"
+                value={createForm.binusEmail}
+                onChange={handleCreateChange}
+                className="border p-2 rounded w-full"
+                placeholder="Binus Email (Optional)"
               />
               <input
                 name="password"
@@ -874,6 +907,23 @@ Panitia BNCC Launching`,
                 placeholder="WhatsApp"
                 required
               />
+              <select
+                name="status"
+                value={createForm.status}
+                onChange={handleCreateChange}
+                className="border p-2 rounded w-full"
+                required
+              >
+                <option value="">Select Status</option>
+                <option value="email_verified">Email Verified</option>
+                <option value="email_unverified">Email Unverified</option>
+                <option value="done_launching">Done Launching</option>
+                <option value="confirm_launching">Confirm Launching</option>
+                <option value="letter_error">Letter Error</option>
+                <option value="letter_verified">Letter Verified</option>
+                <option value="done_reregist">Done Re-Registration</option>
+                <option value="closed">Closed</option>
+              </select>
               <select
                 name="regionId"
                 value={createForm.regionId}
@@ -1169,7 +1219,7 @@ Panitia BNCC Launching`,
           value={searchQuery}
           onChange={(e) => {
             setSearchQuery(e.target.value)
-            setPageIndex(1) // Reset to page 1 when searching
+            setPageIndex(1)
           }}
           className="py-2 px-4 w-full md:w-[400px] border rounded"
         />
@@ -1200,6 +1250,7 @@ Panitia BNCC Launching`,
           </button>
         </div>
       </div>
+
       <div className="flex flex-row gap-7 min-w-fit px-6">
         <div className="p-5 rounded-[8px] bg-white w-full">
           <Table
