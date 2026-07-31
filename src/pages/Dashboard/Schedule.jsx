@@ -142,8 +142,9 @@ export default function Schedule() {
       const apiUrl =
         import.meta.env.VITE_API_URL || 'https://launching-api.bncc.net/api'
 
-      const res = await fetch(`${apiUrl}/user/schedule`, {
-        method: 'PUT',
+      // Updated endpoint path to /reschedule and method to PATCH
+      const res = await fetch(`${apiUrl}/reschedule`, {
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
@@ -154,18 +155,16 @@ export default function Schedule() {
       })
 
       const body = await res.json().catch(() => null)
-      console.log('[Schedule] PUT /user/schedule status:', res.status, body)
+      console.log('[Schedule] PATCH /reschedule status:', res.status, body)
 
       if (!res.ok) {
         setSaveError(
           body?.message || 'Gagal menyimpan jadwal. Silakan coba lagi.',
         )
-        return // do NOT update local state — backend didn't save it
+        return
       }
 
-      // Only trust local state after backend confirms success.
-      // If the PUT response already returns the updated schedule object,
-      // prefer that over tempSchedule to guarantee it matches backend.
+      // Update local state on success
       setUserSchedule(body?.data ?? tempSchedule)
       setTempSchedule(null)
       setPopupOpen(true)
