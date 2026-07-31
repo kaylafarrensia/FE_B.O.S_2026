@@ -24,7 +24,11 @@ const HOVER_GLASS_STYLE = {
 }
 
 export default function Japres() {
-  const [hasReadGuideline, setHasReadGuideline] = useState(false)
+  // Initialize checkbox state from localStorage
+  const [hasReadGuideline, setHasReadGuideline] = useState(() => {
+    return localStorage.getItem('japres_has_read_guideline') === 'true'
+  })
+
   const [japresUrl, setJapresUrl] = useState('')
   const [currentStatus, setCurrentStatus] = useState('NOT_SUBMITTED')
   const [submittedAt, setSubmittedAt] = useState(null)
@@ -34,6 +38,12 @@ export default function Japres() {
 
   const apiUrl =
     import.meta.env.VITE_API_URL || 'https://launching-api.bncc.net/api'
+
+  // Handler to update state and save to localStorage
+  const handleToggleGuideline = (value) => {
+    setHasReadGuideline(value)
+    localStorage.setItem('japres_has_read_guideline', value ? 'true' : 'false')
+  }
 
   // Fetch status from backend
   const loadStatus = async () => {
@@ -52,6 +62,9 @@ export default function Japres() {
           setSubmittedAt(data.updatedAt || data.submittedAt || null)
           if (data.japresUrl) {
             setJapresUrl(data.japresUrl)
+            // Auto-check if user already submitted in the past
+            setHasReadGuideline(true)
+            localStorage.setItem('japres_has_read_guideline', 'true')
           }
         }
       }
@@ -97,7 +110,6 @@ export default function Japres() {
         return
       }
 
-      // Refresh latest status directly from backend
       await loadStatus()
     } catch (err) {
       console.error('Error submitting JaPres:', err)
@@ -252,7 +264,7 @@ export default function Japres() {
           <div className="space-y-4 sm:space-y-6">
             <GuidelineSection
               hasReadGuideline={hasReadGuideline}
-              setHasReadGuideline={setHasReadGuideline}
+              setHasReadGuideline={handleToggleGuideline}
             />
             <DocumentSubmission
               japresUrl={japresUrl}
