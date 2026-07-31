@@ -138,7 +138,6 @@ Panitia BNCC Launching`,
   } = useQuery({
     queryKey: ['user-details', pageIndex, itemsPerPage, searchQuery],
     queryFn: () => {
-      // Handles both parametrized and non-parametrized getUsersDetails functions
       try {
         return getUsersDetails({
           page: pageIndex,
@@ -244,9 +243,7 @@ Panitia BNCC Launching`,
       const payload = {
         fullName: String(form.fullName || '').trim(),
         email: String(form.email || '').trim(),
-        binusEmail:
-          String(form.binusEmail || '').trim() ||
-          `${String(form.nim || '').trim()}@binus.ac.id`,
+        binusEmail: String(form.binusEmail || '').trim(),
         password: String(form.password || ''),
         nim: String(form.nim || '').trim(),
         lineId: String(form.lineId || '').trim(),
@@ -320,13 +317,26 @@ Panitia BNCC Launching`,
   // Map raw users into table row objects safely
   const allRows = rawUsers.map((user) => {
     const reg = user?.registrations?.[0] || {}
+
+    // Multi-key fallback search for Binus Email
+    const extractedBinusEmail =
+      reg?.binusEmail ||
+      reg?.binus_email ||
+      reg?.emailBinus ||
+      reg?.binusianEmail ||
+      user?.binusEmail ||
+      user?.binus_email ||
+      user?.emailBinus ||
+      user?.binusianEmail ||
+      '-'
+
     return {
       ID: user?.id ?? '-',
       'BNCC ID': reg?.bnccId || '-',
       'Full Name': user?.name || '-',
       Status: user?.status || '-',
       Email: user?.email || '-',
-      'Binus Email': reg?.binusEmail || user?.binusEmail || '-',
+      'Binus Email': extractedBinusEmail,
       LINE: reg?.lineId || '-',
       WhatsApp: reg?.whatsappNumber ? (
         <a
@@ -387,7 +397,8 @@ Panitia BNCC Launching`,
                 id: user?.id ?? 0,
                 name: user?.name || '',
                 email: user?.email || '',
-                binusEmail: reg?.binusEmail || user?.binusEmail || '',
+                binusEmail:
+                  extractedBinusEmail !== '-' ? extractedBinusEmail : '',
                 nim: reg?.nim || '',
                 lineId: reg?.lineId || '',
                 whatsappNumber: reg?.whatsappNumber || '',
@@ -448,7 +459,7 @@ Panitia BNCC Launching`,
     }
   })
 
-  // Client-side fallback search if backend returns unpaginated/unfiltered array
+  // Client-side fallback search
   const filteredRows = searchQuery
     ? allRows.filter((row) =>
         String(row['Full Name'] || '')
@@ -457,7 +468,6 @@ Panitia BNCC Launching`,
       )
     : allRows
 
-  // If backend already paginated, use allRows; otherwise slice client-side
   const pagedData =
     data?.pagination || data?.meta
       ? allRows
@@ -578,7 +588,9 @@ Panitia BNCC Launching`,
                 <div>
                   <b>Binus Email:</b>{' '}
                   {viewUser.registrations?.[0]?.binusEmail ||
+                    viewUser.registrations?.[0]?.binus_email ||
                     viewUser.binusEmail ||
+                    viewUser.binus_email ||
                     '-'}
                 </div>
                 <div>
@@ -665,7 +677,7 @@ Panitia BNCC Launching`,
                 value={editForm.email || ''}
                 onChange={handleEditChange}
                 className="border p-2 rounded w-full"
-                placeholder="Email"
+                placeholder="Personal Email"
                 required
               />
               <input
@@ -674,6 +686,7 @@ Panitia BNCC Launching`,
                 onChange={handleEditChange}
                 className="border p-2 rounded w-full"
                 placeholder="Binus Email"
+                required
               />
               <input
                 name="nim"
@@ -872,7 +885,8 @@ Panitia BNCC Launching`,
                 value={createForm.binusEmail}
                 onChange={handleCreateChange}
                 className="border p-2 rounded w-full"
-                placeholder="Binus Email (Optional)"
+                placeholder="Binus Email"
+                required
               />
               <input
                 name="password"
