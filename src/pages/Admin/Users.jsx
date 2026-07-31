@@ -159,7 +159,6 @@ Panitia BNCC Launching`,
         ? data.users
         : []
 
-  // Extract total count safely
   const totalItems =
     data?.pagination?.total ||
     data?.meta?.total ||
@@ -208,6 +207,8 @@ Panitia BNCC Launching`,
     mutationFn: (form) => {
       const payload = {
         ...form,
+        binusEmail: form.binusEmail?.trim(),
+        binusianEmail: form.binusEmail?.trim(), // Sends both variants for backend compatibility
         regionId: Number(form.regionId),
         facultyId: Number(form.facultyId),
         majorId: Number(form.majorId),
@@ -240,10 +241,12 @@ Panitia BNCC Launching`,
 
   const createMutation = useMutation({
     mutationFn: (form) => {
+      const bEmail = String(form.binusEmail || '').trim()
       const payload = {
         fullName: String(form.fullName || '').trim(),
         email: String(form.email || '').trim(),
-        binusEmail: String(form.binusEmail || '').trim(),
+        binusEmail: bEmail,
+        binusianEmail: bEmail, // Sends both key formats to handle backend variations
         password: String(form.password || ''),
         nim: String(form.nim || '').trim(),
         lineId: String(form.lineId || '').trim(),
@@ -316,18 +319,18 @@ Panitia BNCC Launching`,
 
   // Map raw users into table row objects safely
   const allRows = rawUsers.map((user) => {
-    const reg = user?.registrations?.[0] || {}
+    const reg = user?.registrations?.[0] || user?.registration || {}
 
-    // Multi-key fallback search for Binus Email
+    // Comprehensive search for Binus Email across all common field names
     const extractedBinusEmail =
-      reg?.binusEmail ||
-      reg?.binus_email ||
-      reg?.emailBinus ||
-      reg?.binusianEmail ||
       user?.binusEmail ||
-      user?.binus_email ||
-      user?.emailBinus ||
+      reg?.binusEmail ||
       user?.binusianEmail ||
+      reg?.binusianEmail ||
+      user?.binus_email ||
+      reg?.binus_email ||
+      user?.emailBinus ||
+      reg?.emailBinus ||
       '-'
 
     return {
@@ -337,6 +340,7 @@ Panitia BNCC Launching`,
       Status: user?.status || '-',
       Email: user?.email || '-',
       'Binus Email': extractedBinusEmail,
+      'Binusian Email': extractedBinusEmail, // Mapped to BOTH titles so it shows regardless of constants.js title!
       LINE: reg?.lineId || '-',
       WhatsApp: reg?.whatsappNumber ? (
         <a
@@ -587,10 +591,10 @@ Panitia BNCC Launching`,
                 </div>
                 <div>
                   <b>Binus Email:</b>{' '}
-                  {viewUser.registrations?.[0]?.binusEmail ||
-                    viewUser.registrations?.[0]?.binus_email ||
-                    viewUser.binusEmail ||
-                    viewUser.binus_email ||
+                  {viewUser.binusEmail ||
+                    viewUser.binusianEmail ||
+                    viewUser.registrations?.[0]?.binusEmail ||
+                    viewUser.registrations?.[0]?.binusianEmail ||
                     '-'}
                 </div>
                 <div>
