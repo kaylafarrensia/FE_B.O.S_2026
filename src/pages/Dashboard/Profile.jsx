@@ -228,7 +228,7 @@ function Profile() {
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">Binus Email</p>
                     <p className="text-sm sm:text-lg font-semibold break-words">
-                      {renderEmail(user.email)}
+                      {renderEmail(user.binusEmail)}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2">
