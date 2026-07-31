@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react'
 
 export default function Pagination({
   index,
@@ -9,76 +9,76 @@ export default function Pagination({
   onChangeItemsPerPage,
   disabled = false,
 }) {
-  const totalPages = Math.max(1, Math.ceil(totalItem / itemsPerPage));
-  const [pageSizeInput, setPageSizeInput] = useState(itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(totalItem / itemsPerPage))
+  const [pageSizeInput, setPageSizeInput] = useState(itemsPerPage)
 
   useEffect(() => {
-    setPageSizeInput(itemsPerPage);
-  }, [itemsPerPage]);
+    setPageSizeInput(itemsPerPage)
+  }, [itemsPerPage])
 
   const range = (start, end) => {
-    const out = [];
-    for (let i = start; i <= end; i++) out.push(i);
-    return out;
-  };
+    const out = []
+    for (let i = start; i <= end; i++) out.push(i)
+    return out
+  }
 
   const getPageNumbers = () => {
-    if (totalPages <= 5) return range(1, totalPages);
+    if (totalPages <= 5) return range(1, totalPages)
 
-    if (index === 1) return range(1, Math.min(3, totalPages));
-    if (index === 2) return range(1, Math.min(4, totalPages));
+    if (index === 1) return range(1, Math.min(3, totalPages))
+    if (index === 2) return range(1, Math.min(4, totalPages))
 
     if (index === totalPages) {
-      return range(Math.max(1, totalPages - 2), totalPages);
+      return range(Math.max(1, totalPages - 2), totalPages)
     }
 
     if (index === totalPages - 1) {
-      return range(Math.max(1, totalPages - 3), totalPages);
+      return range(Math.max(1, totalPages - 3), totalPages)
     }
 
-    const start = Math.max(1, index - 2);
-    const end = Math.min(totalPages, index + 2);
+    const start = Math.max(1, index - 2)
+    const end = Math.min(totalPages, index + 2)
 
     if (end - start + 1 < 5) {
       if (start === 1) {
-        return range(start, Math.min(totalPages, start + 4));
+        return range(start, Math.min(totalPages, start + 4))
       }
 
       if (end === totalPages) {
-        return range(Math.max(1, end - 4), end);
+        return range(Math.max(1, end - 4), end)
       }
     }
 
-    return range(start, end);
-  };
+    return range(start, end)
+  }
 
   const handleJumpTo = (e) => {
-    const value = Number(e.target.value);
-    onChangeIndex?.(value);
-  };
+    const value = Number(e.target.value)
+    onChangeIndex?.(value)
+  }
 
   const handleNav = (type) => {
-    let newIndex = index;
+    let newIndex = index
 
-    if (type === 'first') newIndex = 1;
-    if (type === 'prev') newIndex = Math.max(1, index - 1);
-    if (type === 'next') newIndex = Math.min(totalPages, index + 1);
-    if (type === 'last') newIndex = totalPages;
-    if (typeof type === 'number') newIndex = type;
+    if (type === 'first') newIndex = 1
+    if (type === 'prev') newIndex = Math.max(1, index - 1)
+    if (type === 'next') newIndex = Math.min(totalPages, index + 1)
+    if (type === 'last') newIndex = totalPages
+    if (typeof type === 'number') newIndex = type
 
-    onChangeIndex?.(newIndex);
-  };
+    onChangeIndex?.(newIndex)
+  }
 
   const handlePageSizeChange = (e) => {
-    const value = Math.max(1, Number(e.target.value) || 1);
+    const value = Math.max(1, Number(e.target.value) || 1)
 
-    setPageSizeInput(value);
-    onChangeItemsPerPage?.(value);
-    onChangeIndex?.(1);
-  };
+    setPageSizeInput(value)
+    onChangeItemsPerPage?.(value)
+    onChangeIndex?.(1)
+  }
 
-  const disabledPrev = index === 1 || disabled;
-  const disabledNext = index === totalPages || disabled;
+  const disabledPrev = index === 1 || disabled
+  const disabledNext = index === totalPages || disabled
 
   return (
     <div className="flex flex-wrap items-center justify-end gap-4 text-sm py-2">
@@ -102,9 +102,7 @@ export default function Pagination({
       <div className="flex items-center gap-1">
         <button
           className={`border rounded p-2 flex items-center justify-center ${
-            disabledPrev
-              ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-              : ''
+            disabledPrev ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : ''
           }`}
           disabled={disabledPrev}
           onClick={() => handleNav('first')}
@@ -131,9 +129,7 @@ export default function Pagination({
 
         <button
           className={`border rounded p-2 flex items-center justify-center ${
-            disabledPrev
-              ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-              : ''
+            disabledPrev ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : ''
           }`}
           disabled={disabledPrev}
           onClick={() => handleNav('prev')}
@@ -168,9 +164,7 @@ export default function Pagination({
 
         <button
           className={`border rounded w-8 h-8 flex items-center justify-center ${
-            disabledNext
-              ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-              : ''
+            disabledNext ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : ''
           }`}
           disabled={disabledNext}
           onClick={() => handleNav('next')}
@@ -189,9 +183,7 @@ export default function Pagination({
 
         <button
           className={`border rounded w-8 h-8 flex items-center justify-center ${
-            disabledNext
-              ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-              : ''
+            disabledNext ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : ''
           }`}
           disabled={disabledNext}
           onClick={() => handleNav('last')}
@@ -241,5 +233,5 @@ export default function Pagination({
         Result(s)
       </span>
     </div>
-  );
+  )
 }

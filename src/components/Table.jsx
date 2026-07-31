@@ -1,10 +1,10 @@
-import { isValidElement, useMemo } from 'react';
+import { isValidElement, useMemo } from 'react'
 import {
   useReactTable,
   getCoreRowModel,
   flexRender,
-} from '@tanstack/react-table';
-import Loader from '@/components/ui/loader';
+} from '@tanstack/react-table'
+import Loader from '@/components/ui/loader'
 
 export default function Table({
   columns,
@@ -16,31 +16,33 @@ export default function Table({
   bordered = false,
 }) {
   const tanstackColumns = useMemo(() => {
-    const cols = [];
+    const cols = []
 
     columns.forEach((column, index) => {
-      const dataIndex =
-        column._index !== undefined ? column._index : index;
+      const dataIndex = column._index !== undefined ? column._index : index
 
       cols.push({
         accessorFn: (row) => {
           if (column.accessor) {
-            return row[column.accessor];
+            return row[column.accessor]
           }
-          if (typeof column.title === 'string' && row[column.title] !== undefined) {
-            return row[column.title];
+          if (
+            typeof column.title === 'string' &&
+            row[column.title] !== undefined
+          ) {
+            return row[column.title]
           }
-          const keys = Object.keys(row);
-          return row[keys[dataIndex]] ?? row[keys[index]];
+          const keys = Object.keys(row)
+          return row[keys[dataIndex]] ?? row[keys[index]]
         },
         header: column.title || 'Column',
 
         cell: ({ getValue, row }) => {
-          const value = getValue();
-          let content;
+          const value = getValue()
+          let content
 
           if (column.itemWrapper) {
-            content = column.itemWrapper(value, row.original);
+            content = column.itemWrapper(value, row.original)
           } else if (
             typeof value === 'string' ||
             typeof value === 'number' ||
@@ -48,11 +50,11 @@ export default function Table({
             value === null ||
             value === undefined
           ) {
-            content = value ?? '-';
+            content = value ?? '-'
           } else if (isValidElement(value)) {
-            content = value;
+            content = value
           } else {
-            content = '-';
+            content = '-'
           }
 
           return (
@@ -65,49 +67,44 @@ export default function Table({
                     : 'text-left'
               }`}
               style={{
-                verticalAlign:
-                  column.itemVerticalAlign || 'baseline',
+                verticalAlign: column.itemVerticalAlign || 'baseline',
               }}
             >
               {content}
             </div>
-          );
+          )
         },
 
         enableSorting: false,
 
         size: column.width
-          ? Number.parseInt(
-              column.width.replace('px', '')
-            )
+          ? Number.parseInt(column.width.replace('px', ''))
           : 120,
-      });
-    });
+      })
+    })
 
-    return cols;
-  }, [columns, data.length]);
+    return cols
+  }, [columns, data.length])
 
   const table = useReactTable({
     data,
     columns: tanstackColumns,
     getCoreRowModel: getCoreRowModel(),
-  });
+  })
 
   return (
     <div className={`flex flex-col h-full ${className}`}>
       <div className="flex-1">
         <table
           className={`w-full border-collapse ${
-            bordered
-              ? 'border border-[#E9ECEF]'
-              : ''
+            bordered ? 'border border-[#E9ECEF]' : ''
           }`}
         >
           <thead className="bg-gray-50">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header, idx) => {
-                  const colDef = columns[idx] || {};
+                  const colDef = columns[idx] || {}
 
                   return (
                     <th
@@ -128,10 +125,10 @@ export default function Table({
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </th>
-                  );
+                  )
                 })}
               </tr>
             ))}
@@ -146,9 +143,7 @@ export default function Table({
                 >
                   <div className="flex flex-col items-center justify-center">
                     <Loader />
-                    <span className="block mt-2">
-                      Loading...
-                    </span>
+                    <span className="block mt-2">Loading...</span>
                   </div>
                 </td>
               </tr>
@@ -166,24 +161,13 @@ export default function Table({
                 <tr
                   key={row.id}
                   className={`${
-                    striped
-                      ? idx % 2 === 0
-                        ? 'bg-gray-50'
-                        : 'bg-white'
-                      : ''
-                  } ${
-                    striped
-                      ? 'hover:bg-gray-200'
-                      : 'hover:bg-gray-50'
-                  } ${
-                    bordered
-                      ? 'border-b border-[#E9ECEF]'
-                      : ''
+                    striped ? (idx % 2 === 0 ? 'bg-gray-50' : 'bg-white') : ''
+                  } ${striped ? 'hover:bg-gray-200' : 'hover:bg-gray-50'} ${
+                    bordered ? 'border-b border-[#E9ECEF]' : ''
                   }`}
                 >
                   {row.getVisibleCells().map((cell, cellIdx) => {
-                    const colDef =
-                      columns[cellIdx] || {};
+                    const colDef = columns[cellIdx] || {}
 
                     return (
                       <td
@@ -195,17 +179,15 @@ export default function Table({
                               ? 'text-right'
                               : 'text-left'
                         } ${
-                          bordered
-                            ? 'border border-[#E9ECEF]'
-                            : ''
+                          bordered ? 'border border-[#E9ECEF]' : ''
                         } text-gray-800`}
                       >
                         {flexRender(
                           cell.column.columnDef.cell,
-                          cell.getContext()
+                          cell.getContext(),
                         )}
                       </td>
-                    );
+                    )
                   })}
                 </tr>
               ))
@@ -216,5 +198,5 @@ export default function Table({
 
       {tableFooter && <>{tableFooter}</>}
     </div>
-  );
+  )
 }

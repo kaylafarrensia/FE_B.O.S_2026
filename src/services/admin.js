@@ -117,29 +117,9 @@ export const getAdminOverview = async () => {
 }
 
 // Get User Details
-export const getUsersDetails = async () => {
-  // return {
-  //   "success": true,
-  //   "message": "Users retrieved successfully",
-  //   "data": [
-  //     {
-  //       "id": 1,
-  //       "name": "User Name",
-  //       "email": "user@example.com",
-  //       "status": "email_verified",
-  //       "role": 0,
-  //       "registrations": [{ "region": { "name": "Kemanggisan" } }]
-  //     }
-  //   ],
-  //   "pagination": {
-  //     "page": 1,
-  //     "limit": 10,
-  //     "total": 50,
-  //     "totalPages": 5
-  //   }
-  // }
+export const getUsersDetails = async ({ page = 1, limit = 10 } = {}) => {
   try {
-    const response = await api.get(`/admin/users?limit=0`)
+    const response = await api.get(`/admin/users?page=${page}&limit=${limit}`)
     return response.data
   } catch (error) {
     throw error

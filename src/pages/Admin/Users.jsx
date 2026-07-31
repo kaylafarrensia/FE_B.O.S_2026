@@ -132,6 +132,7 @@ Panitia BNCC Launching`,
     (s) => !s.regionId || Number(s.regionId) === Number(createForm.regionId),
   )
 
+  // ── SERVER-SIDE PAGINATED QUERY ──────────────────────────────────────────────
   const {
     data,
     isLoading,
@@ -139,9 +140,18 @@ Panitia BNCC Launching`,
     error: fetchError,
     refetch,
   } = useQuery({
-    queryKey: ['user-details'],
-    queryFn: getUsersDetails,
+    queryKey: ['user-details', pageIndex, itemsPerPage, searchQuery],
+    queryFn: () =>
+      getUsersDetails({
+        page: pageIndex,
+        limit: itemsPerPage,
+        search: searchQuery,
+      }),
   })
+
+  // Extract total count returned by backend safely
+  const totalItems =
+    data?.pagination?.total || data?.meta?.total || data?.total || 0
 
   useEffect(() => {
     if (isError) {
@@ -233,7 +243,6 @@ Panitia BNCC Launching`,
         heardFrom: null,
       }
 
-      // Map -1 (Pending) to 0 or handle cleanly for the backend validation schema
       if (
         form.isJapres !== null &&
         form.isJapres !== undefined &&
@@ -288,7 +297,8 @@ Panitia BNCC Launching`,
     window.open(`https://wa.me/+62${number}?text=${formatText}`)
   }
 
-  const allData =
+  // Directly map current page data from server response
+  const pagedData =
     data?.data?.map((user) => {
       const reg = user.registrations?.[0] || {}
       return {
@@ -416,19 +426,6 @@ Panitia BNCC Launching`,
         ),
       }
     }) ?? []
-
-  const filteredData = searchQuery
-    ? allData.filter((row) =>
-        (row['Full Name'] || '')
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()),
-      )
-    : allData
-
-  const pagedData = filteredData.slice(
-    (pageIndex - 1) * itemsPerPage,
-    pageIndex * itemsPerPage,
-  )
 
   const handleRetry = () => {
     setShowErrorModal(false)
@@ -607,122 +604,6 @@ Panitia BNCC Launching`,
                       ) : (
                         '-'
                       )}
-                    </div>
-                    <div>
-                      <b>Member Letter:</b>{' '}
-                      {reg.suratMember
-                        ? (() => {
-                            const v = reg.suratMember
-                            if (
-                              isDataUrl(v) ||
-                              /^([A-Za-z0-9+\/=\-_\s]+)$/.test(v)
-                            ) {
-                              return (
-                                <button
-                                  onClick={async () => {
-                                    try {
-                                      let blob
-                                      if (isDataUrl(v)) blob = base64ToBlob(v)
-                                      else {
-                                        const normalized = v
-                                          .replace(/\s/g, '')
-                                          .replace(/-/g, '+')
-                                          .replace(/_/g, '/')
-                                        blob = base64ToBlob(
-                                          'data:application/octet-stream;base64,' +
-                                            normalized,
-                                        )
-                                      }
-                                      const url = URL.createObjectURL(blob)
-                                      window.open(url, '_blank')
-                                      setTimeout(
-                                        () => URL.revokeObjectURL(url),
-                                        5000,
-                                      )
-                                    } catch (e) {
-                                      console.error(
-                                        'Failed to open member letter',
-                                        e,
-                                      )
-                                      window.alert('Failed to open file')
-                                    }
-                                  }}
-                                  className="text-blue-600 underline"
-                                >
-                                  Member Letter
-                                </button>
-                              )
-                            }
-                            return (
-                              <a
-                                href={v}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 underline"
-                              >
-                                Member Letter
-                              </a>
-                            )
-                          })()
-                        : '-'}
-                    </div>
-                    <div>
-                      <b>Binusian Card:</b>{' '}
-                      {reg.binusianCard
-                        ? (() => {
-                            const v = reg.binusianCard
-                            if (
-                              isDataUrl(v) ||
-                              /^([A-Za-z0-9+\/=\-_\s]+)$/.test(v)
-                            ) {
-                              return (
-                                <button
-                                  onClick={async () => {
-                                    try {
-                                      let blob
-                                      if (isDataUrl(v)) blob = base64ToBlob(v)
-                                      else {
-                                        const normalized = v
-                                          .replace(/\s/g, '')
-                                          .replace(/-/g, '+')
-                                          .replace(/_/g, '/')
-                                        blob = base64ToBlob(
-                                          'data:application/octet-stream;base64,' +
-                                            normalized,
-                                        )
-                                      }
-                                      const url = URL.createObjectURL(blob)
-                                      window.open(url, '_blank')
-                                      setTimeout(
-                                        () => URL.revokeObjectURL(url),
-                                        5000,
-                                      )
-                                    } catch (e) {
-                                      console.error(
-                                        'Failed to open binusian card',
-                                        e,
-                                      )
-                                      window.alert('Failed to open file')
-                                    }
-                                  }}
-                                  className="text-blue-600 underline"
-                                >
-                                  Binusian Card
-                                </button>
-                              )
-                            }
-                            return (
-                              <a
-                                href={v}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 underline"
-                              >
-                                Binusian Card
-                              </a>
-                            )
-                          })()
-                        : '-'}
                     </div>
                   </div>
                 ))}
@@ -1286,7 +1167,10 @@ Panitia BNCC Launching`,
           type="text"
           placeholder="Search by Full Name..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e) => {
+            setSearchQuery(e.target.value)
+            setPageIndex(1) // Reset to page 1 when searching
+          }}
           className="py-2 px-4 w-full md:w-[400px] border rounded"
         />
         <div className="flex gap-2">
@@ -1332,7 +1216,7 @@ Panitia BNCC Launching`,
               >
                 <Pagination
                   index={pageIndex}
-                  totalItem={filteredData.length}
+                  totalItem={totalItems}
                   itemsPerPage={itemsPerPage}
                   optionItemPerPage={[5, 10, 25, 50, 100]}
                   onChangeIndex={setPageIndex}
@@ -1340,6 +1224,7 @@ Panitia BNCC Launching`,
                     setItemsPerPage(val)
                     setPageIndex(1)
                   }}
+                  disabled={isLoading}
                 />
                 <button
                   className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 cursor-pointer"
