@@ -1,5 +1,5 @@
-import React, { forwardRef } from 'react';
-import { cn } from '@/lib/utils';
+import React, { forwardRef } from 'react'
+import { cn } from '@/lib/utils'
 
 const Button = forwardRef(function Button(
   {
@@ -12,10 +12,10 @@ const Button = forwardRef(function Button(
     type = 'button',
     ...props
   },
-  ref
+  ref,
 ) {
   const baseClasses =
-    'rounded-full font-semibold hover:scale-105 transition-all duration-300 ease-in-out transform flex items-center justify-center gap-2 cursor-pointer';
+    'rounded-full font-semibold hover:scale-105 transition-all duration-300 ease-in-out transform flex items-center justify-center gap-2 cursor-pointer'
 
   const variantClasses = {
     gradient:
@@ -23,15 +23,15 @@ const Button = forwardRef(function Button(
     solid: 'text-white bg-[#251369] hover:bg-[#9084CD]',
     outline:
       'text-[#251369] border-2 border-[#251369] hover:bg-[#251369] hover:text-white',
-  };
+  }
 
   const sizeClasses = {
     sm: 'px-6 py-2 text-sm',
     md: 'px-8 py-3 text-base',
     lg: 'px-10 py-4 text-lg',
-  };
+  }
 
-  const isDisabled = disabled || loading;
+  const isDisabled = disabled || loading
 
   return (
     <button
@@ -39,10 +39,12 @@ const Button = forwardRef(function Button(
       type={type}
       className={cn(
         baseClasses,
+        // Fallback to text-white if variant doesn't match or inheritance fails
+        'text-white',
         variantClasses[variant],
         sizeClasses[size],
         isDisabled && 'opacity-50 cursor-not-allowed hover:scale-100',
-        className
+        className,
       )}
       disabled={isDisabled}
       {...props}
@@ -52,7 +54,7 @@ const Button = forwardRef(function Button(
       )}
       {loading ? 'Loading...' : children}
     </button>
-  );
-});
+  )
+})
 
-export default Button;
+export default Button
