@@ -2,7 +2,27 @@ import Card from '../../../components/ui/Card.jsx'
 import Button from '../../../components/ui/Button.jsx'
 import IconUpload from '../../../assets/icons/IconUpload.svg'
 import IconTime from '../../../assets/icons/IconTime.svg'
-import { formatDate } from '../../../utils/index.js'
+
+// Helper function to format date + time (e.g., "22 Jul 2026 at 16:15")
+const formatDateTime = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  if (isNaN(date.getTime())) return ''
+
+  const formattedDate = date.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  })
+
+  const formattedTime = date.toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  })
+
+  return `${formattedDate} at ${formattedTime}`
+}
 
 export default function DocumentSubmission({
   japresUrl,
@@ -48,7 +68,7 @@ export default function DocumentSubmission({
             <img src={IconTime} alt="" className="w-4 h-4" />
             <span>
               {submittedAt
-                ? `Last submitted: ${formatDate(submittedAt)}`
+                ? `Last submitted: ${formatDateTime(submittedAt)}`
                 : 'No latest submission'}
             </span>
           </div>

@@ -35,7 +35,7 @@ export default function Japres() {
   const apiUrl =
     import.meta.env.VITE_API_URL || 'https://launching-api.bncc.net/api'
 
-  // Fetch status dari backend
+  // Fetch status from backend
   const loadStatus = async () => {
     const token = getToken()
     if (!token) return
@@ -50,7 +50,9 @@ export default function Japres() {
         if (data) {
           setCurrentStatus(data.status || 'NOT_SUBMITTED')
           setSubmittedAt(data.updatedAt || data.submittedAt || null)
-          if (data.japresUrl) setJapresUrl(data.japresUrl)
+          if (data.japresUrl) {
+            setJapresUrl(data.japresUrl)
+          }
         }
       }
     } catch (err) {
@@ -95,7 +97,7 @@ export default function Japres() {
         return
       }
 
-      // Ambil data status terbaru langsung dari backend
+      // Refresh latest status directly from backend
       await loadStatus()
     } catch (err) {
       console.error('Error submitting JaPres:', err)
@@ -246,7 +248,7 @@ export default function Japres() {
 
         {/* Section Grid */}
         <section className="grid w-full grid-cols-1 gap-4 sm:gap-6 xl:grid-cols-2">
-          {/* Kolom Kiri */}
+          {/* Left Column */}
           <div className="space-y-4 sm:space-y-6">
             <GuidelineSection
               hasReadGuideline={hasReadGuideline}
@@ -256,7 +258,6 @@ export default function Japres() {
               japresUrl={japresUrl}
               setJapresUrl={setJapresUrl}
               hasReadGuideline={hasReadGuideline}
-              status={currentStatus}
               submittedAt={submittedAt}
               onSubmit={handleSubmit}
               submitting={submitting}
@@ -264,7 +265,7 @@ export default function Japres() {
             />
           </div>
 
-          {/* Kolom Kanan */}
+          {/* Right Column */}
           <div className="space-y-4 sm:space-y-6">
             <TimelineSection overrideToday="2026-08-17" />
             <ApplicationStatus status={currentStatus} />

@@ -41,7 +41,7 @@ const STATUS_CONFIG = {
 }
 
 export default function ApplicationStatus({ status }) {
-  // Safe Normalization (menangani "Accepted Gold", "ACCEPTED_GOLD", "Pending", "PENDING", dll)
+  // Safe normalization (handles "Accepted Gold", "ACCEPTED_GOLD", "Pending", "PENDING", etc.)
   const normalizedKey =
     typeof status === 'string'
       ? status.trim().toUpperCase().replace(/\s+/g, '_')
