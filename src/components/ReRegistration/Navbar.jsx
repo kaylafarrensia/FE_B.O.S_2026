@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
-import bnccLogo from '../../../public/images/img-BNCC.png'
+import bnccLogo from '../../../public/images/ic-bncc-whitebg.svg'
 import icReregist from '../../../public/icons/ic-reregist.svg'
 import icJapres from '../../../public/icons/ic-japres.svg'
 import icProfile from '../../../public/icons/ic-profile.svg'
