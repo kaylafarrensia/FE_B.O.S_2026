@@ -71,7 +71,7 @@ function Profile() {
       setLoading(true)
       try {
         const apiUrl =
-          import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
+          import.meta.env.VITE_API_URL || 'https://launching-api.bncc.net/api'
         const res = await fetch(`${apiUrl}/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         })
@@ -216,7 +216,6 @@ function Profile() {
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">BNCC ID</p>
                     <p className="text-sm sm:text-lg font-semibold">
-                      {/* Changed from '—' to '-' to match LinkedIn & Github */}
                       {user.registration.bnccId || '-'}
                     </p>
                   </div>
