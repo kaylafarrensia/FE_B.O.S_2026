@@ -1,379 +1,216 @@
+import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import Card from '../../components/ui/Card.jsx'
-import Button from '../../components/ui/Button.jsx'
-import IconDownload from '../../assets/icons/IconDownload.svg'
-import { useOutletContext } from 'react-router-dom'
-import { formatDate } from '../../utils/index.js'
+import BNCC from '../../assets/images/BNCC.png'
+import IconCard from '../../assets/icons/IconCard.svg'
+import IconCheckList from '../../assets/icons/IconChecklist.svg'
+import IconMail from '../../assets/icons/IconMail.svg'
+import IconPieChart from '../../assets/icons/IconPiechart.svg'
+import IconTrophy from '../../assets/icons/IconTrophyV2.svg'
+import IconUsers from '../../assets/icons/IconUsers.svg'
 
-// ── DUMMY DATA ─────────────────────────────────────────────────────────────────
-const DUMMY_USER = {
-  name: 'John Doe',
-  email: 'johndoe123@gmail.com',
-  registration: {
-    whatsappNumber: '0831-0050-1534',
-    lineId: 'johndoeline',
-    nim: '2602345678',
-    bnccId: null,
-    schedule: {
-      startTime: '2026-08-15T09:00:00Z',
-      endTime: '2026-08-15T12:00:00Z',
-    },
-    lntCourse: { title: 'Front-End' },
-    faculty: { name: 'School of Computer Science' },
-    major: { name: 'Computer Science' },
-    region: { name: 'Jakarta' },
-    suratMember: 'null',
-    binusianCard: 'null',
-    linkedinUrl: '',
-    githubUrl: '',
+const navItems = [
+  {
+    path: '/admin/overview',
+    name: 'Overview',
+    icon: IconPieChart,
   },
+  {
+    path: '/admin/users',
+    name: 'User Details',
+    icon: IconUsers,
+  },
+  {
+    path: '/admin/documents',
+    name: 'Documents',
+    icon: IconMail,
+  },
+  {
+    path: '/admin/payment',
+    name: 'Payment',
+    icon: IconCard,
+  },
+  {
+    path: '/admin/japres',
+    name: 'Jalur Prestasi',
+    icon: IconTrophy,
+  },
+  {
+    path: '/admin/subscription',
+    name: 'Subscription',
+    icon: IconCheckList,
+  },
+]
+
+const adminNameDict = {
+  ALS: 'Alam Sutera',
+  BDG: 'Bandung',
+  KMG: 'Kemanggisan',
+  MLG: 'Malang',
+  SUPER: 'All Region',
 }
 
-function formatTime(startIso, endIso) {
+// ── Formats time specifically in WIB (Asia/Jakarta, UTC+7) ─────────────────────
+function formatWibTime(startIso, endIso) {
   if (!startIso) return '-'
   const s = new Date(startIso)
   const e = new Date(endIso)
+
   const fmt = (d) =>
     d.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false,
-      timeZone: 'UTC',
+      timeZone: 'Asia/Jakarta', // Forces +7 Hours UTC / WIB
     })
+
   return `${fmt(s)} – ${fmt(e)} WIB`
 }
 
-function renderEmail(email) {
-  if (!email) return ''
-  const parts = email.split('@')
-  if (parts.length === 2) {
-    return (
-      <>
-        {parts[0]}@<wbr />
-        {parts[1]}
-      </>
-    )
-  }
-  return email
-}
+export default function Dashboard() {
+  const [collapsed, setCollapsed] = useState(false)
+  const [userSchedule, setUserSchedule] = useState({
+    startTime: null,
+    endTime: null,
+  })
 
-function Profile() {
-  const [user, setUser] = useState(DUMMY_USER)
-  const [loading, setLoading] = useState(false)
-  const { userSchedule } = useOutletContext()
+  const location = useLocation()
+  const navigate = useNavigate()
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      const token =
-        localStorage.getItem('token') || localStorage.getItem('accessToken')
-
-      // If no token exists, don't attempt request
-      if (!token) return
-
-      setLoading(true)
-      try {
-        const apiUrl =
-          import.meta.env.VITE_API_URL || 'https://launching-api.bncc.net/api'
-        const res = await fetch(`${apiUrl}/profile`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-
-        // Handle Expired or Invalid Token (401 / 403)
-        if (res.status === 401 || res.status === 403) {
-          console.warn('Session expired. Clearing storage...')
-          localStorage.removeItem('token')
-          localStorage.removeItem('accessToken')
-          // Redirect to login page if using react-router
-          window.location.href = '/login'
-          return
-        }
-
-        if (res.ok) {
-          const json = await res.json()
-          const data = json?.data || json
-
-          const fetchedBinusEmail =
-            data.binusEmail ||
-            data.binus_email ||
-            data.emailBinus ||
-            data.binusianEmail ||
-            data.registration?.binusEmail ||
-            data.registration?.binus_email ||
-            data.registration?.emailBinus ||
-            ''
-
-          setUser({
-            name: data.fullName || data.name || DUMMY_USER.name,
-            email: data.email || DUMMY_USER.email,
-            binusEmail: fetchedBinusEmail,
-            registration: {
-              ...DUMMY_USER.registration,
-              ...data.registration,
-              whatsappNumber:
-                data.registration?.whatsappNumber ||
-                DUMMY_USER.registration.whatsappNumber,
-              lineId:
-                data.registration?.lineId || DUMMY_USER.registration.lineId,
-              nim: data.registration?.nim || DUMMY_USER.registration.nim,
-              bnccId: data.registration?.bnccId ?? null,
-              lntCourse:
-                data.registration?.lntCourse ||
-                DUMMY_USER.registration.lntCourse,
-              faculty:
-                data.registration?.faculty || DUMMY_USER.registration.faculty,
-              major: data.registration?.major || DUMMY_USER.registration.major,
-              region:
-                data.registration?.region || DUMMY_USER.registration.region,
-              linkedinUrl:
-                data.registration?.linkedinUrl ||
-                DUMMY_USER.registration.linkedinUrl,
-              githubUrl:
-                data.registration?.githubUrl ||
-                DUMMY_USER.registration.githubUrl,
-            },
-          })
-        }
-      } catch (err) {
-        console.warn('Failed to load profile from backend:', err)
-      } finally {
-        setLoading(false)
-      }
+    const token =
+      localStorage.getItem('token') || localStorage.getItem('accessToken')
+    if (import.meta.env.PROD && !token) {
+      navigate('/signin', { replace: true })
     }
+  }, [navigate])
 
-    fetchProfile()
-  }, [])
+  const getPageTitle = () => {
+    const currentPath = location.pathname
+    const matchingNavItem = navItems.find((item) => item.path === currentPath)
+    return matchingNavItem ? matchingNavItem.name : 'Admin Dashboard'
+  }
+
+  const navLinkClass = ({ isActive }) =>
+    `flex items-center py-2.5 rounded-lg hover:bg-gray-700 transition-all duration-200 ${
+      isActive ? 'bg-[#343A40] text-white font-semibold' : 'text-gray-400'
+    } ${collapsed ? 'px-2.5' : 'px-4'}`
 
   return (
-    <div className="relative">
-      <div className="flex justify-center w-full pt-3 pb-8 xl:py-15 px-6 xl:px-[10vw]">
-        <div className="w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 xl:gap-5 items-start">
-            {/* Left Column */}
-            <div className="flex flex-col gap-4 xl:gap-5 w-full">
-              {/* Personal Information */}
-              <Card className="border-white border-2 rounded-2xl px-6 sm:px-10 py-10">
-                <h1 className="font-bold pb-8 text-lg sm:text-3xl text-center">
-                  PERSONAL INFORMATION
-                </h1>
-                <div className="grid grid-cols-2 gap-5 justify-start items-start">
-                  <div className="flex flex-col gap-2">
-                    <p className="text-sm text-gray-500">Full Name</p>
-                    <p className="text-sm sm:text-lg font-semibold">
-                      {user.name}
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <p className="text-sm text-gray-500">WhatsApp Number</p>
-                    <p className="text-sm sm:text-lg font-semibold">
-                      {user.registration.whatsappNumber}
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <p className="text-sm text-gray-500">Line ID</p>
-                    <p className="text-sm sm:text-lg font-semibold">
-                      {user.registration.lineId}
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <p className="text-sm text-gray-500">Email</p>
-                    <p className="text-sm sm:text-lg font-semibold break-words">
-                      {renderEmail(user.email)}
-                    </p>
-                  </div>
-                </div>
-              </Card>
-
-              {/* BNCC Registration */}
-              <Card className="border-white border-2 rounded-2xl px-6 sm:px-10 py-10">
-                <h1 className="font-bold pb-8 text-lg sm:text-3xl text-center">
-                  BNCC REGISTRATION
-                </h1>
-                <div className="grid grid-cols-2 gap-5 justify-start items-start">
-                  <div className="flex flex-col gap-2">
-                    <p className="text-sm text-gray-500">
-                      BNCC Launching Schedule
-                    </p>
-                    <p className="text-sm sm:text-lg font-semibold break-words">
-                      {formatDate(userSchedule.startTime)}
-                      <br />
-                      {formatTime(userSchedule.startTime, userSchedule.endTime)}
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <p className="text-sm text-gray-500">LnT Course</p>
-                    <p className="text-sm sm:text-lg font-semibold break-words">
-                      {user.registration.lntCourse.title}
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            </div>
-
-            {/* Right Column */}
-            <div className="flex flex-col gap-4 xl:gap-5 w-full">
-              {/* Student Credentials */}
-              <Card className="border-white border-2 rounded-2xl px-6 sm:px-10 py-10">
-                <h1 className="font-bold pb-8 text-lg sm:text-3xl text-center text-">
-                  STUDENT CREDENTIALS
-                </h1>
-                <div className="grid grid-cols-2 gap-5 justify-start items-start">
-                  <div className="flex flex-col gap-2">
-                    <p className="text-sm text-gray-500">NIM</p>
-                    <p className="text-sm sm:text-lg font-semibold">
-                      {user.registration.nim || '-'}
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <p className="text-sm text-gray-500">Campus Region</p>
-                    <p className="text-sm sm:text-lg font-semibold">
-                      {user.registration.region.name || '-'}
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <p className="text-sm text-gray-500">BNCC ID</p>
-                    <p className="text-sm sm:text-lg font-semibold">
-                      {user.registration.bnccId || '-'}
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <p className="text-sm text-gray-500">Faculty</p>
-                    <p className="text-sm sm:text-lg font-semibold">
-                      {user.registration.faculty.name || '-'}
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <p className="text-sm text-gray-500">Binus Email</p>
-                    <p className="text-sm sm:text-lg font-semibold break-words">
-                      {renderEmail(user.binusEmail)}
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <p className="text-sm text-gray-500">Major</p>
-                    <p className="text-sm sm:text-lg font-semibold">
-                      {user.registration.major.name || '-'}
-                    </p>
-                  </div>
-                </div>
-              </Card>
-
-              {/* Re-Registration */}
-              <Card className="border-white border-2 rounded-2xl px-6 sm:px-10 py-10">
-                <h1 className="font-bold pb-10 text-lg sm:text-2xl text-center">
-                  RE-REGISTRATION
-                </h1>
-                <div className="flex flex-col gap-5 justify-start w-full">
-                  <div className="flex flex-col gap-2">
-                    <p className="text-sm text-gray-500">LinkedIn URL</p>
-                    <p className="text-sm sm:text-lg font-semibold">
-                      {user.registration.linkedinUrl &&
-                      user.registration.linkedinUrl !== 'https://' &&
-                      user.registration.linkedinUrl !== 'null' &&
-                      user.registration.linkedinUrl.trim() !== ''
-                        ? user.registration.linkedinUrl
-                        : '-'}
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <p className="text-sm text-gray-500">Github URL</p>
-                    <p className="text-sm sm:text-lg font-semibold">
-                      {user.registration.githubUrl &&
-                      user.registration.githubUrl !== 'https://' &&
-                      user.registration.githubUrl !== 'null' &&
-                      user.registration.githubUrl.trim() !== ''
-                        ? user.registration.githubUrl
-                        : '-'}
-                    </p>
-                  </div>
-                  <div className="gap-2 flex flex-col w-full">
-                    <p className="text-sm text-gray-500">Member Letter</p>
-                    {user.registration.suratMember &&
-                    user.registration.suratMember !== 'null' &&
-                    user.registration.suratMember.trim() !== '' ? (
-                      <Button
-                        className="w-full"
-                        onClick={() =>
-                          window.open(
-                            user.registration.suratMember,
-                            '_blank',
-                            'noopener,noreferrer',
-                          )
-                        }
-                      >
-                        <img
-                          src={IconDownload}
-                          alt="Download"
-                          className="w-6 h-6 mr-2"
-                        />
-                        <p className="text-xs sm:text-sm text-white">
-                          Download Latest Submission
-                        </p>
-                      </Button>
-                    ) : (
-                      <button
-                        disabled
-                        style={{ color: '#FFFFFF' }}
-                        className="w-full flex items-center justify-center gap-2 rounded-lg py-2.5 sm:py-3 px-8 text-sm sm:text-base font-semibold bg-gradient-to-r from-[#84A4C9] to-[#A3C7EE] text-white cursor-not-allowed select-none shadow-sm"
-                      >
-                        <img
-                          src={IconDownload}
-                          alt="Download"
-                          className="w-6 h-6 mr-2 text-white"
-                        />
-                        <p className="text-xs sm:text-sm text-white">
-                          Download Latest Submission
-                        </p>
-                      </button>
-                    )}
-                  </div>
-                  <div className="gap-2 flex flex-col w-full">
-                    <p className="text-sm text-gray-500">Binusian Card</p>
-                    {user.registration.binusianCard &&
-                    user.registration.binusianCard !== 'null' &&
-                    user.registration.binusianCard.trim() !== '' ? (
-                      <Button
-                        className="w-full"
-                        onClick={() =>
-                          window.open(
-                            user.registration.binusianCard,
-                            '_blank',
-                            'noopener,noreferrer',
-                          )
-                        }
-                      >
-                        <img
-                          src={IconDownload}
-                          alt="Download"
-                          className="w-6 h-6 mr-2"
-                        />
-                        <p className="text-xs sm:text-sm text-white">
-                          Download Binusian Card
-                        </p>
-                      </Button>
-                    ) : (
-                      <button
-                        disabled
-                        style={{ color: '#FFFFFF' }}
-                        className="w-full flex items-center justify-center gap-2 rounded-lg py-2.5 sm:py-3 px-8 text-sm sm:text-base font-semibold bg-gradient-to-r from-[#84A4C9] to-[#A3C7EE] text-white cursor-not-allowed select-none shadow-sm"
-                      >
-                        <img
-                          src={IconDownload}
-                          alt="Download"
-                          className="w-6 h-6 mr-2 text-white"
-                        />
-                        <p className="text-xs sm:text-sm text-white">
-                          Download Binusian Card
-                        </p>
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </Card>
-            </div>
+    <div className="flex h-screen bg-gray-100 font-sans overflow-hidden">
+      <aside
+        className={`bg-[#212529] text-white flex flex-col transition-all duration-1000 ${
+          collapsed ? 'w-[60px]' : 'w-64'
+        }`}
+      >
+        <div
+          className={`flex items-center border-b border-gray-700 h-16 px-4 ${
+            collapsed ? 'justify-center' : 'justify-between'
+          }`}
+        >
+          <div
+            className={`overflow-hidden transition-all duration-300 ${
+              collapsed ? 'w-0' : 'w-auto'
+            }`}
+          >
+            <img src={BNCC} alt="BNCC" className="h-5" />
           </div>
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="p-2 rounded-lg hover:bg-gray-700 cursor-pointer"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-6 h-6 transition-transform duration-300"
+              style={{
+                transform: collapsed ? 'rotate(180deg)' : 'rotate(0deg)',
+              }}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+              />
+            </svg>
+          </button>
         </div>
+
+        <nav className="flex-1 px-2 py-6 space-y-2">
+          {navItems.map((item) => (
+            <NavLink key={item.name} to={item.path} className={navLinkClass}>
+              <img
+                src={item.icon || '/placeholder.svg'}
+                alt=""
+                className="w-6 h-6 flex-shrink-0"
+              />
+              <span
+                className={`overflow-hidden whitespace-nowrap transition-all duration-200 ${
+                  collapsed ? 'w-0 ml-0 text-transparent' : 'w-full ml-4'
+                }`}
+              >
+                {item.name}
+              </span>
+            </NavLink>
+          ))}
+        </nav>
+
+        <button
+          onClick={() => {
+            localStorage.clear()
+            window.location.href = '/'
+          }}
+          className="mt-auto flex items-center px-[18px] py-3 text-red-400 hover:text-white hover:bg-red-600 transition-all duration-200 cursor-pointer"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-6 h-6 flex-shrink-0"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6A2.25 2.25 0 005.25 5.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"
+            />
+          </svg>
+          <span
+            className={`overflow-hidden whitespace-nowrap transition-all duration-200 text-left ${
+              collapsed ? 'w-0 ml-0 text-transparent' : 'w-full ml-4'
+            }`}
+          >
+            Logout
+          </span>
+        </button>
+      </aside>
+
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <header className="h-16 bg-white shadow flex items-center justify-between px-6 flex-shrink-0">
+          <h1 className="text-xl font-semibold text-gray-800">
+            {getPageTitle()}
+          </h1>
+          <div className="flex items-center space-x-4">
+            <span className="font-medium text-gray-700">
+              {adminNameDict['SUPER'] ?? 'Admin'}
+            </span>
+          </div>
+        </header>
+
+        <main
+          className="flex-1 overflow-y-auto overflow-x-auto"
+          style={{ scrollBehavior: 'smooth' }}
+          data-lenis-prevent
+        >
+          <div className="w-full h-full">
+            {/* Passes userSchedule context to child routes (like Profile/Users pages) */}
+            <Outlet context={{ userSchedule, formatWibTime }} />
+          </div>
+        </main>
       </div>
     </div>
   )
 }
-
-export default Profile
