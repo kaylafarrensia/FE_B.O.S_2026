@@ -10,7 +10,7 @@ const DUMMY_USER = {
   name: 'John Doe',
   email: 'johndoe123@gmail.com',
   registration: {
-    whatsappNumber: '0821-0000-1234',
+    whatsappNumber: '0831-0000-1234',
     lineId: 'johndoeline',
     nim: '2602345678',
     bnccId: null,
