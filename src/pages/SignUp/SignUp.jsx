@@ -383,9 +383,9 @@ export default function SignUp() {
                         validate: (v) =>
                           (v &&
                             v.length >= 9 &&
-                            v.length <= 12 &&
+                            v.length <= 13 &&
                             /^\d+$/.test(v)) ||
-                          'WhatsApp number must be 9–12 digits',
+                          'WhatsApp number must be 9–13 digits',
                       })}
                       type="text"
                       placeholder="Enter your WhatsApp number"

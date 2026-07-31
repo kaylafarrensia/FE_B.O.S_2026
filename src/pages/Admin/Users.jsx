@@ -207,8 +207,11 @@ Panitia BNCC Launching`,
     mutationFn: (form) => {
       const payload = {
         ...form,
+        whatsappNumber: String(form.whatsappNumber || '')
+          .trim()
+          .slice(0, 13),
+        binus_email: form.binusEmail?.trim(),
         binusEmail: form.binusEmail?.trim(),
-        binusianEmail: form.binusEmail?.trim(), // Sends both variants for backend compatibility
         regionId: Number(form.regionId),
         facultyId: Number(form.facultyId),
         majorId: Number(form.majorId),
@@ -244,13 +247,16 @@ Panitia BNCC Launching`,
       const bEmail = String(form.binusEmail || '').trim()
       const payload = {
         fullName: String(form.fullName || '').trim(),
+        name: String(form.fullName || '').trim(),
         email: String(form.email || '').trim(),
+        binus_email: bEmail,
         binusEmail: bEmail,
-        binusianEmail: bEmail, // Sends both key formats to handle backend variations
         password: String(form.password || ''),
         nim: String(form.nim || '').trim(),
         lineId: String(form.lineId || '').trim(),
-        whatsappNumber: String(form.whatsappNumber || '').trim(),
+        whatsappNumber: String(form.whatsappNumber || '')
+          .trim()
+          .slice(0, 13),
         regionId: Number(form.regionId),
         facultyId: Number(form.facultyId),
         majorId: Number(form.majorId),
@@ -321,7 +327,6 @@ Panitia BNCC Launching`,
   const allRows = rawUsers.map((user) => {
     const reg = user?.registrations?.[0] || user?.registration || {}
 
-    // Comprehensive search for Binus Email across all common field names
     const extractedBinusEmail =
       user?.binusEmail ||
       reg?.binusEmail ||
@@ -340,7 +345,7 @@ Panitia BNCC Launching`,
       Status: user?.status || '-',
       Email: user?.email || '-',
       'Binus Email': extractedBinusEmail,
-      'Binusian Email': extractedBinusEmail, // Mapped to BOTH titles so it shows regardless of constants.js title!
+      'Binusian Email': extractedBinusEmail,
       LINE: reg?.lineId || '-',
       WhatsApp: reg?.whatsappNumber ? (
         <a
@@ -501,6 +506,35 @@ Panitia BNCC Launching`,
 
   const handleEditSubmit = (e) => {
     e.preventDefault()
+
+    // Frontend Validations for Edit
+    if (
+      editForm.whatsappNumber &&
+      !/^\d{9,13}$/.test(editForm.whatsappNumber)
+    ) {
+      setAlert({
+        type: 'error',
+        message: 'WhatsApp number must be 9–13 digits.',
+      })
+      return
+    }
+
+    if (editForm.nim && !/^\d{10}$/.test(editForm.nim)) {
+      setAlert({
+        type: 'error',
+        message: 'NIM must be exactly 10 digits.',
+      })
+      return
+    }
+
+    if (editForm.binusEmail && !/binus\.ac\.id$/i.test(editForm.binusEmail)) {
+      setAlert({
+        type: 'error',
+        message: 'BINUS Email must end with binus.ac.id.',
+      })
+      return
+    }
+
     editMutation.mutate(editForm)
   }
 
@@ -510,6 +544,61 @@ Panitia BNCC Launching`,
 
   const handleCreateSubmit = (e) => {
     e.preventDefault()
+
+    // Sign-Up Page Validations applied to Create Form
+    if (createForm.fullName.trim().length < 3) {
+      setAlert({
+        type: 'error',
+        message: 'Full name must be at least 3 characters long.',
+      })
+      return
+    }
+
+    if (!/^\d{9,13}$/.test(createForm.whatsappNumber)) {
+      setAlert({
+        type: 'error',
+        message: 'WhatsApp number must be 9–13 digits.',
+      })
+      return
+    }
+
+    if (!/^\d{10}$/.test(createForm.nim)) {
+      setAlert({
+        type: 'error',
+        message: 'NIM must be exactly 10 digits.',
+      })
+      return
+    }
+
+    if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(createForm.email)) {
+      setAlert({
+        type: 'error',
+        message: 'Please enter a valid personal email.',
+      })
+      return
+    }
+
+    if (!/binus\.ac\.id$/i.test(createForm.binusEmail)) {
+      setAlert({
+        type: 'error',
+        message: 'BINUS Email must end with binus.ac.id.',
+      })
+      return
+    }
+
+    if (
+      createForm.password.length < 8 ||
+      !/[A-Z]/.test(createForm.password) ||
+      !/[a-z]/.test(createForm.password)
+    ) {
+      setAlert({
+        type: 'error',
+        message:
+          'Password must be at least 8 characters long with 1 uppercase and 1 lowercase letter.',
+      })
+      return
+    }
+
     createMutation.mutate(createForm)
   }
 
@@ -674,10 +763,12 @@ Panitia BNCC Launching`,
                 onChange={handleEditChange}
                 className="border p-2 rounded w-full"
                 placeholder="Name"
+                minLength={3}
                 required
               />
               <input
                 name="email"
+                type="email"
                 value={editForm.email || ''}
                 onChange={handleEditChange}
                 className="border p-2 rounded w-full"
@@ -689,7 +780,7 @@ Panitia BNCC Launching`,
                 value={editForm.binusEmail || ''}
                 onChange={handleEditChange}
                 className="border p-2 rounded w-full"
-                placeholder="Binus Email"
+                placeholder="Binus Email (@binus.ac.id)"
                 required
               />
               <input
@@ -697,7 +788,8 @@ Panitia BNCC Launching`,
                 value={editForm.nim || ''}
                 onChange={handleEditChange}
                 className="border p-2 rounded w-full"
-                placeholder="NIM"
+                placeholder="NIM (10 Digits)"
+                maxLength={10}
                 required
               />
               <input
@@ -713,7 +805,8 @@ Panitia BNCC Launching`,
                 value={editForm.whatsappNumber || ''}
                 onChange={handleEditChange}
                 className="border p-2 rounded w-full"
-                placeholder="WhatsApp"
+                placeholder="WhatsApp (9–13 Digits)"
+                maxLength={13}
                 required
               />
               <select
@@ -859,7 +952,7 @@ Panitia BNCC Launching`,
         </div>
       )}
 
-      {/* Create User Modal */}
+      {/* Create User Modal with Validations */}
       {showCreateModal && (
         <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-10 pb-10 overflow-y-auto">
           <form
@@ -873,11 +966,13 @@ Panitia BNCC Launching`,
                 value={createForm.fullName}
                 onChange={handleCreateChange}
                 className="border p-2 rounded w-full"
-                placeholder="Full Name"
+                placeholder="Full Name (Min 3 Chars)"
+                minLength={3}
                 required
               />
               <input
                 name="email"
+                type="email"
                 value={createForm.email}
                 onChange={handleCreateChange}
                 className="border p-2 rounded w-full"
@@ -889,7 +984,7 @@ Panitia BNCC Launching`,
                 value={createForm.binusEmail}
                 onChange={handleCreateChange}
                 className="border p-2 rounded w-full"
-                placeholder="Binus Email"
+                placeholder="Binus Email (@binus.ac.id)"
                 required
               />
               <input
@@ -898,7 +993,7 @@ Panitia BNCC Launching`,
                 value={createForm.password}
                 onChange={handleCreateChange}
                 className="border p-2 rounded w-full"
-                placeholder="Password"
+                placeholder="Password (Min 8, 1 Upper, 1 Lower)"
                 required
               />
               <input
@@ -906,7 +1001,8 @@ Panitia BNCC Launching`,
                 value={createForm.nim}
                 onChange={handleCreateChange}
                 className="border p-2 rounded w-full"
-                placeholder="NIM"
+                placeholder="NIM (10 Digits)"
+                maxLength={10}
                 required
               />
               <input
@@ -922,7 +1018,8 @@ Panitia BNCC Launching`,
                 value={createForm.whatsappNumber}
                 onChange={handleCreateChange}
                 className="border p-2 rounded w-full"
-                placeholder="WhatsApp"
+                placeholder="WhatsApp (9–13 Digits)"
+                maxLength={13}
                 required
               />
               <select
