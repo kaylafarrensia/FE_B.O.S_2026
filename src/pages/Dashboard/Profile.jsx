@@ -9,7 +9,6 @@ import { formatDate } from '../../utils/index.js'
 const DUMMY_USER = {
   name: 'John Doe',
   email: 'johndoe123@gmail.com',
-  binusEmail: '',
   registration: {
     whatsappNumber: '0831-0050-1534',
     lineId: 'johndoeline',
@@ -30,7 +29,6 @@ const DUMMY_USER = {
   },
 }
 
-// ── Formats time specifically in WIB (Asia/Jakarta, UTC+7) ─────────────────────
 function formatTime(startIso, endIso) {
   if (!startIso) return '-'
   const s = new Date(startIso)
@@ -40,13 +38,13 @@ function formatTime(startIso, endIso) {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false,
-      timeZone: 'Asia/Jakarta',
+      timeZone: 'UTC',
     })
   return `${fmt(s)} – ${fmt(e)} WIB`
 }
 
 function renderEmail(email) {
-  if (!email || email === 'null' || email.trim() === '') return '-'
+  if (!email) return ''
   const parts = email.split('@')
   if (parts.length === 2) {
     return (
@@ -68,6 +66,8 @@ function Profile() {
     const fetchProfile = async () => {
       const token =
         localStorage.getItem('token') || localStorage.getItem('accessToken')
+
+      // If no token exists, don't attempt request
       if (!token) return
 
       setLoading(true)
@@ -77,14 +77,21 @@ function Profile() {
         const res = await fetch(`${apiUrl}/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         })
+
+        // Handle Expired or Invalid Token (401 / 403)
+        if (res.status === 401 || res.status === 403) {
+          console.warn('Session expired. Clearing storage...')
+          localStorage.removeItem('token')
+          localStorage.removeItem('accessToken')
+          // Redirect to login page if using react-router
+          window.location.href = '/login'
+          return
+        }
+
         if (res.ok) {
           const json = await res.json()
           const data = json?.data || json
 
-          // Debug log to check exact response keys in browser console
-          console.log('[Profile] Full GET /profile response:', data)
-
-          // Flexible fallback checks for binusEmail key variations
           const fetchedBinusEmail =
             data.binusEmail ||
             data.binus_email ||
@@ -187,22 +194,15 @@ function Profile() {
                       BNCC Launching Schedule
                     </p>
                     <p className="text-sm sm:text-lg font-semibold break-words">
-                      {userSchedule?.startTime
-                        ? formatDate(userSchedule.startTime)
-                        : '-'}
+                      {formatDate(userSchedule.startTime)}
                       <br />
-                      {userSchedule?.startTime
-                        ? formatTime(
-                            userSchedule.startTime,
-                            userSchedule.endTime,
-                          )
-                        : '-'}
+                      {formatTime(userSchedule.startTime, userSchedule.endTime)}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">LnT Course</p>
                     <p className="text-sm sm:text-lg font-semibold break-words">
-                      {user.registration.lntCourse?.title || '-'}
+                      {user.registration.lntCourse.title}
                     </p>
                   </div>
                 </div>
@@ -213,7 +213,7 @@ function Profile() {
             <div className="flex flex-col gap-4 xl:gap-5 w-full">
               {/* Student Credentials */}
               <Card className="border-white border-2 rounded-2xl px-6 sm:px-10 py-10">
-                <h1 className="font-bold pb-8 text-lg sm:text-3xl text-center">
+                <h1 className="font-bold pb-8 text-lg sm:text-3xl text-center text-">
                   STUDENT CREDENTIALS
                 </h1>
                 <div className="grid grid-cols-2 gap-5 justify-start items-start">
@@ -226,7 +226,7 @@ function Profile() {
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">Campus Region</p>
                     <p className="text-sm sm:text-lg font-semibold">
-                      {user.registration.region?.name || '-'}
+                      {user.registration.region.name || '-'}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2">
@@ -238,7 +238,7 @@ function Profile() {
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">Faculty</p>
                     <p className="text-sm sm:text-lg font-semibold">
-                      {user.registration.faculty?.name || '-'}
+                      {user.registration.faculty.name || '-'}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2">
@@ -250,7 +250,7 @@ function Profile() {
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">Major</p>
                     <p className="text-sm sm:text-lg font-semibold">
-                      {user.registration.major?.name || '-'}
+                      {user.registration.major.name || '-'}
                     </p>
                   </div>
                 </div>
