@@ -78,9 +78,7 @@ export default function Users() {
   const [whatsAppMessage, setWhatsAppMessage] = useState(
     `Halo, {nama}!
 
-Jangan lewatkan codesign BNCC 2025 untuk mendapatkan materi yang dapat mempersiapkan kamu sebagai seorang developers!
-
-https://www.instagram.com/bnccbinus/
+Jangan lewatkan codesign BNCC 2026 untuk mendapatkan materi yang dapat mempersiapkan kamu sebagai seorang developers!
 
 Best Regards,
 Panitia BNCC Launching`,
@@ -164,13 +162,6 @@ Panitia BNCC Launching`,
         ? data.users
         : []
 
-  const totalItems =
-    data?.pagination?.total ||
-    data?.meta?.total ||
-    data?.total ||
-    rawUsers.length ||
-    0
-
   useEffect(() => {
     if (isError) {
       setError(fetchError)
@@ -215,7 +206,6 @@ Panitia BNCC Launching`,
   // ── Bulk Status Update Mutation ──
   const bulkStatusMutation = useMutation({
     mutationFn: async ({ ids, status }) => {
-      // Executes updates concurrently for all selected IDs
       const promises = Array.from(ids).map((id) => updateUser({ id, status }))
       return Promise.all(promises)
     },
@@ -584,22 +574,30 @@ Panitia BNCC Launching`,
     ...(usersColumns || []),
   ]
 
-  // Client-side fallback search
+  // Robust Client-side Search Filtering
   const filteredRows = searchQuery
-    ? allRows.filter((row) =>
-        String(row['Full Name'] || '')
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()),
-      )
+    ? allRows.filter((row) => {
+        const query = searchQuery.toLowerCase()
+        const fullName = String(row['Full Name'] || '').toLowerCase()
+        const email = String(row['Email'] || '').toLowerCase()
+        const binusEmail = String(row['Binus Email'] || '').toLowerCase()
+        const nim = String(row['NIM'] || '').toLowerCase()
+
+        return (
+          fullName.includes(query) ||
+          email.includes(query) ||
+          binusEmail.includes(query) ||
+          nim.includes(query)
+        )
+      })
     : allRows
 
-  const pagedData =
-    data?.pagination || data?.meta
-      ? allRows
-      : filteredRows.slice(
-          (pageIndex - 1) * itemsPerPage,
-          pageIndex * itemsPerPage,
-        )
+  const pagedData = filteredRows.slice(
+    (pageIndex - 1) * itemsPerPage,
+    pageIndex * itemsPerPage,
+  )
+
+  const totalItems = filteredRows.length
 
   const handleRetry = () => {
     setShowErrorModal(false)
