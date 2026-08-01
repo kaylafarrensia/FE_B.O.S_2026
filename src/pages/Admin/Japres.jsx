@@ -1,26 +1,26 @@
-import { Table, Pagination } from '@/components';
-import { useState, useEffect, useRef } from 'react';
-import { japresColumns } from './constants';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { Table, Pagination } from '@/components'
+import { useState, useEffect, useRef } from 'react'
+import { japresColumns } from './constants'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import {
   downloadJapresExcel,
   getJapres,
   updateJapresStatus,
-} from '@/services/admin';
+} from '@/services/admin'
 
 export default function Japres() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [pageIndex, setPageIndex] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [showErrorModal, setShowErrorModal] = useState(false);
-  const [error, setError] = useState(null);
-  const [alert, setAlert] = useState(null);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [editJapres, setEditJapres] = useState(null);
-  const [editValue, setEditValue] = useState(null);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('')
+  const [pageIndex, setPageIndex] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
+  const [showErrorModal, setShowErrorModal] = useState(false)
+  const [error, setError] = useState(null)
+  const [alert, setAlert] = useState(null)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [editJapres, setEditJapres] = useState(null)
+  const [editValue, setEditValue] = useState(null)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
 
-  const abortRef = useRef(null);
+  const abortRef = useRef(null)
 
   const {
     data,
@@ -31,38 +31,35 @@ export default function Japres() {
   } = useQuery({
     queryKey: ['japres'],
     queryFn: getJapres,
-  });
+  })
 
   useEffect(() => {
     if (isError) {
-      setError(fetchError);
-      setShowErrorModal(true);
+      setError(fetchError)
+      setShowErrorModal(true)
     }
-  }, [isError, fetchError]);
+  }, [isError, fetchError])
 
   useEffect(() => {
     return () => {
-      abortRef.current?.abort();
-    };
-  }, []);
+      abortRef.current?.abort()
+    }
+  }, [])
 
   const editMutation = useMutation({
-    mutationFn: async ({
-      userId,
-      isJapres,
-    }) => {
-      return updateJapresStatus(String(userId), isJapres);
+    mutationFn: async ({ userId, isJapres }) => {
+      return updateJapresStatus(String(userId), isJapres)
     },
     onSuccess: () => {
       setAlert({
         type: 'success',
         message: 'Japres status updated successfully!',
-      });
-      setShowEditModal(false);
-      setShowConfirmModal(false);
-      setEditJapres(null);
-      setEditValue(null);
-      refetch();
+      })
+      setShowEditModal(false)
+      setShowConfirmModal(false)
+      setEditJapres(null)
+      setEditValue(null)
+      refetch()
     },
     onError: (err) => {
       setAlert({
@@ -71,11 +68,11 @@ export default function Japres() {
           err?.response?.data?.error ||
           err?.message ||
           'Failed to update Japres status.',
-      });
-      setShowEditModal(false);
-      setShowConfirmModal(false);
+      })
+      setShowEditModal(false)
+      setShowConfirmModal(false)
     },
-  });
+  })
 
   const allData =
     data?.data?.map((item) => ({
@@ -83,9 +80,9 @@ export default function Japres() {
       Email: item.email || '-',
       'Full Name': item.name || '-',
       Region: item.region || '-',
-      'Link Drive': item.japres_url ? (
+      'Link Drive': item.japresUrl ? (
         <a
-          href={item.japres_url}
+          href={item.japresUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="text-blue-600 underline"
@@ -102,9 +99,9 @@ export default function Japres() {
       Actions: (
         <button
           onClick={() => {
-            setEditJapres(item);
-            setEditValue(null);
-            setShowEditModal(true);
+            setEditJapres(item)
+            setEditValue(null)
+            setShowEditModal(true)
           }}
           aria-label="Edit"
           className="mx-1"
@@ -126,65 +123,65 @@ export default function Japres() {
           </svg>
         </button>
       ),
-    })) ?? [];
+    })) ?? []
 
   const filteredData = searchQuery
     ? allData.filter((row) =>
-      (row['Full Name'] || '')
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase())
-    )
-    : allData;
+        (row['Full Name'] || '')
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()),
+      )
+    : allData
 
   const pagedData = filteredData.slice(
     (pageIndex - 1) * itemsPerPage,
-    pageIndex * itemsPerPage
-  );
+    pageIndex * itemsPerPage,
+  )
 
   const handleRetry = () => {
-    setShowErrorModal(false);
-    setError(null);
-    refetch();
-  };
+    setShowErrorModal(false)
+    setError(null)
+    refetch()
+  }
 
-  const handleAlertClose = () => setAlert(null);
+  const handleAlertClose = () => setAlert(null)
 
   const getEditOptions = () => {
-    if (!editJapres) return [];
+    if (!editJapres) return []
     if (editJapres.is_japres === null) {
       return [
         { value: -1, label: 'Pending' },
         { value: 0, label: 'Rejected' },
         { value: 1, label: 'Accepted Silver' },
         { value: 2, label: 'Accepted Gold' },
-      ];
+      ]
     }
     if (editJapres.is_japres === -1) {
       return [
         { value: 0, label: 'Rejected' },
         { value: 1, label: 'Accepted Silver' },
         { value: 2, label: 'Accepted Gold' },
-      ];
+      ]
     }
     return [
       { value: -1, label: 'Pending' },
       { value: 0, label: 'Rejected' },
       { value: 1, label: 'Accepted Silver' },
       { value: 2, label: 'Accepted Gold' },
-    ];
-  };
+    ]
+  }
 
   const handleEditSubmit = (e) => {
-    e.preventDefault();
-    setShowEditModal(false);
-    setShowConfirmModal(true);
-  };
+    e.preventDefault()
+    setShowEditModal(false)
+    setShowConfirmModal(true)
+  }
 
   const handleConfirmEdit = () => {
     if (editJapres && editValue !== null) {
-      editMutation.mutate({ userId: editJapres.userId, isJapres: editValue });
+      editMutation.mutate({ userId: editJapres.userId, isJapres: editValue })
     }
-  };
+  }
 
   return (
     <div className={`py-6 space-y-7`}>
@@ -291,8 +288,8 @@ export default function Japres() {
                   optionItemPerPage={[5, 10, 25, 50, 100]}
                   onChangeIndex={setPageIndex}
                   onChangeItemsPerPage={(val) => {
-                    setItemsPerPage(val);
-                    setPageIndex(1);
+                    setItemsPerPage(val)
+                    setPageIndex(1)
                   }}
                 />
                 <button
@@ -331,9 +328,9 @@ export default function Japres() {
                 : '-'}
               <br />
               <b>Drive Link:</b>{' '}
-              {editJapres.japres_url ? (
+              {editJapres.japresUrl ? (
                 <a
-                  href={editJapres.japres_url}
+                  href={editJapres.japresUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 underline"
@@ -349,8 +346,8 @@ export default function Japres() {
               <select
                 value={editValue !== null ? editValue : ''}
                 onChange={(e) => {
-                  const val = e.target.value;
-                  setEditValue(val === '' ? null : Number(val));
+                  const val = e.target.value
+                  setEditValue(val === '' ? null : Number(val))
                 }}
                 className="border p-2 rounded w-full"
                 required
@@ -422,5 +419,5 @@ export default function Japres() {
         </div>
       )}
     </div>
-  );
+  )
 }
