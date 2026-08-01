@@ -10,7 +10,7 @@ import Calendar from './Schedule/Calendar.jsx'
 import ScheduleDropdown from './Schedule/ScheduleDropdown.jsx'
 import SavedPopup from './Schedule/SavedPopup.jsx'
 import ContactPerson from './Japres/ContactPerson.jsx'
-import { getLinksByRegionAndSchedule } from '../../services/admin.js'
+import { getLinks } from '../../services/admin.js'
 
 // ── Dummy Data Fallback ───────────────────────────────────────────────────────
 const DUMMY_SCHEDULES = [
@@ -37,14 +37,6 @@ export default function Schedule() {
 
   // Loading state to prevent stale schedule flicker on page refresh
   const [loadingSchedule, setLoadingSchedule] = useState(true)
-
-  // Current time (refreshed every 30s) to evaluate the 30-min join window
-  const [now, setNow] = useState(() => new Date())
-
-  useEffect(() => {
-    const timer = setInterval(() => setNow(new Date()), 30_000)
-    return () => clearInterval(timer)
-  }, [])
 
   // Fetch schedules with safe region handling and fallback
   useEffect(() => {
@@ -157,20 +149,12 @@ export default function Schedule() {
 
   // 1. Fetch data link dari API via TanStack Query
   const { data: linksData, isLoading: loadingLinks } = useQuery({
-    queryKey: [
-      'links',
-      userSchedule?.id,
-      userSchedule?.regionId || userSchedule?.region?.id,
-    ],
-    queryFn: () =>
-      getLinksByRegionAndSchedule({
-        regionId: userSchedule?.regionId || userSchedule?.region?.id,
-        scheduleId: userSchedule?.id,
-      }),
+    queryKey: ['links'],
+    queryFn: getLinks,
     enabled: !!userSchedule, // Hanya fetch jika userSchedule sudah ada
   })
 
-  // 2. Cari link Zoom yang cocok dengan region atau schedule user secara fleksibel
+  // 2. Cari link Zoom yang cocok dengan region user
   const joinLink = useMemo(() => {
     if (!userSchedule || !linksData) return null
 
@@ -179,45 +163,20 @@ export default function Schedule() {
       ? linksData
       : linksData?.data || linksData?.links || []
 
-    const userRegionId = Number(
-      userSchedule.regionId || userSchedule.region?.id,
-    )
-    const userScheduleId = Number(userSchedule.id)
-
-    // Prioritas 1: Cari link yang spesifik berdasarkan scheduleId jika backend menyediakannya
-    let matchedLink = rawLinks.find(
+    // Cari link yang regionId-nya cocok dan tag-nya ZOOM (atau link pertama yang cocok)
+    const matchedLink = rawLinks.find(
       (link) =>
-        Number(link.scheduleId) === userScheduleId &&
+        Number(link.regionId) ===
+          Number(userSchedule.regionId || userSchedule.region?.id) &&
         (link.tag === 'ZOOM' || !link.tag),
     )
-
-    // Prioritas 2: Cari link yang regionId-nya cocok dengan region user
-    if (!matchedLink && !isNaN(userRegionId)) {
-      matchedLink = rawLinks.find(
-        (link) =>
-          Number(link.regionId) === userRegionId &&
-          (link.tag === 'ZOOM' || !link.tag),
-      )
-    }
-
-    // Prioritas 3: Fallback ke link ZOOM apa pun yang tersedia agar user tetap bisa join
-    if (!matchedLink) {
-      matchedLink = rawLinks.find(
-        (link) => link.tag === 'ZOOM' || link.url?.includes('zoom'),
-      )
-    }
-
-    // Prioritas 4: Ambil link pertama apa pun dari list sebagai upaya terakhir
-    if (!matchedLink && rawLinks.length > 0) {
-      matchedLink = rawLinks[0]
-    }
 
     return matchedLink ? matchedLink.url : null
   }, [userSchedule, linksData])
 
   // 3. Handler saat tombol "Join Now!" diklik
   const handleJoinNow = () => {
-    if (joinLink && joinWindowOpen) {
+    if (joinLink) {
       // Buka link Zoom di tab baru
       window.open(joinLink, '_blank', 'noopener,noreferrer')
       if (setUserStatus) {
@@ -225,16 +184,6 @@ export default function Schedule() {
       }
     }
   }
-
-  // Join link hanya bisa diakses maksimal 30 menit sebelum event dimulai
-  const joinWindowOpen = (() => {
-    if (!userSchedule?.startTime) return false
-    const start = new Date(userSchedule.startTime)
-    if (isNaN(start.getTime())) return false
-    const end = userSchedule.endTime ? new Date(userSchedule.endTime) : start
-    const minsUntilStart = (start.getTime() - now.getTime()) / 60_000
-    return minsUntilStart <= 30 && now.getTime() <= end.getTime()
-  })()
 
   return (
     <>
@@ -293,32 +242,18 @@ export default function Schedule() {
                   </p>
                 </li>
               </ul>
-              <div className="flex flex-col items-center xl:items-start gap-2">
+              <div className="flex justify-center xl:block">
                 <Button
                   className={
-                    !joinLink || !joinWindowOpen || loadingSchedule || loadingLinks
+                    !joinLink || loadingSchedule || loadingLinks
                       ? 'opacity-50 cursor-not-allowed'
                       : ''
                   }
-                  disabled={
-                    !userSchedule ||
-                    !joinLink ||
-                    !joinWindowOpen ||
-                    loadingSchedule ||
-                    loadingLinks
-                  }
+                  // disabled={!userSchedule || !joinLink || loadingSchedule || loadingLinks}
                   onClick={handleJoinNow}
                 >
                   {loadingLinks ? 'Loading link...' : 'Join Now!'}
                 </Button>
-                {userSchedule &&
-                  !loadingLinks &&
-                  !joinWindowOpen &&
-                  (joinLink ? (
-                    <p className="text-xs sm:text-sm text-persian-indigo/70 font-medium">
-                      Link akan terbuka 30 menit sebelum event dimulai
-                    </p>
-                  ) : null)}
               </div>
             </Card>
 
