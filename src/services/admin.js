@@ -341,6 +341,21 @@ export const getLinks = async () => {
 };
 
 /**
+ * GET link untuk user, difilter berdasarkan region & schedule
+ */
+export const getLinksByRegionAndSchedule = async ({
+  regionId,
+  scheduleId,
+} = {}) => {
+  const params = new URLSearchParams();
+  if (regionId) params.set('regionId', regionId);
+  if (scheduleId) params.set('scheduleId', scheduleId);
+  const qs = params.toString();
+  const response = await api.get(`/links${qs ? `?${qs}` : ''}`);
+  return response.data;
+};
+
+/**
  * POST /api/admin/links
  * Creates a single link object in Prisma database
  */
