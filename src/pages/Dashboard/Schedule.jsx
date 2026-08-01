@@ -154,7 +154,7 @@ export default function Schedule() {
     enabled: !!userSchedule, // Hanya fetch jika userSchedule sudah ada
   })
 
-  // 2. Cari link Zoom yang cocok dengan region user
+  // 2. Cari link Zoom yang cocok dengan region atau schedule user secara fleksibel
   const joinLink = useMemo(() => {
     if (!userSchedule || !linksData) return null
 
@@ -163,12 +163,38 @@ export default function Schedule() {
       ? linksData
       : linksData?.data || linksData?.links || []
 
-    // Cari link yang regionId-nya cocok dan tag-nya ZOOM (atau link pertama yang cocok)
-    const matchedLink = rawLinks.find(
+    const userRegionId = Number(
+      userSchedule.regionId || userSchedule.region?.id,
+    )
+    const userScheduleId = Number(userSchedule.id)
+
+    // Prioritas 1: Cari link yang spesifik berdasarkan scheduleId jika backend menyediakannya
+    let matchedLink = rawLinks.find(
       (link) =>
-        Number(link.regionId) === Number(userSchedule.regionId || userSchedule.region?.id) &&
+        Number(link.scheduleId) === userScheduleId &&
         (link.tag === 'ZOOM' || !link.tag),
     )
+
+    // Prioritas 2: Cari link yang regionId-nya cocok dengan region user
+    if (!matchedLink && !isNaN(userRegionId)) {
+      matchedLink = rawLinks.find(
+        (link) =>
+          Number(link.regionId) === userRegionId &&
+          (link.tag === 'ZOOM' || !link.tag),
+      )
+    }
+
+    // Prioritas 3: Fallback ke link ZOOM apa pun yang tersedia agar user tetap bisa join
+    if (!matchedLink) {
+      matchedLink = rawLinks.find(
+        (link) => link.tag === 'ZOOM' || link.url?.includes('zoom'),
+      )
+    }
+
+    // Prioritas 4: Ambil link pertama apa pun dari list sebagai upaya terakhir
+    if (!matchedLink && rawLinks.length > 0) {
+      matchedLink = rawLinks[0]
+    }
 
     return matchedLink ? matchedLink.url : null
   }, [userSchedule, linksData])
@@ -244,9 +270,16 @@ export default function Schedule() {
               <div className="flex justify-center xl:block">
                 <Button
                   className={
-                    !joinLink || loadingSchedule || loadingLinks ? 'opacity-50 cursor-not-allowed' : ''
+                    !joinLink || loadingSchedule || loadingLinks
+                      ? 'opacity-50 cursor-not-allowed'
+                      : ''
                   }
-                  // disabled={!userSchedule || !joinLink || loadingSchedule || loadingLinks}
+                  disabled={
+                    !userSchedule ||
+                    !joinLink ||
+                    loadingSchedule ||
+                    loadingLinks
+                  }
                   onClick={handleJoinNow}
                 >
                   {loadingLinks ? 'Loading link...' : 'Join Now!'}
