@@ -282,7 +282,6 @@ Panitia BNCC Launching`,
         whatsappNumber: String(form.whatsappNumber || '')
           .trim()
           .slice(0, 13),
-        binus_email: form.binusEmail?.trim(),
         binusEmail: form.binusEmail?.trim(),
         regionId: Number(form.regionId),
         facultyId: Number(form.facultyId),
@@ -791,12 +790,8 @@ Panitia BNCC Launching`,
                 </div>
                 <div>
                   <b>Binus Email:</b>{' '}
-                  {viewUser.binus_email ||
-                    viewUser.binusEmail ||
-                    viewUser.binusianEmail ||
-                    viewUser.registrations?.[0]?.binus_email ||
+                  {viewUser.binusEmail ||
                     viewUser.registrations?.[0]?.binusEmail ||
-                    viewUser.registrations?.[0]?.binusianEmail ||
                     '-'}
                 </div>
                 <div>
