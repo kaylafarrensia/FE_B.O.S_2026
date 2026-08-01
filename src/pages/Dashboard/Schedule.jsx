@@ -246,7 +246,7 @@ export default function Schedule() {
                   className={
                     !joinLink || loadingSchedule || loadingLinks ? 'opacity-50 cursor-not-allowed' : ''
                   }
-                  disabled={!userSchedule || !joinLink || loadingSchedule || loadingLinks}
+                  // disabled={!userSchedule || !joinLink || loadingSchedule || loadingLinks}
                   onClick={handleJoinNow}
                 >
                   {loadingLinks ? 'Loading link...' : 'Join Now!'}
