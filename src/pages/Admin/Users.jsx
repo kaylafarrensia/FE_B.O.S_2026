@@ -433,17 +433,15 @@ Panitia BNCC Launching`,
       'Binusian Email': extractedBinusEmail,
       LINE: reg?.lineId || '-',
       WhatsApp: reg?.whatsappNumber ? (
-        <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault()
+        <span
+          onClick={() => {
             const message = whatsAppMessage.replace('{nama}', user?.name || '')
             OpenWhatsApp(reg.whatsappNumber, message)
           }}
-          className="text-blue-600 underline"
+          className="text-blue-600 underline cursor-pointer"
         >
           {reg.whatsappNumber}
-        </a>
+        </span>
       ) : (
         '-'
       ),
@@ -595,7 +593,12 @@ Panitia BNCC Launching`,
     pageIndex * itemsPerPage,
   )
 
-  const totalItems = filteredRows.length
+  const totalItems =
+    data?.pagination?.total ||
+    data?.meta?.total ||
+    data?.total ||
+    filteredRows.length ||
+    0
 
   const handleRetry = () => {
     setShowErrorModal(false)
