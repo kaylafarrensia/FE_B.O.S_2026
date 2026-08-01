@@ -1,7 +1,7 @@
 import { Table, Pagination } from '@/components';
 import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { getZoomSchedules, createLink } from '@/services/admin';
+import { getLinks, createLink } from '@/services/admin';
 
 // Sesuaikan ID & Region dengan database kamu
 const REGIONS = [
@@ -50,7 +50,7 @@ function Links() {
     refetch,
   } = useQuery({
     queryKey: ['admin-links'],
-    queryFn: getZoomSchedules,
+    queryFn: getLinks,
   });
 
   // 2. POST: Mutation untuk menambah link baru

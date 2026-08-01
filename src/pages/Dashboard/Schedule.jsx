@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useOutletContext, useNavigate } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query' // Pastikan terimport
 import Card from '../../components/ui/Card.jsx'
 import Button from '../../components/ui/Button.jsx'
 import IconSchedule from '../../assets/icons/IconSchedule.svg'
@@ -9,6 +10,7 @@ import Calendar from './Schedule/Calendar.jsx'
 import ScheduleDropdown from './Schedule/ScheduleDropdown.jsx'
 import SavedPopup from './Schedule/SavedPopup.jsx'
 import ContactPerson from './Japres/ContactPerson.jsx'
+import { getLinks } from '../../services/admin.js'
 
 // ── Dummy Data Fallback ───────────────────────────────────────────────────────
 const DUMMY_SCHEDULES = [
@@ -30,38 +32,11 @@ export default function Schedule() {
   const [tempSchedule, setTempSchedule] = useState(null)
   const { userSchedule, setUserSchedule, setUserStatus } = useOutletContext()
   const [availableSchedules, setAvailableSchedules] = useState([])
-  const [joinLink, setJoinLink] = useState('')
   const [saveError, setSaveError] = useState('')
   const [saving, setSaving] = useState(false)
 
   // Loading state to prevent stale schedule flicker on page refresh
   const [loadingSchedule, setLoadingSchedule] = useState(true)
-
-  // Fetch the link from the /links API endpoint
-  useEffect(() => {
-    const fetchLinks = async () => {
-      const token = getToken()
-      if (!token) return
-
-      try {
-        const apiUrl =
-          import.meta.env.VITE_API_URL || 'https://launching-api.bncc.net/api'
-
-        const res = await fetch(`${apiUrl}/links`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        if (res.ok) {
-          const json = await res.json()
-          if (json?.data?.zoom) {
-            setJoinLink(json.data.zoom)
-          }
-        }
-      } catch (err) {
-        console.warn('Failed to fetch links:', err)
-      }
-    }
-    fetchLinks()
-  }, [])
 
   // Fetch schedules with safe region handling and fallback
   useEffect(() => {
@@ -172,13 +147,41 @@ export default function Schedule() {
     }
   }
 
-  const handleJoinNow = () => {
-    if (!joinLink) return
+  // 1. Fetch data link dari API via TanStack Query
+  const { data: linksData, isLoading: loadingLinks } = useQuery({
+    queryKey: ['links'],
+    queryFn: getLinks,
+    enabled: !!userSchedule, // Hanya fetch jika userSchedule sudah ada
+  })
 
-    if (setUserStatus) {
-      setUserStatus('registration')
+  // 2. Cari link Zoom yang cocok dengan region user
+  const joinLink = useMemo(() => {
+    if (!userSchedule || !linksData) return null
+
+    // Normalisasi array response dari backend
+    const rawLinks = Array.isArray(linksData)
+      ? linksData
+      : linksData?.data || linksData?.links || []
+
+    // Cari link yang regionId-nya cocok dan tag-nya ZOOM (atau link pertama yang cocok)
+    const matchedLink = rawLinks.find(
+      (link) =>
+        Number(link.regionId) === Number(userSchedule.regionId || userSchedule.region?.id) &&
+        (link.tag === 'ZOOM' || !link.tag),
+    )
+
+    return matchedLink ? matchedLink.url : null
+  }, [userSchedule, linksData])
+
+  // 3. Handler saat tombol "Join Now!" diklik
+  const handleJoinNow = () => {
+    if (joinLink) {
+      // Buka link Zoom di tab baru
+      window.open(joinLink, '_blank', 'noopener,noreferrer')
+      if (setUserStatus) {
+        setUserStatus('registration')
+      }
     }
-    window.open(joinLink, '_blank', 'noopener,noreferrer')
   }
 
   return (
@@ -240,11 +243,13 @@ export default function Schedule() {
               </ul>
               <div className="flex justify-center xl:block">
                 <Button
-                  className={!joinLink || loadingSchedule ? 'opacity-50' : ''}
-                  disabled={!userSchedule || !joinLink || loadingSchedule}
+                  className={
+                    !joinLink || loadingSchedule || loadingLinks ? 'opacity-50 cursor-not-allowed' : ''
+                  }
+                  disabled={!userSchedule || !joinLink || loadingSchedule || loadingLinks}
                   onClick={handleJoinNow}
                 >
-                  Join Now!
+                  {loadingLinks ? 'Loading link...' : 'Join Now!'}
                 </Button>
               </div>
             </Card>

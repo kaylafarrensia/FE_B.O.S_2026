@@ -335,7 +335,7 @@ export const blastEmail = async (delayMs) => {
 /**
  * GET semua link dari backend
  */
-export const getZoomSchedules = async () => {
+export const getLinks = async () => {
   const response = await api.get('/admin/links');
   return response.data;
 };
