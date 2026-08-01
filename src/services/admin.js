@@ -331,3 +331,27 @@ export const blastEmail = async (delayMs) => {
     throw error
   }
 }
+
+/**
+ * GET semua link dari backend
+ */
+export const getZoomSchedules = async () => {
+  const response = await api.get('/admin/links');
+  return response.data;
+};
+
+/**
+ * POST /api/admin/links
+ * Creates a single link object in Prisma database
+ */
+export const createLink = async (payload) => {
+  // payload: { regionId: number, name: string, tag: string, url: string }
+  const response = await api.post('/admin/links', {
+    regionId: Number(payload.regionId), // Pastikan bertipe Number
+    name: payload.name,
+    tag: payload.tag || 'ZOOM', // Sesuaikan dengan enum LinkTag backend kamu
+    url: payload.url,
+  });
+
+  return response.data;
+};

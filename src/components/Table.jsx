@@ -16,12 +16,15 @@ export default function Table({
   bordered = false,
 }) {
   const tanstackColumns = useMemo(() => {
-    const cols = []
-
-    columns.forEach((column, index) => {
+    return columns.map((column, index) => {
       const dataIndex = column._index !== undefined ? column._index : index
 
-      cols.push({
+      // 💡 Menentukan header unik agar React key tidak bentrok
+      const headerTitle =
+        column.title || column.Header || column.accessor || `Column_${index}`
+
+      return {
+        id: column.id || column.accessor || `col_${index}`,
         accessorFn: (row) => {
           if (column.accessor) {
             return row[column.accessor]
@@ -35,7 +38,7 @@ export default function Table({
           const keys = Object.keys(row)
           return row[keys[dataIndex]] ?? row[keys[index]]
         },
-        header: column.title || 'Column',
+        header: () => headerTitle,
 
         cell: ({ getValue, row }) => {
           const value = getValue()
@@ -78,13 +81,11 @@ export default function Table({
         enableSorting: false,
 
         size: column.width
-          ? Number.parseInt(column.width.replace('px', ''))
+          ? Number.parseInt(String(column.width).replace('px', ''))
           : 120,
-      })
+      }
     })
-
-    return cols
-  }, [columns, data.length])
+  }, [columns, data])
 
   const table = useReactTable({
     data,

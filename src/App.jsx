@@ -22,6 +22,7 @@ import AdminJapres from './pages/Admin/Japres.jsx'
 import User from './pages/Admin/Users.jsx'
 import Documents from './pages/Admin/Documents.jsx'
 import Payment from './pages/Admin/Payment.jsx'
+import Links from './pages/Admin/Links.jsx'
 import Subscription from './pages/Admin/Subscription.jsx'
 
 function App() {
@@ -62,6 +63,7 @@ function App() {
         <Route path="documents" element={<Documents />} />
         <Route path="payment" element={<Payment />} />
         <Route path="japres" element={<AdminJapres />} />
+        <Route path="links" element={<Links />} />
         <Route path="subscription" element={<Subscription />} />
       </Route>
     </Routes>
