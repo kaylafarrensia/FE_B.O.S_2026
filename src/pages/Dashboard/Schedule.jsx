@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { useOutletContext, useNavigate } from 'react-router-dom'
+import { useOutletContext } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query' // Pastikan terimport
 import Card from '../../components/ui/Card.jsx'
 import Button from '../../components/ui/Button.jsx'
@@ -10,7 +10,7 @@ import Calendar from './Schedule/Calendar.jsx'
 import ScheduleDropdown from './Schedule/ScheduleDropdown.jsx'
 import SavedPopup from './Schedule/SavedPopup.jsx'
 import ContactPerson from './Japres/ContactPerson.jsx'
-import { getLinks } from '../../services/admin.js'
+import { getLinksByRegionAndSchedule } from '../../services/admin.js'
 
 // ── Dummy Data Fallback ───────────────────────────────────────────────────────
 const DUMMY_SCHEDULES = [
@@ -27,13 +27,13 @@ const getToken = () =>
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function Schedule() {
-  const navigate = useNavigate()
   const [popupOpen, setPopupOpen] = useState(false)
   const [tempSchedule, setTempSchedule] = useState(null)
   const { userSchedule, setUserSchedule, setUserStatus } = useOutletContext()
   const [availableSchedules, setAvailableSchedules] = useState([])
   const [saveError, setSaveError] = useState('')
   const [saving, setSaving] = useState(false)
+  const [userRegionId, setUserRegionId] = useState(null)
 
   // Loading state to prevent stale schedule flicker on page refresh
   const [loadingSchedule, setLoadingSchedule] = useState(true)
@@ -59,6 +59,7 @@ export default function Schedule() {
             regionId =
               profileData?.registration?.regionId ||
               profileData?.registration?.region?.id
+            setUserRegionId(regionId)
           }
         }
 
@@ -92,7 +93,7 @@ export default function Schedule() {
       }
     }
     fetchSchedules()
-  }, [])
+  }, [setUserSchedule])
 
   const schedulesToUse =
     availableSchedules.length > 0 ? availableSchedules : DUMMY_SCHEDULES
@@ -147,10 +148,17 @@ export default function Schedule() {
     }
   }
 
+  const regionToUse =
+    userRegionId || userSchedule?.regionId || userSchedule?.region?.id || null
+
   // 1. Fetch data link dari API via TanStack Query
   const { data: linksData, isLoading: loadingLinks } = useQuery({
-    queryKey: ['links'],
-    queryFn: getLinks,
+    queryKey: ['links', regionToUse, userSchedule?.id],
+    queryFn: () =>
+      getLinksByRegionAndSchedule({
+        regionId: regionToUse,
+        scheduleId: userSchedule?.id,
+      }),
     enabled: !!userSchedule, // Hanya fetch jika userSchedule sudah ada
   })
 
@@ -158,30 +166,75 @@ export default function Schedule() {
   const joinLink = useMemo(() => {
     if (!userSchedule || !linksData) return null
 
-    // Normalisasi array response dari backend
-    const rawLinks = Array.isArray(linksData)
-      ? linksData
-      : linksData?.data || linksData?.links || []
+    // Normalisasi array atau object response dari backend
+    const dataContent = linksData?.data ?? linksData?.links ?? linksData
 
-    // Cari link yang regionId-nya cocok dan tag-nya ZOOM (atau link pertama yang cocok)
-    const matchedLink = rawLinks.find(
-      (link) =>
-        Number(link.regionId) ===
-          Number(userSchedule.regionId || userSchedule.region?.id) &&
-        (link.tag === 'ZOOM' || !link.tag),
-    )
+    // If it's a string, return it directly
+    if (typeof dataContent === 'string') return dataContent
 
-    return matchedLink ? matchedLink.url : null
-  }, [userSchedule, linksData])
+    // Jika dataContent berupa array, cari link yang regionId-nya cocok dan tag-nya ZOOM (atau link pertama yang cocok)
+    if (Array.isArray(dataContent)) {
+      const targetRegionId = Number(regionToUse)
+      const targetScheduleId = Number(userSchedule?.id)
+      const matchedLink = dataContent.find(
+        (link) =>
+          Number(link?.regionId) === targetRegionId &&
+          (!link?.scheduleId || Number(link.scheduleId) === targetScheduleId) &&
+          (link?.tag === 'ZOOM' ||
+            !link?.tag ||
+            link?.name?.toUpperCase()?.includes('ZOOM')),
+      )
+      return matchedLink ? matchedLink.url : null
+    }
+
+    // Jika dataContent berupa object, kembalikan field zoom atau url
+    if (dataContent && typeof dataContent === 'object') {
+      if (dataContent.zoom) {
+        return typeof dataContent.zoom === 'object'
+          ? dataContent.zoom.url
+          : dataContent.zoom
+      }
+      if (dataContent.url) return dataContent.url
+      // Iterasi key object untuk mencari key yang mengandung kata 'zoom'
+      for (const key of Object.keys(dataContent)) {
+        const val = dataContent[key]
+        if (key.toLowerCase().includes('zoom')) {
+          return typeof val === 'object' ? val?.url : val
+        }
+      }
+    }
+
+    return null
+  }, [userSchedule, linksData, regionToUse])
+
+  // Window akses: tombol join baru bisa digunakan maksimal 30 menit sebelum event
+  const [now, setNow] = useState(() => Date.now())
+
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 30000)
+    return () => clearInterval(t)
+  }, [])
+
+  const isRealHttpsLink =
+    !!joinLink && joinLink.trim().toLowerCase().startsWith('https://')
+
+  const joinWindowOpen = (() => {
+    if (!userSchedule?.startTime) return false
+    const start = new Date(userSchedule.startTime).getTime()
+    if (!Number.isFinite(start)) return false
+    return now >= start - 30 * 60 * 1000
+  })()
+
+  const canJoin =
+    isRealHttpsLink && joinWindowOpen && !loadingSchedule && !loadingLinks
 
   // 3. Handler saat tombol "Join Now!" diklik
   const handleJoinNow = () => {
-    if (joinLink) {
-      // Buka link Zoom di tab baru
-      window.open(joinLink, '_blank', 'noopener,noreferrer')
-      if (setUserStatus) {
-        setUserStatus('registration')
-      }
+    if (!canJoin) return
+    // Buka link Zoom di tab baru
+    window.open(joinLink, '_blank', 'noopener,noreferrer')
+    if (setUserStatus) {
+      setUserStatus('registration')
     }
   }
 
@@ -244,15 +297,15 @@ export default function Schedule() {
               </ul>
               <div className="flex justify-center xl:block">
                 <Button
-                  className={
-                    !joinLink || loadingSchedule || loadingLinks
-                      ? 'opacity-50 cursor-not-allowed'
-                      : ''
-                  }
-                  // disabled={!userSchedule || !joinLink || loadingSchedule || loadingLinks}
+                  className={!canJoin ? 'opacity-50 cursor-not-allowed' : ''}
+                  disabled={!canJoin}
                   onClick={handleJoinNow}
                 >
-                  {loadingLinks ? 'Loading link...' : 'Join Now!'}
+                  {loadingLinks
+                    ? 'Loading link...'
+                    : canJoin
+                      ? 'Join Now!'
+                      : 'Link opens 30 minutes before the event'}
                 </Button>
               </div>
             </Card>
