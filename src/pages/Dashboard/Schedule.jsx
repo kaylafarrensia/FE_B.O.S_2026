@@ -178,15 +178,23 @@ export default function Schedule() {
     enabled: !!userSchedule,
   })
 
-  // 2. Parse and return strictly the Zoom link
+  // 2. Parse and return strictly the Zoom link (with test fallback & logs)
   const joinLink = useMemo(() => {
-    if (!userSchedule || !linksData) return null
+    console.log('--- DEBUG SCHEDULE LINKS ---')
+    console.log('userSchedule:', userSchedule)
+    console.log('regionToUse:', regionToUse)
+    console.log('linksData from API:', linksData)
+
+    const fallbackTestUrl = 'https://zoom.us/j/123456789'
+
+    if (!linksData) return fallbackTestUrl
 
     const dataContent = linksData?.data ?? linksData?.links ?? linksData
+    console.log('Extracted dataContent:', dataContent)
 
     // If string, parse directly
     if (typeof dataContent === 'string') {
-      return extractZoomUrl(dataContent)
+      return extractZoomUrl(dataContent) || fallbackTestUrl
     }
 
     // If Array, find matched item and parse URL
@@ -203,12 +211,15 @@ export default function Schedule() {
           link?.tag === 'ZOOM' ||
           !link?.tag ||
           link?.name?.toUpperCase()?.includes('ZOOM') ||
-          String(link?.url).includes('zoom.us')
+          String(link?.url || link?.link).includes('zoom.us')
 
         return matchRegion && matchSchedule && isZoom
       })
 
-      return matchedLink ? extractZoomUrl(matchedLink.url) : null
+      console.log('Matched Link Obj:', matchedLink)
+      return (
+        extractZoomUrl(matchedLink?.url || matchedLink?.link) || fallbackTestUrl
+      )
     }
 
     // If Object, search keys
@@ -221,10 +232,10 @@ export default function Schedule() {
           (val) => typeof val === 'string' && val.includes('zoom.us'),
         )
 
-      return extractZoomUrl(candidate)
+      return extractZoomUrl(candidate) || fallbackTestUrl
     }
 
-    return null
+    return fallbackTestUrl
   }, [userSchedule, linksData, regionToUse])
 
   // Window access control
@@ -246,7 +257,7 @@ export default function Schedule() {
   })()
 
   // ───────────────────────────────────────────────────────────────────────────
-  // 🧪 TEST MODE: Temporarily forced to bypass countdown for testing
+  // 🧪 TEST MODE: Temporarily bypasses joinWindowOpen countdown for testing
   // Revert back to: isRealHttpsLink && joinWindowOpen && !loadingSchedule && !loadingLinks
   // ───────────────────────────────────────────────────────────────────────────
   const canJoin = isRealHttpsLink && !loadingSchedule && !loadingLinks
