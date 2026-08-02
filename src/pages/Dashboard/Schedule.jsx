@@ -301,11 +301,7 @@ export default function Schedule() {
                   disabled={!canJoin}
                   onClick={handleJoinNow}
                 >
-                  {loadingLinks
-                    ? 'Loading link...'
-                    : canJoin
-                      ? 'Join Now!'
-                      : 'Link opens 30 minutes before the event'}
+                  {loadingLinks ? 'Loading link...' : 'Join Now!'}
                 </Button>
               </div>
             </Card>
