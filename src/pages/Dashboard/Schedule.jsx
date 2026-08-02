@@ -16,12 +16,12 @@ import { getLinksByRegionAndSchedule } from '../../services/admin.js'
 const extractZoomUrl = (input) => {
   if (!input || typeof input !== 'string') return null
 
-  // 1. Direct Regex Match for Zoom URLs (e.g., https://us02web.zoom.us/j/... or https://zoom.us/j/...)
+  // 1. Direct Regex Match for Zoom URLs
   const zoomRegex = /(https?:\/\/[a-zA-Z0-9-]+\.zoom\.us\/[^\s"'>]+)/i
   const directMatch = input.match(zoomRegex)
   if (directMatch) return directMatch[0]
 
-  // 2. Fallback: Parse URL params if Zoom link is wrapped (e.g., https://redirect.com?url=https://zoom.us/...)
+  // 2. Fallback: Parse URL params if Zoom link is wrapped
   try {
     const parsed = new URL(input)
     for (const [, val] of parsed.searchParams.entries()) {
@@ -245,8 +245,11 @@ export default function Schedule() {
     return now >= start - 30 * 60 * 1000
   })()
 
-  const canJoin =
-    isRealHttpsLink && joinWindowOpen && !loadingSchedule && !loadingLinks
+  // ───────────────────────────────────────────────────────────────────────────
+  // 🧪 TEST MODE: Temporarily forced to bypass countdown for testing
+  // Revert back to: isRealHttpsLink && joinWindowOpen && !loadingSchedule && !loadingLinks
+  // ───────────────────────────────────────────────────────────────────────────
+  const canJoin = isRealHttpsLink && !loadingSchedule && !loadingLinks
 
   const handleJoinNow = () => {
     if (!canJoin || !joinLink) return
