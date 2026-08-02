@@ -84,30 +84,6 @@ export const getName = async () => {
 
 // Get Overview
 export const getAdminOverview = async () => {
-  // return {
-  //   "success": true,
-  //   "data": {
-  //     "totalPendaftar": 100,
-  //     "angkatan": {
-  //       "B29": { "count": 40, "percentage": 40 },
-  //       "B30": { "count": 60, "percentage": 60 }
-  //     },
-  //     "lntClasses": [
-  //       { "className": "Kelas A", "count": 30, "percentage": 30 },
-  //       { "className": "Kelas B", "count": 20, "percentage": 20 }
-  //     ],
-  //     "jurusan": {
-  //       "totalJurusan": 10,
-  //       "top3": [
-  //         { "name": "Teknik Informatika", "count": 30 },
-  //         { "name": "Sistem Informasi", "count": 20 },
-  //         { "name": "Manajemen", "count": 15 }
-  //       ]
-  //     },
-  //     "statusLaunching": { "count": 50, "percentage": 50 },
-  //     "statusMember": { "count": 30, "percentage": 30 }
-  //   }
-  // }
   try {
     const response = await api.get('/admin/overview')
     return response.data
@@ -184,28 +160,6 @@ export const downloadUsersExcel = async () => {
 
 // Get Payment Details
 export const getPaymentDetails = async () => {
-  // return {
-  //   "success": true,
-  //   "message": "Payment list retrieved",
-  //   "data": [
-  //     {
-  //       "userId": 1,
-  //       "name": "User Name",
-  //       "region": "Kemanggisan",
-  //       "bnccId": "BNCC26101",
-  //       "is_japres": "Not Submitted",
-  //       "payment_status": "PENDING",
-  //       "order_id": null,
-  //       "amount": 650000
-  //     }
-  //   ],
-  //   "pagination": {
-  //     "page": 1,
-  //     "limit": 20,
-  //     "total": 50,
-  //     "totalPages": 3
-  //   }
-  // }
   try {
     const response = await api.get('/admin/payments')
     return response.data
@@ -240,22 +194,6 @@ export const updatePaymentStatus = async (userId, payload) => {
 
 // Get Japres
 export const getJapres = async () => {
-  // return {
-  //   "success": true,
-  //   "message": "Japres details retrieved successfully",
-  //   "data": [
-  //     {
-  //       "userId": 1,
-  //       "email": "user@example.com",
-  //       "name": "User Name",
-  //       "region": "Kemanggisan",
-  //       "japresUrl": "https://s3.bncc.net/...",
-  //       "isJapres": null,
-  //       "status": "Not Submitted",
-  //       "submittedAt": null
-  //     }
-  //   ]
-  // }
   try {
     const response = await api.get('/admin/japres')
     return response.data
@@ -298,17 +236,6 @@ export const downloadJapresExcel = async () => {
 
 // Get All Subscribers
 export const getAllSubscribers = async () => {
-  // return {
-  //   "success": true,
-  //   "data": [
-  //     {
-  //       "id": 1,
-  //       "email": "user@example.com",
-  //       "blastStatus": "SUCCESS",
-  //       "blastTime": "2026-07-28T12:00:00.000Z"
-  //     }
-  //   ]
-  // }
   try {
     const response = await api.get('/admin/subscribers')
     return response.data
@@ -319,11 +246,6 @@ export const getAllSubscribers = async () => {
 
 // Blast Email
 export const blastEmail = async (delayMs) => {
-  // return {
-  //   "success": true,
-  //   "message": "Blast started",
-  //   "jobId": "blast-1712345678"
-  // }
   try {
     const response = await api.post('/admin/blast-email', { delayMs })
     return response.data
@@ -336,37 +258,45 @@ export const blastEmail = async (delayMs) => {
  * GET semua link dari backend
  */
 export const getLinks = async () => {
-  const response = await api.get('/admin/links');
-  return response.data;
-};
+  const response = await api.get('/links')
+  return response.data
+}
 
 /**
- * GET link untuk user, difilter berdasarkan region & schedule
- */
-export const getLinksByRegionAndSchedule = async ({
-  regionId,
-  scheduleId,
-} = {}) => {
-  const params = new URLSearchParams();
-  if (regionId) params.set('regionId', regionId);
-  if (scheduleId) params.set('scheduleId', scheduleId);
-  const qs = params.toString();
-  const response = await api.get(`/links${qs ? `?${qs}` : ''}`);
-  return response.data;
-};
-
-/**
- * POST /api/admin/links
- * Creates a single link object in Prisma database
+ * POST /admin/links
+ * Creates a single link object in database
  */
 export const createLink = async (payload) => {
-  // payload: { regionId: number, name: string, tag: string, url: string }
   const response = await api.post('/admin/links', {
-    regionId: Number(payload.regionId), // Pastikan bertipe Number
+    regionId: Number(payload.regionId),
     name: payload.name,
-    tag: payload.tag || 'ZOOM', // Sesuaikan dengan enum LinkTag backend kamu
+    tag: payload.tag || 'ZOOM',
     url: payload.url,
-  });
+  })
 
-  return response.data;
-};
+  return response.data
+}
+
+/**
+ * PATCH /admin/links/:id
+ * Updates an existing link in the database
+ */
+export const updateLink = async (id, payload) => {
+  const response = await api.patch(`/admin/links/${id}`, {
+    ...(payload.regionId && { regionId: Number(payload.regionId) }),
+    ...(payload.name && { name: payload.name }),
+    ...(payload.tag && { tag: payload.tag }),
+    ...(payload.url && { url: payload.url }),
+  })
+
+  return response.data
+}
+
+/**
+ * DELETE /admin/links/:id
+ * Deletes a link from the database
+ */
+export const deleteLink = async (id) => {
+  const response = await api.delete(`/admin/links/${id}`)
+  return response.data
+}
