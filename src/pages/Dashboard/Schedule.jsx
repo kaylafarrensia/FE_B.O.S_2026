@@ -326,18 +326,20 @@ export default function Schedule() {
                   </p>
                 </li>
               </ul>
-              <div className="flex justify-center xl:block">
+              <div className="flex flex-col items-center xl:items-start gap-2">
                 <Button
                   className={!canJoin ? 'opacity-50 cursor-not-allowed' : ''}
                   disabled={!canJoin}
                   onClick={handleJoinNow}
                 >
-                  {loadingLinks
-                    ? 'Loading link...'
-                    : canJoin
-                      ? 'Join Now!'
-                      : 'Link opens 30 minutes before the event'}
+                  {loadingLinks ? 'Loading link...' : 'Join Now!'}
                 </Button>
+
+                {!canJoin && (
+                  <p className="text-xs text-gray-500 pt-1 text-center xl:text-left">
+                    Link opens 30 minutes before the event
+                  </p>
+                )}
               </div>
             </Card>
 
