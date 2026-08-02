@@ -389,8 +389,51 @@ Panitia BNCC Launching`,
   })
 
   const OpenWhatsApp = (number, text) => {
+    const formatNumber = String(number).replace(/^0+/, '')
     const formatText = encodeURIComponent(text)
-    window.open(`https://wa.me/+62${number}?text=${formatText}`)
+    window.open(`https://wa.me/+62${formatNumber}?text=${formatText}`, '_blank')
+  }
+
+  // ── BLAST WA MESSAGE HANDLER ──
+  const handleBlastWhatsAppAll = () => {
+    const targetUsers =
+      selectedUserIds.size > 0
+        ? rawUsers.filter((u) => selectedUserIds.has(u.id))
+        : rawUsers
+
+    const usersWithWA = targetUsers.filter((u) => {
+      const reg =
+        (Array.isArray(u?.registrations) ? u?.registrations[0] : null) ||
+        u?.registration ||
+        {}
+      return !!reg?.whatsappNumber
+    })
+
+    if (usersWithWA.length === 0) {
+      setAlert({
+        type: 'error',
+        message: 'No users with valid WhatsApp numbers were found.',
+      })
+      return
+    }
+
+    const confirmMsg =
+      selectedUserIds.size > 0
+        ? `Are you sure you want to blast WhatsApp messages to ${usersWithWA.length} selected users?`
+        : `Are you sure you want to blast WhatsApp messages to all ${usersWithWA.length} users on this page?`
+
+    if (!window.confirm(confirmMsg)) return
+
+    usersWithWA.forEach((user, idx) => {
+      const reg =
+        (Array.isArray(user?.registrations) ? user?.registrations[0] : null) ||
+        user?.registration ||
+        {}
+      const message = whatsAppMessage.replace('{nama}', user?.name || '')
+      setTimeout(() => {
+        OpenWhatsApp(reg.whatsappNumber, message)
+      }, idx * 350)
+    })
   }
 
   // Map raw users into table row objects safely
@@ -1493,15 +1536,23 @@ Panitia BNCC Launching`,
             setSearchQuery(e.target.value)
             setPageIndex(1)
           }}
-          className="py-2 px-4 w-full md:w-[400px] border rounded"
+          className="py-2 px-4 w-full md:w-[350px] border rounded"
         />
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
             onClick={() => setShowCreateModal(true)}
             type="button"
           >
             + Create User
+          </button>
+          <button
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+            onClick={handleBlastWhatsAppAll}
+            type="button"
+          >
+            Blast WA Message{' '}
+            {selectedUserIds.size > 0 ? `(${selectedUserIds.size})` : ''}
           </button>
           <button
             className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"

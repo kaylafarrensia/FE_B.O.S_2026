@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useOutletContext } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query' // Pastikan terimport
+import { useQuery } from '@tanstack/react-query'
 import Card from '../../components/ui/Card.jsx'
 import Button from '../../components/ui/Button.jsx'
 import IconSchedule from '../../assets/icons/IconSchedule.svg'
@@ -12,7 +12,34 @@ import SavedPopup from './Schedule/SavedPopup.jsx'
 import ContactPerson from './Japres/ContactPerson.jsx'
 import { getLinksByRegionAndSchedule } from '../../services/admin.js'
 
-// ── Dummy Data Fallback ───────────────────────────────────────────────────────
+// ── Utility: Helper to extract and sanitize a valid Zoom URL ──────────────────
+const extractZoomUrl = (input) => {
+  if (!input || typeof input !== 'string') return null
+
+  // 1. Direct Regex Match for Zoom URLs (e.g., https://us02web.zoom.us/j/... or https://zoom.us/j/...)
+  const zoomRegex = /(https?:\/\/[a-zA-Z0-9-]+\.zoom\.us\/[^\s"'>]+)/i
+  const directMatch = input.match(zoomRegex)
+  if (directMatch) return directMatch[0]
+
+  // 2. Fallback: Parse URL params if Zoom link is wrapped (e.g., https://redirect.com?url=https://zoom.us/...)
+  try {
+    const parsed = new URL(input)
+    for (const [, val] of parsed.searchParams.entries()) {
+      const innerMatch = val.match(zoomRegex)
+      if (innerMatch) return innerMatch[0]
+    }
+  } catch (e) {
+    // String is not a full URL
+  }
+
+  // 3. Fallback: Check if string is any valid HTTPS URL
+  if (input.trim().toLowerCase().startsWith('https://')) {
+    return input.trim()
+  }
+
+  return null
+}
+
 const DUMMY_SCHEDULES = [
   {
     id: 1,
@@ -25,7 +52,6 @@ const DUMMY_SCHEDULES = [
 const getToken = () =>
   localStorage.getItem('token') || localStorage.getItem('accessToken')
 
-// ── Page ──────────────────────────────────────────────────────────────────────
 export default function Schedule() {
   const [popupOpen, setPopupOpen] = useState(false)
   const [tempSchedule, setTempSchedule] = useState(null)
@@ -34,11 +60,8 @@ export default function Schedule() {
   const [saveError, setSaveError] = useState('')
   const [saving, setSaving] = useState(false)
   const [userRegionId, setUserRegionId] = useState(null)
-
-  // Loading state to prevent stale schedule flicker on page refresh
   const [loadingSchedule, setLoadingSchedule] = useState(true)
 
-  // Fetch schedules with safe region handling and fallback
   useEffect(() => {
     const fetchSchedules = async () => {
       setLoadingSchedule(true)
@@ -63,14 +86,12 @@ export default function Schedule() {
           }
         }
 
-        // Sync userSchedule with backend truth
         const currentSchedule =
           profileData?.registration?.schedule || profileData?.schedule || null
         if (currentSchedule) {
           setUserSchedule(currentSchedule)
         }
 
-        // Build URL safely: only append regionId if it exists to avoid 400 errors
         const schedulesUrl = regionId
           ? `${apiUrl}/lookup/schedules?regionId=${regionId}`
           : `${apiUrl}/lookup/schedules`
@@ -100,12 +121,10 @@ export default function Schedule() {
 
   const handleConfirm = async () => {
     if (!tempSchedule) return
-
     setSaveError('')
     const token = getToken()
 
     if (!token) {
-      console.error('[Schedule] No token found — cannot save schedule')
       setSaveError('Sesi login kamu habis. Silakan login ulang.')
       return
     }
@@ -127,8 +146,6 @@ export default function Schedule() {
       })
 
       const body = await res.json().catch(() => null)
-      console.log('[Schedule] PATCH /reschedule status:', res.status, body)
-
       if (!res.ok) {
         setSaveError(
           body?.message || 'Gagal menyimpan jadwal. Silakan coba lagi.',
@@ -136,7 +153,6 @@ export default function Schedule() {
         return
       }
 
-      // Update local state on success
       setUserSchedule(body?.data ?? tempSchedule)
       setTempSchedule(null)
       setPopupOpen(true)
@@ -151,7 +167,7 @@ export default function Schedule() {
   const regionToUse =
     userRegionId || userSchedule?.regionId || userSchedule?.region?.id || null
 
-  // 1. Fetch data link dari API via TanStack Query
+  // 1. Fetch links data from API
   const { data: linksData, isLoading: loadingLinks } = useQuery({
     queryKey: ['links', regionToUse, userSchedule?.id],
     queryFn: () =>
@@ -159,55 +175,59 @@ export default function Schedule() {
         regionId: regionToUse,
         scheduleId: userSchedule?.id,
       }),
-    enabled: !!userSchedule, // Hanya fetch jika userSchedule sudah ada
+    enabled: !!userSchedule,
   })
 
-  // 2. Cari link Zoom yang cocok dengan region user
+  // 2. Parse and return strictly the Zoom link
   const joinLink = useMemo(() => {
     if (!userSchedule || !linksData) return null
 
-    // Normalisasi array atau object response dari backend
     const dataContent = linksData?.data ?? linksData?.links ?? linksData
 
-    // If it's a string, return it directly
-    if (typeof dataContent === 'string') return dataContent
+    // If string, parse directly
+    if (typeof dataContent === 'string') {
+      return extractZoomUrl(dataContent)
+    }
 
-    // Jika dataContent berupa array, cari link yang regionId-nya cocok dan tag-nya ZOOM (atau link pertama yang cocok)
+    // If Array, find matched item and parse URL
     if (Array.isArray(dataContent)) {
       const targetRegionId = Number(regionToUse)
       const targetScheduleId = Number(userSchedule?.id)
-      const matchedLink = dataContent.find(
-        (link) =>
-          Number(link?.regionId) === targetRegionId &&
-          (!link?.scheduleId || Number(link.scheduleId) === targetScheduleId) &&
-          (link?.tag === 'ZOOM' ||
-            !link?.tag ||
-            link?.name?.toUpperCase()?.includes('ZOOM')),
-      )
-      return matchedLink ? matchedLink.url : null
+
+      const matchedLink = dataContent.find((link) => {
+        const matchRegion =
+          !link?.regionId || Number(link?.regionId) === targetRegionId
+        const matchSchedule =
+          !link?.scheduleId || Number(link?.scheduleId) === targetScheduleId
+        const isZoom =
+          link?.tag === 'ZOOM' ||
+          !link?.tag ||
+          link?.name?.toUpperCase()?.includes('ZOOM') ||
+          String(link?.url).includes('zoom.us')
+
+        return matchRegion && matchSchedule && isZoom
+      })
+
+      return matchedLink ? extractZoomUrl(matchedLink.url) : null
     }
 
-    // Jika dataContent berupa object, kembalikan field zoom atau url
+    // If Object, search keys
     if (dataContent && typeof dataContent === 'object') {
-      if (dataContent.zoom) {
-        return typeof dataContent.zoom === 'object'
-          ? dataContent.zoom.url
-          : dataContent.zoom
-      }
-      if (dataContent.url) return dataContent.url
-      // Iterasi key object untuk mencari key yang mengandung kata 'zoom'
-      for (const key of Object.keys(dataContent)) {
-        const val = dataContent[key]
-        if (key.toLowerCase().includes('zoom')) {
-          return typeof val === 'object' ? val?.url : val
-        }
-      }
+      const candidate =
+        dataContent.zoom?.url ||
+        dataContent.zoom ||
+        dataContent.url ||
+        Object.values(dataContent).find(
+          (val) => typeof val === 'string' && val.includes('zoom.us'),
+        )
+
+      return extractZoomUrl(candidate)
     }
 
     return null
   }, [userSchedule, linksData, regionToUse])
 
-  // Window akses: tombol join baru bisa digunakan maksimal 30 menit sebelum event
+  // Window access control
   const [now, setNow] = useState(() => Date.now())
 
   useEffect(() => {
@@ -228,10 +248,8 @@ export default function Schedule() {
   const canJoin =
     isRealHttpsLink && joinWindowOpen && !loadingSchedule && !loadingLinks
 
-  // 3. Handler saat tombol "Join Now!" diklik
   const handleJoinNow = () => {
-    if (!canJoin) return
-    // Buka link Zoom di tab baru
+    if (!canJoin || !joinLink) return
     window.open(joinLink, '_blank', 'noopener,noreferrer')
     if (setUserStatus) {
       setUserStatus('registration')
@@ -244,9 +262,8 @@ export default function Schedule() {
 
       <div className="relative">
         <div className="flex flex-col xl:flex-row justify-center w-full pt-3 pb-8 xl:py-15 px-6 xl:px-[10vw] gap-4 xl:gap-5">
-          {/* ── Left Column ── */}
+          {/* Left Column */}
           <div className="flex flex-col w-full gap-4 xl:gap-5">
-            {/* Current Schedule Info */}
             <Card className="flex flex-col p-10 rounded-xl border-white border-[3px]">
               <h1 className="text-xl font-bold sm:text-3xl w-fit">
                 Join Our Launch!
@@ -301,12 +318,15 @@ export default function Schedule() {
                   disabled={!canJoin}
                   onClick={handleJoinNow}
                 >
-                  {loadingLinks ? 'Loading link...' : 'Join Now!'}
+                  {loadingLinks
+                    ? 'Loading link...'
+                    : canJoin
+                      ? 'Join Now!'
+                      : 'Link opens 30 minutes before the event'}
                 </Button>
               </div>
             </Card>
 
-            {/* Change Schedule Card */}
             <Card className="flex flex-col p-10 mt-0 rounded-xl border-white border-[3px] z-[99]">
               <h1 className="text-xl font-bold sm:text-3xl w-fit">
                 Change Your Schedule?
@@ -337,14 +357,12 @@ export default function Schedule() {
             </Card>
           </div>
 
-          {/* ── Right Column ── */}
+          {/* Right Column */}
           <div className="flex flex-col w-full gap-4 xl:gap-5">
             <Calendar
               schedules={schedulesToUse}
               userScheduleId={userSchedule?.id}
             />
-
-            {/* Contact Person */}
             <ContactPerson />
           </div>
         </div>
