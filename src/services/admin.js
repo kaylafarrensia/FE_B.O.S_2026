@@ -255,10 +255,10 @@ export const blastEmail = async (delayMs) => {
 }
 
 /**
- * GET semua link dari backend
+ * GET semua link dari backend admin
  */
 export const getLinks = async () => {
-  const response = await api.get('/links')
+  const response = await api.get('/admin/links')
   return response.data
 }
 
@@ -269,7 +269,7 @@ export const getLinksByRegionAndSchedule = async ({
   regionId,
   scheduleId,
 } = {}) => {
-  let url = '/links'
+  let url = '/admin/links'
   const params = new URLSearchParams()
 
   if (regionId) params.append('regionId', regionId)
