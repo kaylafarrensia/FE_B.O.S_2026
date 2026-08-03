@@ -263,6 +263,28 @@ export const getLinks = async () => {
 }
 
 /**
+ * GET links filtered by regionId and/or scheduleId
+ */
+export const getLinksByRegionAndSchedule = async ({
+  regionId,
+  scheduleId,
+} = {}) => {
+  let url = '/links'
+  const params = new URLSearchParams()
+
+  if (regionId) params.append('regionId', regionId)
+  if (scheduleId) params.append('scheduleId', scheduleId)
+
+  const queryString = params.toString()
+  if (queryString) {
+    url += `?${queryString}`
+  }
+
+  const response = await api.get(url)
+  return response.data
+}
+
+/**
  * POST /admin/links
  * Creates a single link object in database
  */
