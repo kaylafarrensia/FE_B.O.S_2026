@@ -178,23 +178,15 @@ export default function Schedule() {
     enabled: !!userSchedule,
   })
 
-  // 2. Parse and return strictly the Zoom link (with test fallback & logs)
+  // 2. Parse and return strictly the Zoom link
   const joinLink = useMemo(() => {
-    console.log('--- DEBUG SCHEDULE LINKS ---')
-    console.log('userSchedule:', userSchedule)
-    console.log('regionToUse:', regionToUse)
-    console.log('linksData from API:', linksData)
-
-    const fallbackTestUrl = 'https://zoom.us/j/123456789'
-
-    if (!linksData) return fallbackTestUrl
+    if (!linksData) return null
 
     const dataContent = linksData?.data ?? linksData?.links ?? linksData
-    console.log('Extracted dataContent:', dataContent)
 
     // If string, parse directly
     if (typeof dataContent === 'string') {
-      return extractZoomUrl(dataContent) || fallbackTestUrl
+      return extractZoomUrl(dataContent)
     }
 
     // If Array, find matched item and parse URL
@@ -216,10 +208,7 @@ export default function Schedule() {
         return matchRegion && matchSchedule && isZoom
       })
 
-      console.log('Matched Link Obj:', matchedLink)
-      return (
-        extractZoomUrl(matchedLink?.url || matchedLink?.link) || fallbackTestUrl
-      )
+      return extractZoomUrl(matchedLink?.url || matchedLink?.link)
     }
 
     // If Object, search keys
@@ -232,10 +221,10 @@ export default function Schedule() {
           (val) => typeof val === 'string' && val.includes('zoom.us'),
         )
 
-      return extractZoomUrl(candidate) || fallbackTestUrl
+      return extractZoomUrl(candidate)
     }
 
-    return fallbackTestUrl
+    return null
   }, [userSchedule, linksData, regionToUse])
 
   // Window access control
@@ -256,11 +245,13 @@ export default function Schedule() {
     return now >= start - 30 * 60 * 1000
   })()
 
-  // ───────────────────────────────────────────────────────────────────────────
-  // 🧪 TEST MODE: Temporarily bypasses joinWindowOpen countdown for testing
-  // Revert back to: isRealHttpsLink && joinWindowOpen && !loadingSchedule && !loadingLinks
-  // ───────────────────────────────────────────────────────────────────────────
-  const canJoin = isRealHttpsLink && !loadingSchedule && !loadingLinks
+  // 🔒 Checks:
+  // 1. Must have a valid join link (!!joinLink && isRealHttpsLink)
+  // 2. Time window must be open (30 mins before event)
+  // 3. Data must not be loading
+  const hasValidLink = !!joinLink && isRealHttpsLink
+  const canJoin =
+    hasValidLink && joinWindowOpen && !loadingSchedule && !loadingLinks
 
   const handleJoinNow = () => {
     if (!canJoin || !joinLink) return
@@ -268,6 +259,18 @@ export default function Schedule() {
     if (setUserStatus) {
       setUserStatus('registration')
     }
+  }
+
+  // Dynamic status text for user guidance
+  const getSubtext = () => {
+    if (loadingSchedule || loadingLinks) return null
+    if (!hasValidLink && joinWindowOpen) {
+      return 'Please kindly wait for the meeting room as it is under preparation.'
+    }
+    if (!joinWindowOpen) {
+      return 'Link opens 30 minutes before the event'
+    }
+    return null
   }
 
   return (
@@ -335,9 +338,9 @@ export default function Schedule() {
                   {loadingLinks ? 'Loading link...' : 'Join Now!'}
                 </Button>
 
-                {!canJoin && (
+                {!canJoin && getSubtext() && (
                   <p className="text-xs text-gray-500 pt-1 text-center xl:text-left">
-                    Link opens 30 minutes before the event
+                    {getSubtext()}
                   </p>
                 )}
               </div>
