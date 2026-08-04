@@ -100,7 +100,7 @@ export default function SignUp() {
   const [showExpoCode, setShowExpoCode] = useState(false)
   const [toastVisible, setToastVisible] = useState(false)
 
-  // ── New State to track if the user has clicked "Show Code" ──
+  // ── Track if user has clicked "Show Code" ──
   const [hasSeenCode, setHasSeenCode] = useState(false)
 
   const watchedPassword = watch('password', '')
@@ -201,7 +201,6 @@ export default function SignUp() {
       return
     }
 
-    // Explicit validation/casting mapping matching the admin dashboard payload pattern
     const payload = {
       fullName: String(data.fullName || '').trim(),
       lineId: String(data.lineId || '').trim(),
@@ -227,13 +226,16 @@ export default function SignUp() {
         setCurrentStep(4)
       },
       onError: (err) => {
-        const msg = err?.response?.data?.message
-        const backendError = Array.isArray(msg) ? msg.join(', ') : msg
+        // 💡 EXTRACT REASON DARI BACKEND
+        const rawMsg =
+          err?.response?.data?.message || err?.response?.data?.error
+        const backendError = Array.isArray(rawMsg) ? rawMsg.join(', ') : rawMsg
+
         const errorMsg =
           backendError ||
-          err?.response?.data?.error ||
           err?.message ||
           'Registration failed. Please try again.'
+
         showPopup({
           type: 'error',
           heading: 'Registration Failed',
@@ -248,15 +250,12 @@ export default function SignUp() {
     const code = expoCode || 'EXBC01001'
     setShowExpoCode(!showExpoCode)
 
-    // Unlock the submit button
     setHasSeenCode(true)
 
-    // Copy to clipboard
     navigator.clipboard
       .writeText(code)
       .then(() => {
         setToastVisible(true)
-        // Hide toast after 3 seconds
         setTimeout(() => {
           setToastVisible(false)
         }, 3000)
@@ -309,7 +308,7 @@ export default function SignUp() {
             <strong className="font-bold text-[#2474C0]">SEASON 2026</strong>
           </header>
 
-          {/* Title Box with Bounding Box & Selection Handles */}
+          {/* Title Box */}
           <div className="relative z-0 mt-3 sm:mt-4 flex items-center justify-center w-full">
             <BoundingBox>
               <h1
@@ -323,7 +322,6 @@ export default function SignUp() {
 
           {/* ══ Glassmorphism Card ══ */}
           <div className="relative z-2 -mt-5 min-[400px]:-mt-7 sm:-mt-8 w-[82%] max-w-[19rem] min-[400px]:max-w-[21rem] sm:max-w-[24rem] lg:max-w-[26rem] flex flex-col rounded-[15px] border-[2.5px] border-white/90 bg-white/35 backdrop-blur-lg px-5 sm:px-8 pt-5 sm:pt-7 pb-5 sm:pb-6 text-[#0A2745]">
-            {/* Card heading */}
             <h2 className="font-bold text-lg sm:text-xl text-center text-[#0D2A4E] mb-5">
               {stepTitle}
             </h2>
@@ -333,7 +331,6 @@ export default function SignUp() {
               {/* ══ STEP 1: Personal Info ══ */}
               {currentStep === 1 && (
                 <>
-                  {/* Full Name */}
                   <div>
                     <label className={labelClass}>Full Name</label>
                     <input
@@ -356,7 +353,6 @@ export default function SignUp() {
                     )}
                   </div>
 
-                  {/* Line ID */}
                   <div>
                     <label className={labelClass}>Line ID</label>
                     <input
@@ -374,7 +370,6 @@ export default function SignUp() {
                     )}
                   </div>
 
-                  {/* WhatsApp */}
                   <div>
                     <label className={labelClass}>WhatsApp Number</label>
                     <input
@@ -398,7 +393,6 @@ export default function SignUp() {
                     )}
                   </div>
 
-                  {/* NIM */}
                   <div>
                     <label className={labelClass}>NIM</label>
                     <input
@@ -418,7 +412,6 @@ export default function SignUp() {
                     )}
                   </div>
 
-                  {/* Region Kampus */}
                   <Controller
                     name="regionId"
                     control={control}
@@ -475,7 +468,6 @@ export default function SignUp() {
                     )}
                   />
 
-                  {/* Fakultas */}
                   <Controller
                     name="facultyId"
                     control={control}
@@ -527,7 +519,6 @@ export default function SignUp() {
                     )}
                   />
 
-                  {/* Jurusan */}
                   <Controller
                     name="majorId"
                     control={control}
@@ -582,7 +573,6 @@ export default function SignUp() {
               {/* ══ STEP 2: BNCC Registration ══ */}
               {currentStep === 2 && (
                 <>
-                  {/* Email */}
                   <div>
                     <label className={labelClass}>Email</label>
                     <input
@@ -604,7 +594,6 @@ export default function SignUp() {
                     )}
                   </div>
 
-                  {/* BINUS Email */}
                   <div>
                     <label className={labelClass}>Email (@binus.ac.id)</label>
                     <input
@@ -626,7 +615,6 @@ export default function SignUp() {
                     )}
                   </div>
 
-                  {/* Password */}
                   <div>
                     <label className={labelClass}>Password</label>
                     <div className="relative">
@@ -662,7 +650,6 @@ export default function SignUp() {
                     )}
                   </div>
 
-                  {/* Confirm Password */}
                   <div>
                     <label className={labelClass}>Confirm Password</label>
                     <div className="relative">
@@ -697,7 +684,6 @@ export default function SignUp() {
                     )}
                   </div>
 
-                  {/* LnT Course */}
                   <Controller
                     name="lntCourseId"
                     control={control}
@@ -743,7 +729,6 @@ export default function SignUp() {
                     )}
                   />
 
-                  {/* Jadwal BNCC Launching */}
                   <Controller
                     name="scheduleId"
                     control={control}
@@ -911,7 +896,7 @@ export default function SignUp() {
             </div>
           </div>
 
-          {/* ── Progress Bar (Outside Card) ── */}
+          {/* ── Progress Bar ── */}
           {currentStep < 4 && (
             <div className="w-[82%] max-w-[19rem] min-[400px]:max-w-[21rem] sm:max-w-[24rem] lg:max-w-[26rem] mt-6">
               <div className="relative w-full h-7 rounded-[8px] border border-white bg-white/20">
@@ -924,7 +909,7 @@ export default function SignUp() {
           )}
         </div>
 
-        {/* BNCC Logo — relative bottom in scroll flow */}
+        {/* BNCC Logo */}
         <div className="mt-3 sm:mt-4 lg:mt-10 mb-3 sm:mb-4 lg:mb-8 relative z-[5] flex justify-center w-full">
           <img
             className="h-9 sm:h-11 w-auto object-contain"
@@ -937,7 +922,6 @@ export default function SignUp() {
       {/* ════════════ SUCCESS POPUP ════════════ */}
       {successVisible && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Blurred overlay */}
           <div
             className="absolute inset-0 transition-opacity duration-300"
             style={{
@@ -946,9 +930,7 @@ export default function SignUp() {
               WebkitBackdropFilter: 'blur(8px)',
             }}
           />
-          {/* Glassmorphism Popup Card */}
           <div className="relative z-10 w-full max-w-[22rem] sm:max-w-[26rem] rounded-[22px] border border-white/90 bg-white/40 backdrop-blur-2xl px-6 sm:px-9 py-8 sm:py-10 flex flex-col items-center text-center shadow-[0_20px_50px_rgba(10,39,69,0.25)]">
-            {/* Green Checkmark Badge */}
             <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-full bg-[#22C55E] flex items-center justify-center mb-6 shadow-[0_8px_20px_rgba(34,197,94,0.35)]">
               <svg
                 className="w-10 h-10 text-white stroke-current stroke-[3.5] fill-none"
@@ -1013,7 +995,7 @@ export default function SignUp() {
             <p className="text-sm text-[#3D6080] mb-6">{config.message}</p>
             <button
               onClick={hidePopup}
-              className="px-8 py-2.5 rounded-xl text-white font-semibold text-sm"
+              className="px-8 py-2.5 rounded-xl text-white font-semibold text-sm cursor-pointer"
               style={{
                 background: 'linear-gradient(135deg, #1B5198 0%, #2A6DC2 100%)',
               }}
@@ -1031,7 +1013,7 @@ export default function SignUp() {
             Copied to clipboard!
           </span>
           <button
-            onClick={() => (setToastValue = setToastVisible(false))}
+            onClick={() => setToastVisible(false)}
             className="text-[#0A2745] hover:opacity-70 cursor-pointer"
           >
             <X size={16} />
