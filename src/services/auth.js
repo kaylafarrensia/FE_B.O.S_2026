@@ -1,15 +1,17 @@
 import api from './api'
 
 /**
- * Helper to extract error message cleanly from Axios responses
+ * Helper to extract error message cleanly from Axios responses.
+ * Handles strings, arrays (NestJS/Zod validations), network errors, and fallbacks.
  */
 const extractErrorMessage = (error, fallbackMessage) => {
-  return (
-    error?.response?.data?.message ||
-    error?.response?.data?.error ||
-    error?.message ||
-    fallbackMessage
-  )
+  const msg = error?.response?.data?.message || error?.response?.data?.error
+
+  if (Array.isArray(msg)) {
+    return msg.join(', ')
+  }
+
+  return msg || error?.message || fallbackMessage
 }
 
 /**
@@ -23,7 +25,7 @@ export const signUp = async (payload) => {
   } catch (error) {
     const message = extractErrorMessage(
       error,
-      'Gagal mendaftar. Silakan periksa kembali data Anda.',
+      'Registration failed. Please check your information and try again.',
     )
     throw new Error(message)
   }
@@ -40,7 +42,7 @@ export const login = async (credentials) => {
   } catch (error) {
     const message = extractErrorMessage(
       error,
-      'Login gagal. Silakan periksa email dan password Anda.',
+      'Login failed. Please check your email and password.',
     )
     throw new Error(message)
   }
@@ -55,7 +57,10 @@ export const getProfile = async () => {
     const response = await api.get('/profile')
     return response.data
   } catch (error) {
-    const message = extractErrorMessage(error, 'Gagal mengambil data profil.')
+    const message = extractErrorMessage(
+      error,
+      'Failed to retrieve profile data.',
+    )
     throw new Error(message)
   }
 }
@@ -69,7 +74,7 @@ export const updateProfile = async (payload) => {
     const response = await api.patch('/profile', payload)
     return response.data
   } catch (error) {
-    const message = extractErrorMessage(error, 'Gagal memperbarui profil.')
+    const message = extractErrorMessage(error, 'Failed to update profile.')
     throw new Error(message)
   }
 }
@@ -85,7 +90,7 @@ export const forgotPassword = async (email) => {
   } catch (error) {
     const message = extractErrorMessage(
       error,
-      'Gagal mengirim permintaan reset password.',
+      'Failed to send password reset request.',
     )
     throw new Error(message)
   }
@@ -100,7 +105,7 @@ export const resetPassword = async (payload) => {
     const response = await api.post('/auth/reset-password', payload)
     return response.data
   } catch (error) {
-    const message = extractErrorMessage(error, 'Gagal mereset password.')
+    const message = extractErrorMessage(error, 'Failed to reset password.')
     throw new Error(message)
   }
 }

@@ -226,7 +226,6 @@ export default function SignUp() {
         setCurrentStep(4)
       },
       onError: (err) => {
-        // 💡 EXTRACT REASON DARI BACKEND
         const rawMsg =
           err?.response?.data?.message || err?.response?.data?.error
         const backendError = Array.isArray(rawMsg) ? rawMsg.join(', ') : rawMsg
@@ -399,7 +398,7 @@ export default function SignUp() {
                       {...register('nim', {
                         required: 'NIM is required',
                         validate: (v) =>
-                          /^\d{10}$/.test(v) || 'NIM harus 10 angka',
+                          /^\d{10}$/.test(v) || 'NIM must be 10 digits',
                       })}
                       type="text"
                       placeholder="Enter your NIM"
@@ -415,7 +414,7 @@ export default function SignUp() {
                   <Controller
                     name="regionId"
                     control={control}
-                    rules={{ required: 'Region Kampus is required' }}
+                    rules={{ required: 'Campus Region is required' }}
                     render={({ field }) => (
                       <div>
                         <label className={labelClass}>Campus Region</label>
@@ -471,7 +470,7 @@ export default function SignUp() {
                   <Controller
                     name="facultyId"
                     control={control}
-                    rules={{ required: 'Fakultas is required' }}
+                    rules={{ required: 'Faculty is required' }}
                     render={({ field }) => (
                       <div>
                         <label className={labelClass}>Faculty</label>
@@ -522,7 +521,7 @@ export default function SignUp() {
                   <Controller
                     name="majorId"
                     control={control}
-                    rules={{ required: 'Jurusan is required' }}
+                    rules={{ required: 'Major is required' }}
                     render={({ field }) => (
                       <div>
                         <label className={labelClass}>Major</label>
@@ -595,7 +594,9 @@ export default function SignUp() {
                   </div>
 
                   <div>
-                    <label className={labelClass}>Email (@binus.ac.id)</label>
+                    <label className={labelClass}>
+                      BINUS Email (@binus.ac.id)
+                    </label>
                     <input
                       {...register('binusEmail', {
                         required: 'BINUS email is required',
@@ -732,11 +733,11 @@ export default function SignUp() {
                   <Controller
                     name="scheduleId"
                     control={control}
-                    rules={{ required: 'Jadwal BNCC Launching is required' }}
+                    rules={{ required: 'BNCC Launch Schedule is required' }}
                     render={({ field }) => (
                       <div>
                         <label className={labelClass}>
-                          Jadwal BNCC Launching
+                          BNCC Launch Schedule
                         </label>
                         <div className="relative">
                           <select

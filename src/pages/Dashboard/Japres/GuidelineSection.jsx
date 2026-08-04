@@ -4,7 +4,7 @@ import Button from '../../../components/ui/Button.jsx'
 import IconView from '../../../assets/icons/IconView.svg'
 
 const GUIDELINE_URL =
-  'https://drive.google.com/file/d/1AhMMNivp4WNo8X88g2x1V7yfWEWUw2Nz/view?usp=sharing'
+  'https://drive.google.com/file/d/1eNmyH6IJesw63ITNhjRbFpXxd1whjBO5/view?usp=sharing'
 
 const STORAGE_KEY = 'japres_guideline_read'
 
