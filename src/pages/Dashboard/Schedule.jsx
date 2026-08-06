@@ -16,18 +16,23 @@ import { getLinksByRegionAndSchedule } from '../../services/admin.js'
 const extractZoomUrl = (input) => {
   if (!input || typeof input !== 'string') return null
 
+  // 1. Direct Regex Match for Zoom URLs
   const zoomRegex = /(https?:\/\/[a-zA-Z0-9-]+\.zoom\.us\/[^\s"'>]+)/i
   const directMatch = input.match(zoomRegex)
   if (directMatch) return directMatch[0]
 
+  // 2. Fallback: Parse URL params if Zoom link is wrapped
   try {
     const parsed = new URL(input)
     for (const [, val] of parsed.searchParams.entries()) {
       const innerMatch = val.match(zoomRegex)
       if (innerMatch) return innerMatch[0]
     }
-  } catch (e) {}
+  } catch (e) {
+    // String is not a full URL
+  }
 
+  // 3. Fallback: Check if string is any valid HTTPS URL
   if (input.trim().toLowerCase().startsWith('https://')) {
     return input.trim()
   }
@@ -162,6 +167,7 @@ export default function Schedule() {
   const regionToUse =
     userRegionId || userSchedule?.regionId || userSchedule?.region?.id || null
 
+  // Fetch links data from API
   const { data: linksData, isLoading: loadingLinks } = useQuery({
     queryKey: ['links', regionToUse, userSchedule?.id],
     queryFn: () =>
@@ -172,14 +178,17 @@ export default function Schedule() {
     enabled: !!userSchedule,
   })
 
-  // 🧪 MANIPULATION 1: Fallback Mock Link if API returns empty
+  // Parse strictly the Zoom link from the backend response
   const joinLink = useMemo(() => {
+    if (!linksData) return null
+
     const dataContent = linksData?.data ?? linksData?.links ?? linksData
 
-    let parsedUrl = null
     if (typeof dataContent === 'string') {
-      parsedUrl = extractZoomUrl(dataContent)
-    } else if (Array.isArray(dataContent)) {
+      return extractZoomUrl(dataContent)
+    }
+
+    if (Array.isArray(dataContent)) {
       const targetRegionId = Number(regionToUse)
       const targetScheduleId = Number(userSchedule?.id)
 
@@ -188,37 +197,40 @@ export default function Schedule() {
           !link?.regionId || Number(link?.regionId) === targetRegionId
         const matchSchedule =
           !link?.scheduleId || Number(link?.scheduleId) === targetScheduleId
-        return matchRegion && matchSchedule
+        const isZoom =
+          link?.tag === 'ZOOM' ||
+          !link?.tag ||
+          link?.name?.toUpperCase()?.includes('ZOOM') ||
+          String(link?.url || link?.link).includes('zoom.us')
+
+        return matchRegion && matchSchedule && isZoom
       })
 
-      parsedUrl = extractZoomUrl(matchedLink?.url || matchedLink?.link)
+      return extractZoomUrl(matchedLink?.url || matchedLink?.link)
     }
 
-    // 🔴 FOR TESTING "NO LINK" STATE: Set this to `null`
-    // 🟢 FOR TESTING "LINK AVAILABLE" STATE: Keep `parsedUrl || 'https://binus.zoom.us/j/123456789'`
-    return parsedUrl || 'https://binus.zoom.us/j/123456789'
+    if (dataContent && typeof dataContent === 'object') {
+      const candidate =
+        dataContent.zoom?.url ||
+        dataContent.zoom ||
+        dataContent.url ||
+        Object.values(dataContent).find(
+          (val) => typeof val === 'string' && val.includes('zoom.us'),
+        )
+
+      return extractZoomUrl(candidate)
+    }
+
+    return null
   }, [userSchedule, linksData, regionToUse])
 
-  // 🧪 MANIPULATION 2: Force 'now' to be 10 minutes before event start time
-  const [now, setNow] = useState(() => {
-    if (userSchedule?.startTime) {
-      const start = new Date(userSchedule.startTime).getTime()
-      if (Number.isFinite(start)) {
-        // Force current time to 10 minutes before the event
-        return start - 10 * 60 * 1000
-      }
-    }
-    return Date.now()
-  })
+  // Real-time time clock, updates every 30 seconds
+  const [now, setNow] = useState(() => Date.now())
 
   useEffect(() => {
-    if (userSchedule?.startTime) {
-      const start = new Date(userSchedule.startTime).getTime()
-      if (Number.isFinite(start)) {
-        setNow(start - 10 * 60 * 1000)
-      }
-    }
-  }, [userSchedule])
+    const t = setInterval(() => setNow(Date.now()), 30000)
+    return () => clearInterval(t)
+  }, [])
 
   const isRealHttpsLink =
     !!joinLink && joinLink.trim().toLowerCase().startsWith('https://')
@@ -242,6 +254,7 @@ export default function Schedule() {
     }
   }
 
+  // Guidance subtext for the user
   const getSubtext = () => {
     if (loadingSchedule || loadingLinks) return null
     if (!hasValidLink && joinWindowOpen) {

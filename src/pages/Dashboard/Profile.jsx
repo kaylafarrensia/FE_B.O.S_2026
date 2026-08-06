@@ -283,9 +283,9 @@ function Profile() {
                     </p>
                   </div>
                   <div className="flex flex-col gap-2">
-                    <p className="text-sm text-gray-500">Binus Email</p>
-                    <p className="text-sm sm:text-lg font-semibold break-words">
-                      {loading ? <Skeleton /> : renderEmail(user.binusEmail)}
+                    <p className="text-sm text-gray-500">Expo Code</p>
+                    <p className="text-sm sm:text-lg font-semibold font-mono tracking-wide text-[#0D2A4E]">
+                      {loading ? <Skeleton /> : user.registration.expoId || '-'}
                     </p>
                   </div>
 
@@ -311,11 +311,11 @@ function Profile() {
                     </p>
                   </div>
 
-                  {/* Row 4 (Expo Code) */}
+                  {/* Row 4 */}
                   <div className="flex flex-col gap-2 col-span-2 sm:col-span-1">
-                    <p className="text-sm text-gray-500">Expo Code</p>
-                    <p className="text-sm sm:text-lg font-semibold font-mono tracking-wide text-[#0D2A4E]">
-                      {loading ? <Skeleton /> : user.registration.expoId || '-'}
+                    <p className="text-sm text-gray-500">Binus Email</p>
+                    <p className="text-sm sm:text-lg font-semibold break-words">
+                      {loading ? <Skeleton /> : renderEmail(user.binusEmail)}
                     </p>
                   </div>
                 </div>
