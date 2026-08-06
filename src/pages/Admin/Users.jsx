@@ -35,6 +35,12 @@ export default function Users() {
   const [bulkStatus, setBulkStatus] = useState('')
   const [bulkLoading, setBulkLoading] = useState(false)
 
+  // ── WA Blast Modal & State ──
+  const [showBlastModal, setShowBlastModal] = useState(false)
+  const [blastScope, setBlastScope] = useState('all_pages') // 'all_pages' | 'selected' | 'current_page'
+  const [blastStatusFilter, setBlastStatusFilter] = useState('all') // 'all' or specific status
+  const [blastLoading, setBlastLoading] = useState(false)
+
   // Edit form state
   const [editForm, setEditForm] = useState({
     id: 0,
@@ -394,46 +400,90 @@ Panitia BNCC Launching`,
     window.open(`https://wa.me/+62${formatNumber}?text=${formatText}`, '_blank')
   }
 
-  // ── BLAST WA MESSAGE HANDLER ──
-  const handleBlastWhatsAppAll = () => {
-    const targetUsers =
-      selectedUserIds.size > 0
-        ? rawUsers.filter((u) => selectedUserIds.has(u.id))
-        : rawUsers
+  // ── MULTI-PAGE BLAST WA EXECUTION HANDLER ──
+  const handleExecuteBlast = async () => {
+    setBlastLoading(true)
 
-    const usersWithWA = targetUsers.filter((u) => {
-      const reg =
-        (Array.isArray(u?.registrations) ? u?.registrations[0] : null) ||
-        u?.registration ||
-        {}
-      return !!reg?.whatsappNumber
-    })
+    try {
+      let targetPool = []
 
-    if (usersWithWA.length === 0) {
+      if (blastScope === 'selected') {
+        targetPool = rawUsers.filter((u) => selectedUserIds.has(u.id))
+      } else if (blastScope === 'current_page') {
+        targetPool = rawUsers
+      } else if (blastScope === 'all_pages') {
+        // Fetch all users across all pages from backend (up to 10,000)
+        const allPagesResponse = await getUsersDetails({
+          page: 1,
+          limit: 10000,
+          search: searchQuery,
+        })
+
+        targetPool = Array.isArray(allPagesResponse)
+          ? allPagesResponse
+          : Array.isArray(allPagesResponse?.data)
+            ? allPagesResponse.data
+            : Array.isArray(allPagesResponse?.users)
+              ? allPagesResponse.users
+              : []
+      }
+
+      // Filter pool by status if specified
+      if (blastStatusFilter !== 'all') {
+        targetPool = targetPool.filter(
+          (user) =>
+            String(user?.status).toLowerCase() ===
+            String(blastStatusFilter).toLowerCase(),
+        )
+      }
+
+      // Filter only users with valid WhatsApp numbers
+      const usersWithWA = targetPool.filter((u) => {
+        const reg =
+          (Array.isArray(u?.registrations) ? u?.registrations[0] : null) ||
+          u?.registration ||
+          {}
+        return !!reg?.whatsappNumber
+      })
+
+      if (usersWithWA.length === 0) {
+        setAlert({
+          type: 'error',
+          message:
+            'No matching users with valid WhatsApp numbers were found for the selected criteria.',
+        })
+        setBlastLoading(false)
+        setShowBlastModal(false)
+        return
+      }
+
+      setShowBlastModal(false)
+
+      usersWithWA.forEach((user, idx) => {
+        const reg =
+          (Array.isArray(user?.registrations)
+            ? user?.registrations[0]
+            : null) ||
+          user?.registration ||
+          {}
+        const message = whatsAppMessage.replace('{nama}', user?.name || '')
+        setTimeout(() => {
+          OpenWhatsApp(reg.whatsappNumber, message)
+        }, idx * 350)
+      })
+
+      setAlert({
+        type: 'success',
+        message: `Triggered WhatsApp messaging for ${usersWithWA.length} users!`,
+      })
+    } catch (err) {
       setAlert({
         type: 'error',
-        message: 'No users with valid WhatsApp numbers were found.',
+        message: 'Failed to fetch full user list for WhatsApp Blast.',
       })
-      return
+    } finally {
+      setBlastLoading(false)
     }
-
-    const confirmMsg =
-      selectedUserIds.size > 0
-        ? `Are you sure you want to blast WhatsApp messages to ${usersWithWA.length} selected users?`
-        : `Are you sure you want to blast WhatsApp messages to all ${usersWithWA.length} users on this page?`
-
-    if (!window.confirm(confirmMsg)) return
-
-    usersWithWA.forEach((user, idx) => {
-      const reg =
-        (Array.isArray(user?.registrations) ? user?.registrations[0] : null) ||
-        user?.registration ||
-        {}
-      const message = whatsAppMessage.replace('{nama}', user?.name || '')
-      setTimeout(() => {
-        OpenWhatsApp(reg.whatsappNumber, message)
-      }, idx * 350)
-    })
   }
 
   // Map raw users into table row objects safely
@@ -631,10 +681,13 @@ Panitia BNCC Launching`,
       })
     : allRows
 
-  const pagedData = filteredRows.slice(
-    (pageIndex - 1) * itemsPerPage,
-    pageIndex * itemsPerPage,
-  )
+  // Slices local data ONLY when client-side searching. When paginating via API, use server response directly.
+  const pagedData = searchQuery
+    ? filteredRows.slice(
+        (pageIndex - 1) * itemsPerPage,
+        pageIndex * itemsPerPage,
+      )
+    : filteredRows
 
   const totalItems =
     data?.pagination?.total ||
@@ -1341,6 +1394,92 @@ Panitia BNCC Launching`,
         </div>
       )}
 
+      {/* ── BLAST WHATSAPP SETUP MODAL ── */}
+      {showBlastModal && (
+        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-10 pb-10 overflow-y-auto">
+          <div className="pointer-events-auto bg-white p-6 rounded-xl shadow-2xl border border-gray-200 text-left min-w-[350px] max-w-[500px] w-full">
+            <h3 className="text-xl font-bold mb-4 text-gray-800">
+              Blast WhatsApp Message
+            </h3>
+
+            <div className="space-y-4 mb-6">
+              {/* Scope Selection */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  Target Scope:
+                </label>
+                <select
+                  value={blastScope}
+                  onChange={(e) => setBlastScope(e.target.value)}
+                  className="w-full border p-2 rounded-lg bg-gray-50 focus:bg-white text-sm"
+                  disabled={blastLoading}
+                >
+                  <option value="all_pages">
+                    All Pages / Entire Database ({totalItems} total)
+                  </option>
+                  {selectedUserIds.size > 0 && (
+                    <option value="selected">
+                      Selected Users ({selectedUserIds.size} checked)
+                    </option>
+                  )}
+                  <option value="current_page">
+                    Current Page Only ({rawUsers.length} users)
+                  </option>
+                </select>
+              </div>
+
+              {/* Status Filter Dropdown */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  Filter By User Status:
+                </label>
+                <select
+                  value={blastStatusFilter}
+                  onChange={(e) => setBlastStatusFilter(e.target.value)}
+                  className="w-full border p-2 rounded-lg bg-gray-50 focus:bg-white text-sm"
+                  disabled={blastLoading}
+                >
+                  <option value="all">All Statuses (No Filter)</option>
+                  <option value="email_verified">Email Verified</option>
+                  <option value="email_unverified">Email Unverified</option>
+                  <option value="done_launching">Done Launching</option>
+                  <option value="confirm_launching">Confirm Launching</option>
+                  <option value="letter_error">Letter Error</option>
+                  <option value="letter_verified">Letter Verified</option>
+                  <option value="done_reregist">Done Re-Registration</option>
+                  <option value="closed">Closed</option>
+                </select>
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg text-xs text-blue-900">
+                <b>Note:</b> Popups will open automatically with a 350ms delay
+                per user to avoid WhatsApp rate limits. Please ensure popups are
+                allowed in your browser.
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowBlastModal(false)}
+                className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-sm font-medium"
+                disabled={blastLoading}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleExecuteBlast}
+                className="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 text-sm font-medium flex items-center gap-2"
+                disabled={blastLoading}
+              >
+                {blastLoading ? <Loader /> : 'Start Blast'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showWhatsAppModal && (
         <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-10 pb-10 overflow-y-auto">
           <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl border border-gray-200 text-left w-full max-w-lg">
@@ -1548,7 +1687,7 @@ Panitia BNCC Launching`,
           </button>
           <button
             className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
-            onClick={handleBlastWhatsAppAll}
+            onClick={() => setShowBlastModal(true)}
             type="button"
           >
             Blast WA Message{' '}
