@@ -15,6 +15,7 @@ const DUMMY_USER = {
     lineId: '',
     nim: '',
     bnccId: null,
+    expoId: '',
     schedule: {
       startTime: '',
       endTime: '',
@@ -61,7 +62,7 @@ function renderEmail(email) {
 
 function Profile() {
   const [user, setUser] = useState(DUMMY_USER)
-  const [loading, setLoading] = useState(true) // Initialized to TRUE to prevent glitch
+  const [loading, setLoading] = useState(true)
   const context = useOutletContext() || {}
   const userSchedule = context.userSchedule
 
@@ -105,6 +106,14 @@ function Profile() {
             data.registration?.emailBinus ||
             ''
 
+          const fetchedExpoId =
+            data.expoId ||
+            data.expoCode ||
+            data.expo_id ||
+            data.registration?.expoId ||
+            data.registration?.expoCode ||
+            ''
+
           setUser({
             name: data.fullName || data.name || DUMMY_USER.name,
             email: data.email || DUMMY_USER.email,
@@ -119,6 +128,7 @@ function Profile() {
                 data.registration?.lineId || DUMMY_USER.registration.lineId,
               nim: data.registration?.nim || DUMMY_USER.registration.nim,
               bnccId: data.registration?.bnccId ?? null,
+              expoId: fetchedExpoId,
               lntCourse:
                 data.registration?.lntCourse ||
                 DUMMY_USER.registration.lntCourse,
@@ -152,7 +162,6 @@ function Profile() {
     fetchProfile()
   }, [])
 
-  // Helper text to show pulse skeleton when fetching profile
   const Skeleton = () => (
     <span className="animate-pulse text-gray-400">Loading...</span>
   )
@@ -248,6 +257,7 @@ function Profile() {
                   STUDENT CREDENTIALS
                 </h1>
                 <div className="grid grid-cols-2 gap-5 justify-start items-start">
+                  {/* Row 1 */}
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">NIM</p>
                     <p className="text-sm sm:text-lg font-semibold">
@@ -264,12 +274,22 @@ function Profile() {
                       )}
                     </p>
                   </div>
+
+                  {/* Row 2 */}
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">BNCC ID</p>
                     <p className="text-sm sm:text-lg font-semibold">
                       {loading ? <Skeleton /> : user.registration.bnccId || '-'}
                     </p>
                   </div>
+                  <div className="flex flex-col gap-2">
+                    <p className="text-sm text-gray-500">Binus Email</p>
+                    <p className="text-sm sm:text-lg font-semibold break-words">
+                      {loading ? <Skeleton /> : renderEmail(user.binusEmail)}
+                    </p>
+                  </div>
+
+                  {/* Row 3 */}
                   <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">Faculty</p>
                     <p className="text-sm sm:text-lg font-semibold">
@@ -281,12 +301,6 @@ function Profile() {
                     </p>
                   </div>
                   <div className="flex flex-col gap-2">
-                    <p className="text-sm text-gray-500">Binus Email</p>
-                    <p className="text-sm sm:text-lg font-semibold break-words">
-                      {loading ? <Skeleton /> : renderEmail(user.binusEmail)}
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-2">
                     <p className="text-sm text-gray-500">Major</p>
                     <p className="text-sm sm:text-lg font-semibold">
                       {loading ? (
@@ -294,6 +308,14 @@ function Profile() {
                       ) : (
                         user.registration.major?.name || '-'
                       )}
+                    </p>
+                  </div>
+
+                  {/* Row 4 (Expo Code) */}
+                  <div className="flex flex-col gap-2 col-span-2 sm:col-span-1">
+                    <p className="text-sm text-gray-500">Expo Code</p>
+                    <p className="text-sm sm:text-lg font-semibold font-mono tracking-wide text-[#0D2A4E]">
+                      {loading ? <Skeleton /> : user.registration.expoId || '-'}
                     </p>
                   </div>
                 </div>
