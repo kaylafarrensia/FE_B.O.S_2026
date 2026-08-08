@@ -67,12 +67,14 @@ function Profile() {
   const userSchedule = context.userSchedule
 
   useEffect(() => {
+    let isMounted = true
+
     const fetchProfile = async () => {
       const token =
         localStorage.getItem('token') || localStorage.getItem('accessToken')
 
       if (!token) {
-        setLoading(false)
+        if (isMounted) setLoading(false)
         return
       }
 
@@ -95,71 +97,68 @@ function Profile() {
         if (res.ok) {
           const json = await res.json()
           const data = json?.data || json
+          const regData = data.registration || {}
 
+          // Thorough checks for Binus Email across all possible API keys
           const fetchedBinusEmail =
             data.binusEmail ||
             data.binus_email ||
             data.emailBinus ||
             data.binusianEmail ||
-            data.registration?.binusEmail ||
-            data.registration?.binus_email ||
-            data.registration?.emailBinus ||
+            regData.binusEmail ||
+            regData.binus_email ||
+            regData.emailBinus ||
             ''
 
+          // Thorough checks for Expo Code across all possible API keys
           const fetchedExpoId =
             data.expoId ||
             data.expoCode ||
             data.expo_id ||
-            data.registration?.expoId ||
-            data.registration?.expoCode ||
+            data.expo_code ||
+            data.expo ||
+            regData.expoId ||
+            regData.expoCode ||
+            regData.expo_id ||
+            regData.expo_code ||
+            regData.expo ||
             ''
 
-          setUser({
-            name: data.fullName || data.name || DUMMY_USER.name,
-            email: data.email || DUMMY_USER.email,
-            binusEmail: fetchedBinusEmail,
-            registration: {
-              ...DUMMY_USER.registration,
-              ...data.registration,
-              whatsappNumber:
-                data.registration?.whatsappNumber ||
-                DUMMY_USER.registration.whatsappNumber,
-              lineId:
-                data.registration?.lineId || DUMMY_USER.registration.lineId,
-              nim: data.registration?.nim || DUMMY_USER.registration.nim,
-              bnccId: data.registration?.bnccId ?? null,
-              expoId: fetchedExpoId,
-              lntCourse:
-                data.registration?.lntCourse ||
-                DUMMY_USER.registration.lntCourse,
-              faculty:
-                data.registration?.faculty || DUMMY_USER.registration.faculty,
-              major: data.registration?.major || DUMMY_USER.registration.major,
-              region:
-                data.registration?.region || DUMMY_USER.registration.region,
-              linkedinUrl:
-                data.registration?.linkedinUrl ||
-                DUMMY_USER.registration.linkedinUrl,
-              githubUrl:
-                data.registration?.githubUrl ||
-                DUMMY_USER.registration.githubUrl,
-              suratMember:
-                data.registration?.suratMember ||
-                DUMMY_USER.registration.suratMember,
-              binusianCard:
-                data.registration?.binusianCard ||
-                DUMMY_USER.registration.binusianCard,
-            },
-          })
+          if (isMounted) {
+            setUser({
+              name: data.fullName || data.name || data.fullNameUser || '',
+              email: data.email || '',
+              binusEmail: fetchedBinusEmail,
+              registration: {
+                whatsappNumber: regData.whatsappNumber || regData.phone || '',
+                lineId: regData.lineId || regData.line_id || '',
+                nim: regData.nim || '',
+                bnccId: regData.bnccId || regData.bncc_id || null,
+                expoId: fetchedExpoId,
+                lntCourse: regData.lntCourse || { title: '' },
+                faculty: regData.faculty || { name: '' },
+                major: regData.major || { name: '' },
+                region: regData.region || { name: '' },
+                linkedinUrl: regData.linkedinUrl || '',
+                githubUrl: regData.githubUrl || '',
+                suratMember: regData.suratMember || 'null',
+                binusianCard: regData.binusianCard || 'null',
+              },
+            })
+          }
         }
       } catch (err) {
         console.warn('Failed to load profile from backend:', err)
       } finally {
-        setLoading(false)
+        if (isMounted) setLoading(false)
       }
     }
 
     fetchProfile()
+
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   const Skeleton = () => (
