@@ -15,6 +15,27 @@ import {
 import { base64ToBlob, isDataUrl, formatScheduleDisplay } from '@/lib/utils'
 import useLookupQuery from '@/hooks/queries/useLookupQuery'
 
+// ── Robust WhatsApp URL Helper ───────────────────────────────────────────────
+const OpenWhatsApp = (number, text) => {
+  if (!number) return
+
+  // 1. Strip all non-digit characters
+  let cleanNumber = String(number).replace(/\D/g, '')
+
+  // 2. Handle country code formatting cleanly
+  if (cleanNumber.startsWith('0')) {
+    cleanNumber = '62' + cleanNumber.slice(1)
+  } else if (!cleanNumber.startsWith('62')) {
+    cleanNumber = '62' + cleanNumber
+  }
+
+  // 3. Encode the message payload
+  const formatText = encodeURIComponent(text || '')
+
+  // 4. Trigger window open
+  window.open(`https://wa.me/${cleanNumber}?text=${formatText}`, '_blank')
+}
+
 export default function Users() {
   const [searchQuery, setSearchQuery] = useState('')
   const [pageIndex, setPageIndex] = useState(1)
@@ -394,13 +415,7 @@ Panitia BNCC Launching`,
     },
   })
 
-  const OpenWhatsApp = (number, text) => {
-    const formatNumber = String(number).replace(/^0+/, '')
-    const formatText = encodeURIComponent(text)
-    window.open(`https://wa.me/+62${formatNumber}?text=${formatText}`, '_blank')
-  }
-
-  // ── MULTI-PAGE BLAST WA EXECUTION HANDLER ──
+  // ── MULTI-PAGE BLAST WA EXECUTION HANDLER (FIXED FOR POPUP BLOCKERS) ──
   const handleExecuteBlast = async () => {
     setBlastLoading(true)
 
@@ -412,7 +427,6 @@ Panitia BNCC Launching`,
       } else if (blastScope === 'current_page') {
         targetPool = rawUsers
       } else if (blastScope === 'all_pages') {
-        // Fetch all users across all pages from backend (up to 10,000)
         const allPagesResponse = await getUsersDetails({
           page: 1,
           limit: 10000,
@@ -459,6 +473,7 @@ Panitia BNCC Launching`,
 
       setShowBlastModal(false)
 
+      // Open tab windows sequentially with clean sanitization
       usersWithWA.forEach((user, idx) => {
         const reg =
           (Array.isArray(user?.registrations)
@@ -469,7 +484,7 @@ Panitia BNCC Launching`,
         const message = whatsAppMessage.replace('{nama}', user?.name || '')
         setTimeout(() => {
           OpenWhatsApp(reg.whatsappNumber, message)
-        }, idx * 350)
+        }, idx * 600) // 600ms gap gives the browser UI breathing room to prevent throttle blocks
       })
 
       setAlert({
@@ -663,7 +678,7 @@ Panitia BNCC Launching`,
     ...(usersColumns || []),
   ]
 
-  // Robust Client-side Search Filtering
+  // Client-side Search Filtering
   const filteredRows = searchQuery
     ? allRows.filter((row) => {
         const query = searchQuery.toLowerCase()
@@ -681,7 +696,6 @@ Panitia BNCC Launching`,
       })
     : allRows
 
-  // Slices local data ONLY when client-side searching. When paginating via API, use server response directly.
   const pagedData = searchQuery
     ? filteredRows.slice(
         (pageIndex - 1) * itemsPerPage,
@@ -1452,9 +1466,9 @@ Panitia BNCC Launching`,
               </div>
 
               <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg text-xs text-blue-900">
-                <b>Note:</b> Popups will open automatically with a 350ms delay
+                <b>Note:</b> Popups will open automatically with a 600ms delay
                 per user to avoid WhatsApp rate limits. Please ensure popups are
-                allowed in your browser.
+                allowed in your browser settings.
               </div>
             </div>
 
