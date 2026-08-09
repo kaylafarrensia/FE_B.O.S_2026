@@ -29,12 +29,15 @@ const OpenWhatsApp = (number, text) => {
     cleanNumber = '62' + cleanNumber
   }
 
-  // 3. Encode the message payload
-  const formatText = encodeURIComponent(text || '')
+  // 3. Normalize newlines for WhatsApp (%0A)
+  const normalizedText = String(text || '').replace(/\r\n/g, '\n')
+  const formatText = encodeURIComponent(normalizedText)
 
   // 4. Trigger window open
   window.open(`https://wa.me/${cleanNumber}?text=${formatText}`, '_blank')
 }
+
+const DEFAULT_WA_MESSAGE = ``
 
 export default function Users() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -42,25 +45,22 @@ export default function Users() {
   const [itemsPerPage, setItemsPerPage] = useState(10)
   const [showErrorModal, setShowErrorModal] = useState(false)
   const [error, setError] = useState(null)
+
+  // Single & Bulk Delete state
   const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [deleteTarget, setDeleteTarget] = useState(null)
+  const [deleteTarget, setDeleteTarget] = useState(null) // ID or 'bulk'
   const [deleting, setDeleting] = useState(false)
+
   const [alert, setAlert] = useState(null)
   const [showViewModal, setShowViewModal] = useState(false)
   const [viewUser, setViewUser] = useState(null)
   const [viewLoading, setViewLoading] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
 
-  // ── Cross-Page Selection & Bulk Status State ──
+  // ── Cross-Page Selection & Bulk Actions State ──
   const [selectedUserIds, setSelectedUserIds] = useState(new Set())
   const [bulkStatus, setBulkStatus] = useState('')
   const [bulkLoading, setBulkLoading] = useState(false)
-
-  // ── WA Blast Modal & State ──
-  const [showBlastModal, setShowBlastModal] = useState(false)
-  const [blastScope, setBlastScope] = useState('all_pages') // 'all_pages' | 'selected' | 'current_page'
-  const [blastStatusFilter, setBlastStatusFilter] = useState('all') // 'all' or specific status
-  const [blastLoading, setBlastLoading] = useState(false)
 
   // Edit form state
   const [editForm, setEditForm] = useState({
@@ -102,16 +102,24 @@ export default function Users() {
   const [showWhatsAppModal, setShowWhatsAppModal] = useState(false)
   const [showViewMessageModal, setShowViewMessageModal] = useState(false)
 
-  const [whatsAppMessage, setWhatsAppMessage] = useState(
-    `Halo, {nama}!
+  // ── Region-Specific WhatsApp Message State ──
+  const adminUser = JSON.parse(localStorage.getItem('user') || '{}')
+  const adminRegionId =
+    adminUser?.regionId || adminUser?.region?.id || 'default'
+  const waStorageKey = `wa_msg_template_region_${adminRegionId}`
 
-Jangan lewatkan codesign BNCC 2026 untuk mendapatkan materi yang dapat mempersiapkan kamu sebagai seorang developers!
-
-Best Regards,
-Panitia BNCC Launching`,
-  )
+  const [whatsAppMessage, setWhatsAppMessage] = useState(() => {
+    return localStorage.getItem(waStorageKey) || DEFAULT_WA_MESSAGE
+  })
   const [tempWhatsAppMessage, setTempWhatsAppMessage] =
     useState(whatsAppMessage)
+
+  useEffect(() => {
+    const savedMsg = localStorage.getItem(waStorageKey)
+    if (savedMsg) {
+      setWhatsAppMessage(savedMsg)
+    }
+  }, [waStorageKey])
 
   // Lookup queries with safe fallbacks
   const editLookup =
@@ -278,15 +286,28 @@ Panitia BNCC Launching`,
     })
   }
 
-  const mutation = useMutation({
-    mutationFn: (id) => {
+  // ── Delete Mutation (Supports both single ID and Bulk IDs) ──
+  const deleteMutation = useMutation({
+    mutationFn: async (target) => {
       abortRef.current = new AbortController()
-      return deleteUser(id, { signal: abortRef.current.signal })
+      if (target === 'bulk') {
+        const promises = Array.from(selectedUserIds).map((id) =>
+          deleteUser(id, { signal: abortRef.current.signal }),
+        )
+        return Promise.all(promises)
+      }
+      return deleteUser(target, { signal: abortRef.current.signal })
     },
     onSuccess: () => {
       setDeleting(false)
       setShowDeleteModal(false)
-      setAlert({ type: 'success', message: 'User deleted successfully.' })
+      const msg =
+        deleteTarget === 'bulk'
+          ? `Successfully deleted ${selectedUserIds.size} users.`
+          : 'User deleted successfully.'
+      setAlert({ type: 'success', message: msg })
+      if (deleteTarget === 'bulk') setSelectedUserIds(new Set())
+      setDeleteTarget(null)
       refetch()
     },
     onError: (err) => {
@@ -297,10 +318,17 @@ Panitia BNCC Launching`,
         message:
           err?.response?.data?.error ||
           err?.message ||
-          'An unknown error occurred.',
+          'An unknown error occurred while deleting.',
       })
     },
   })
+
+  const handleDeleteConfirm = () => {
+    if (deleteTarget) {
+      setDeleting(true)
+      deleteMutation.mutate(deleteTarget)
+    }
+  }
 
   const editMutation = useMutation({
     mutationFn: (form) => {
@@ -414,92 +442,6 @@ Panitia BNCC Launching`,
       })
     },
   })
-
-  // ── MULTI-PAGE BLAST WA EXECUTION HANDLER (FIXED FOR POPUP BLOCKERS) ──
-  const handleExecuteBlast = async () => {
-    setBlastLoading(true)
-
-    try {
-      let targetPool = []
-
-      if (blastScope === 'selected') {
-        targetPool = rawUsers.filter((u) => selectedUserIds.has(u.id))
-      } else if (blastScope === 'current_page') {
-        targetPool = rawUsers
-      } else if (blastScope === 'all_pages') {
-        const allPagesResponse = await getUsersDetails({
-          page: 1,
-          limit: 10000,
-          search: searchQuery,
-        })
-
-        targetPool = Array.isArray(allPagesResponse)
-          ? allPagesResponse
-          : Array.isArray(allPagesResponse?.data)
-            ? allPagesResponse.data
-            : Array.isArray(allPagesResponse?.users)
-              ? allPagesResponse.users
-              : []
-      }
-
-      // Filter pool by status if specified
-      if (blastStatusFilter !== 'all') {
-        targetPool = targetPool.filter(
-          (user) =>
-            String(user?.status).toLowerCase() ===
-            String(blastStatusFilter).toLowerCase(),
-        )
-      }
-
-      // Filter only users with valid WhatsApp numbers
-      const usersWithWA = targetPool.filter((u) => {
-        const reg =
-          (Array.isArray(u?.registrations) ? u?.registrations[0] : null) ||
-          u?.registration ||
-          {}
-        return !!reg?.whatsappNumber
-      })
-
-      if (usersWithWA.length === 0) {
-        setAlert({
-          type: 'error',
-          message:
-            'No matching users with valid WhatsApp numbers were found for the selected criteria.',
-        })
-        setBlastLoading(false)
-        setShowBlastModal(false)
-        return
-      }
-
-      setShowBlastModal(false)
-
-      // Open tab windows sequentially with clean sanitization
-      usersWithWA.forEach((user, idx) => {
-        const reg =
-          (Array.isArray(user?.registrations)
-            ? user?.registrations[0]
-            : null) ||
-          user?.registration ||
-          {}
-        const message = whatsAppMessage.replace('{nama}', user?.name || '')
-        setTimeout(() => {
-          OpenWhatsApp(reg.whatsappNumber, message)
-        }, idx * 600) // 600ms gap gives the browser UI breathing room to prevent throttle blocks
-      })
-
-      setAlert({
-        type: 'success',
-        message: `Triggered WhatsApp messaging for ${usersWithWA.length} users!`,
-      })
-    } catch (err) {
-      setAlert({
-        type: 'error',
-        message: 'Failed to fetch full user list for WhatsApp Blast.',
-      })
-    } finally {
-      setBlastLoading(false)
-    }
-  }
 
   // Map raw users into table row objects safely
   const allRows = rawUsers.map((user) => {
@@ -716,13 +658,6 @@ Panitia BNCC Launching`,
     refetch()
   }
 
-  const handleDeleteConfirm = () => {
-    if (deleteTarget) {
-      setDeleting(true)
-      mutation.mutate(deleteTarget)
-    }
-  }
-
   const handleAlertClose = () => setAlert(null)
 
   const handleEditChange = (e) => {
@@ -845,7 +780,12 @@ Panitia BNCC Launching`,
 
   const handleSaveWhatsAppMessage = () => {
     setWhatsAppMessage(tempWhatsAppMessage)
+    localStorage.setItem(waStorageKey, tempWhatsAppMessage)
     setShowWhatsAppModal(false)
+    setAlert({
+      type: 'success',
+      message: 'Region WhatsApp message template saved successfully!',
+    })
   }
 
   return (
@@ -1408,98 +1348,15 @@ Panitia BNCC Launching`,
         </div>
       )}
 
-      {/* ── BLAST WHATSAPP SETUP MODAL ── */}
-      {showBlastModal && (
-        <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-10 pb-10 overflow-y-auto">
-          <div className="pointer-events-auto bg-white p-6 rounded-xl shadow-2xl border border-gray-200 text-left min-w-[350px] max-w-[500px] w-full">
-            <h3 className="text-xl font-bold mb-4 text-gray-800">
-              Blast WhatsApp Message
-            </h3>
-
-            <div className="space-y-4 mb-6">
-              {/* Scope Selection */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Target Scope:
-                </label>
-                <select
-                  value={blastScope}
-                  onChange={(e) => setBlastScope(e.target.value)}
-                  className="w-full border p-2 rounded-lg bg-gray-50 focus:bg-white text-sm"
-                  disabled={blastLoading}
-                >
-                  <option value="all_pages">
-                    All Pages / Entire Database ({totalItems} total)
-                  </option>
-                  {selectedUserIds.size > 0 && (
-                    <option value="selected">
-                      Selected Users ({selectedUserIds.size} checked)
-                    </option>
-                  )}
-                  <option value="current_page">
-                    Current Page Only ({rawUsers.length} users)
-                  </option>
-                </select>
-              </div>
-
-              {/* Status Filter Dropdown */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                  Filter By User Status:
-                </label>
-                <select
-                  value={blastStatusFilter}
-                  onChange={(e) => setBlastStatusFilter(e.target.value)}
-                  className="w-full border p-2 rounded-lg bg-gray-50 focus:bg-white text-sm"
-                  disabled={blastLoading}
-                >
-                  <option value="all">All Statuses (No Filter)</option>
-                  <option value="email_verified">Email Verified</option>
-                  <option value="email_unverified">Email Unverified</option>
-                  <option value="done_launching">Done Launching</option>
-                  <option value="confirm_launching">Confirm Launching</option>
-                  <option value="letter_error">Letter Error</option>
-                  <option value="letter_verified">Letter Verified</option>
-                  <option value="done_reregist">Done Re-Registration</option>
-                  <option value="closed">Closed</option>
-                </select>
-              </div>
-
-              <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg text-xs text-blue-900">
-                <b>Note:</b> Popups will open automatically with a 600ms delay
-                per user to avoid WhatsApp rate limits. Please ensure popups are
-                allowed in your browser settings.
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setShowBlastModal(false)}
-                className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-sm font-medium"
-                disabled={blastLoading}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleExecuteBlast}
-                className="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 text-sm font-medium flex items-center gap-2"
-                disabled={blastLoading}
-              >
-                {blastLoading ? <Loader /> : 'Start Blast'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {showWhatsAppModal && (
         <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-10 pb-10 overflow-y-auto">
           <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl border border-gray-200 text-left w-full max-w-lg">
             <h3 className="text-xl font-bold mb-2">
               Set WhatsApp Message Template
             </h3>
+            <p className="text-xs text-blue-600 mb-2">
+              Region Specific (Saved for Region ID: {adminRegionId})
+            </p>
             <p className="text-sm text-gray-500 mb-4">
               The text{' '}
               <code className="bg-gray-200 p-1 rounded">{'{nama}'}</code> will
@@ -1531,9 +1388,12 @@ Panitia BNCC Launching`,
       {showViewMessageModal && (
         <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-10 pb-10 overflow-y-auto">
           <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl border border-gray-200 text-left w-full max-w-lg">
-            <h3 className="text-xl font-bold mb-4">
+            <h3 className="text-xl font-bold mb-2">
               Current WhatsApp Message Template
             </h3>
+            <p className="text-xs text-blue-600 mb-4">
+              Region ID: {adminRegionId}
+            </p>
             <div className="bg-gray-100 p-4 rounded border">
               <pre className="whitespace-pre-wrap font-sans text-sm">
                 {whatsAppMessage}
@@ -1551,17 +1411,33 @@ Panitia BNCC Launching`,
         </div>
       )}
 
+      {/* Single & Bulk Delete Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-50 pt-10 pb-10 overflow-y-auto">
           <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl border border-gray-200 text-center">
-            <h3 className="text-xl font-bold mb-4">Delete User</h3>
+            <h3 className="text-xl font-bold mb-4">
+              {deleteTarget === 'bulk' ? 'Bulk Delete Users' : 'Delete User'}
+            </h3>
             <p className="text-gray-600 mb-6">
-              Are you sure you want to delete user{' '}
-              <span className="font-bold">{deleteTarget}</span>?
+              {deleteTarget === 'bulk' ? (
+                <>
+                  Are you sure you want to delete{' '}
+                  <span className="font-bold">{selectedUserIds.size}</span>{' '}
+                  selected users?
+                </>
+              ) : (
+                <>
+                  Are you sure you want to delete user{' '}
+                  <span className="font-bold">{deleteTarget}</span>?
+                </>
+              )}
             </p>
             <div className="flex justify-center space-x-4">
               <button
-                onClick={() => setShowDeleteModal(false)}
+                onClick={() => {
+                  setShowDeleteModal(false)
+                  setDeleteTarget(null)
+                }}
                 className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
                 disabled={deleting}
               >
@@ -1583,7 +1459,7 @@ Panitia BNCC Launching`,
         <div className="fixed inset-0 pointer-events-none flex items-start justify-center z-[60] pt-20">
           <div className="pointer-events-auto bg-white p-8 rounded-xl shadow-2xl border border-gray-200 text-center flex flex-col items-center">
             <Loader />
-            <span className="mt-4 text-gray-700">Deleting user...</span>
+            <span className="mt-4 text-gray-700">Deleting user(s)...</span>
           </div>
         </div>
       )}
@@ -1676,6 +1552,19 @@ Panitia BNCC Launching`,
             >
               {bulkLoading ? <Loader /> : 'Apply Bulk Status'}
             </button>
+
+            {/* ── BULK DELETE BUTTON ── */}
+            <button
+              onClick={() => {
+                setDeleteTarget('bulk')
+                setShowDeleteModal(true)
+              }}
+              disabled={bulkLoading}
+              className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700 disabled:opacity-50 flex items-center gap-2"
+              type="button"
+            >
+              Delete Selected ({selectedUserIds.size})
+            </button>
           </div>
         </div>
       )}
@@ -1698,14 +1587,6 @@ Panitia BNCC Launching`,
             type="button"
           >
             + Create User
-          </button>
-          <button
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
-            onClick={() => setShowBlastModal(true)}
-            type="button"
-          >
-            Blast WA Message{' '}
-            {selectedUserIds.size > 0 ? `(${selectedUserIds.size})` : ''}
           </button>
           <button
             className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
