@@ -37,7 +37,12 @@ const OpenWhatsApp = (number, text) => {
   window.open(`https://wa.me/${cleanNumber}?text=${formatText}`, '_blank')
 }
 
-const DEFAULT_WA_MESSAGE = ``
+const DEFAULT_WA_MESSAGE = `Halo, {nama}!
+
+Jangan lewatkan codesign BNCC 2026 untuk mendapatkan materi yang dapat mempersiapkan kamu sebagai seorang developers!
+
+Best Regards,
+Panitia BNCC Launching`
 
 export default function Users() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -620,36 +625,16 @@ export default function Users() {
     ...(usersColumns || []),
   ]
 
-  // Client-side Search Filtering
-  const filteredRows = searchQuery
-    ? allRows.filter((row) => {
-        const query = searchQuery.toLowerCase()
-        const fullName = String(row['Full Name'] || '').toLowerCase()
-        const email = String(row['Email'] || '').toLowerCase()
-        const binusEmail = String(row['Binus Email'] || '').toLowerCase()
-        const nim = String(row['NIM'] || '').toLowerCase()
-
-        return (
-          fullName.includes(query) ||
-          email.includes(query) ||
-          binusEmail.includes(query) ||
-          nim.includes(query)
-        )
-      })
-    : allRows
-
-  const pagedData = searchQuery
-    ? filteredRows.slice(
-        (pageIndex - 1) * itemsPerPage,
-        pageIndex * itemsPerPage,
-      )
-    : filteredRows
+  // ✅ SERVER-SIDE SEARCH FIX
+  // Since the backend API receives `searchQuery` and performs the database query,
+  // `allRows` ALREADY contains the correctly searched and paginated items.
+  const pagedData = allRows
 
   const totalItems =
     data?.pagination?.total ||
     data?.meta?.total ||
     data?.total ||
-    filteredRows.length ||
+    rawUsers.length ||
     0
 
   const handleRetry = () => {
