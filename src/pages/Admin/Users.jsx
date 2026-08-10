@@ -37,12 +37,8 @@ const OpenWhatsApp = (number, text) => {
   window.open(`https://wa.me/${cleanNumber}?text=${formatText}`, '_blank')
 }
 
-const DEFAULT_WA_MESSAGE = `Halo, {nama}!
-
-Jangan lewatkan codesign BNCC 2026 untuk mendapatkan materi yang dapat mempersiapkan kamu sebagai seorang developers!
-
-Best Regards,
-Panitia BNCC Launching`
+// Default WA message set to empty string
+const DEFAULT_WA_MESSAGE = ``
 
 export default function Users() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -186,11 +182,14 @@ export default function Users() {
           page: pageIndex,
           limit: itemsPerPage,
           search: searchQuery,
+          searchQuery: searchQuery,
+          q: searchQuery,
         })
       } catch (e) {
         return getUsersDetails()
       }
     },
+    keepPreviousData: true,
   })
 
   // Safely extract raw user array from any response shape
@@ -625,9 +624,6 @@ export default function Users() {
     ...(usersColumns || []),
   ]
 
-  // ✅ SERVER-SIDE SEARCH FIX
-  // Since the backend API receives `searchQuery` and performs the database query,
-  // `allRows` ALREADY contains the correctly searched and paginated items.
   const pagedData = allRows
 
   const totalItems =
