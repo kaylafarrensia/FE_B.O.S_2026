@@ -1,7 +1,7 @@
 import Table from '@/components/Table'
 import Pagination from '@/components/Pagination'
 import Loader from '@/components/ui/loader'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { usersColumns } from './constants'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import {
@@ -168,6 +168,9 @@ export default function Users() {
   )
 
   // ── USER DETAILS QUERY ────────────────────────────────────────────────────────
+  // When searchQuery is present, fetch up to 10,000 records so search covers ALL pages!
+  const isSearching = searchQuery.trim().length > 0
+
   const {
     data,
     isLoading,
@@ -178,12 +181,18 @@ export default function Users() {
     queryKey: ['user-details', pageIndex, itemsPerPage, searchQuery],
     queryFn: () => {
       try {
+        if (isSearching) {
+          return getUsersDetails({
+            page: 1,
+            limit: 10000,
+            search: searchQuery,
+            searchQuery: searchQuery,
+            q: searchQuery,
+          })
+        }
         return getUsersDetails({
           page: pageIndex,
           limit: itemsPerPage,
-          search: searchQuery,
-          searchQuery: searchQuery,
-          q: searchQuery,
         })
       } catch (e) {
         return getUsersDetails()
@@ -193,13 +202,15 @@ export default function Users() {
   })
 
   // Safely extract raw user array from any response shape
-  const rawUsers = Array.isArray(data)
-    ? data
-    : Array.isArray(data?.data)
-      ? data.data
-      : Array.isArray(data?.users)
-        ? data.users
-        : []
+  const rawUsers = useMemo(() => {
+    return Array.isArray(data)
+      ? data
+      : Array.isArray(data?.data)
+        ? data.data
+        : Array.isArray(data?.users)
+          ? data.users
+          : []
+  }, [data])
 
   useEffect(() => {
     if (isError) {
@@ -447,163 +458,202 @@ export default function Users() {
     },
   })
 
-  // Map raw users into table row objects safely
-  const allRows = rawUsers.map((user) => {
-    const reg =
-      (Array.isArray(user?.registrations) ? user?.registrations[0] : null) ||
-      user?.registration ||
-      user?.registrations ||
-      {}
+  // Filter raw users globally when a search query is active
+  const filteredUsers = useMemo(() => {
+    if (!isSearching) return rawUsers
 
-    const extractedBinusEmail =
-      user?.binus_email ||
-      reg?.binus_email ||
-      user?.binusEmail ||
-      reg?.binusEmail ||
-      user?.binusianEmail ||
-      reg?.binusianEmail ||
-      user?.email_binus ||
-      reg?.email_binus ||
-      '-'
+    const query = searchQuery.toLowerCase().trim()
+    return rawUsers.filter((user) => {
+      const reg =
+        (Array.isArray(user?.registrations) ? user?.registrations[0] : null) ||
+        user?.registration ||
+        {}
 
-    const nimValue = reg?.nim || user?.nim || ''
-    const userId = user?.id
+      const name = String(user?.name || user?.fullName || '').toLowerCase()
+      const email = String(user?.email || '').toLowerCase()
+      const binusEmail = String(
+        user?.binus_email ||
+          user?.binusEmail ||
+          reg?.binusEmail ||
+          reg?.binus_email ||
+          '',
+      ).toLowerCase()
+      const nim = String(reg?.nim || user?.nim || '').toLowerCase()
+      const whatsapp = String(reg?.whatsappNumber || '').toLowerCase()
 
-    return {
-      Select: (
-        <input
-          type="checkbox"
-          checked={selectedUserIds.has(userId)}
-          onChange={() => toggleSelectUser(userId)}
-          className="w-4 h-4 cursor-pointer accent-blue-600"
-        />
-      ),
-      ID: user?.id ?? '-',
-      'BNCC ID': reg?.bnccId || '-',
-      'Full Name': user?.name || '-',
-      Status: user?.status || '-',
-      Email: user?.email || '-',
-      'Binus Email': extractedBinusEmail,
-      'Binusian Email': extractedBinusEmail,
-      LINE: reg?.lineId || '-',
-      WhatsApp: reg?.whatsappNumber ? (
-        <span
-          onClick={() => {
-            const message = whatsAppMessage.replace('{nama}', user?.name || '')
-            OpenWhatsApp(reg.whatsappNumber, message)
-          }}
-          className="text-blue-600 underline cursor-pointer"
-        >
-          {reg.whatsappNumber}
-        </span>
-      ) : (
+      return (
+        name.includes(query) ||
+        email.includes(query) ||
+        binusEmail.includes(query) ||
+        nim.includes(query) ||
+        whatsapp.includes(query)
+      )
+    })
+  }, [rawUsers, searchQuery, isSearching])
+
+  // Map filtered users into table row objects safely
+  const allRows = useMemo(() => {
+    return filteredUsers.map((user) => {
+      const reg =
+        (Array.isArray(user?.registrations) ? user?.registrations[0] : null) ||
+        user?.registration ||
+        user?.registrations ||
+        {}
+
+      const extractedBinusEmail =
+        user?.binus_email ||
+        reg?.binus_email ||
+        user?.binusEmail ||
+        reg?.binusEmail ||
+        user?.binusianEmail ||
+        reg?.binusianEmail ||
+        user?.email_binus ||
+        reg?.email_binus ||
         '-'
-      ),
-      NIM: nimValue || '-',
-      'LnT Course': reg?.lntCourse?.title || reg?.lntCourse?.name || '-',
-      'Launching Schedule': reg?.schedule?.title || reg?.schedule?.name || '-',
-      Major: reg?.major?.name || '-',
-      Faculty: reg?.faculty?.name || '-',
-      Region: reg?.region?.name || '-',
-      Actions: (
-        <div className="flex flex-row justify-between">
-          <button
-            onClick={() => handleViewUser(user?.id)}
-            aria-label="View"
-            className="mx-1"
-          >
-            <svg
-              width={18}
-              height={18}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"
-                stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <circle
-                cx="12"
-                cy="12"
-                r="3"
-                stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-          <button
+
+      const nimValue = reg?.nim || user?.nim || ''
+      const userId = user?.id
+
+      return {
+        Select: (
+          <input
+            type="checkbox"
+            checked={selectedUserIds.has(userId)}
+            onChange={() => toggleSelectUser(userId)}
+            className="w-4 h-4 cursor-pointer accent-blue-600"
+          />
+        ),
+        ID: user?.id ?? '-',
+        'BNCC ID': reg?.bnccId || '-',
+        'Full Name': user?.name || user?.fullName || '-',
+        Status: user?.status || '-',
+        Email: user?.email || '-',
+        'Binus Email': extractedBinusEmail,
+        'Binusian Email': extractedBinusEmail,
+        LINE: reg?.lineId || '-',
+        WhatsApp: reg?.whatsappNumber ? (
+          <span
             onClick={() => {
-              setEditForm({
-                id: user?.id ?? 0,
-                name: user?.name || '',
-                email: user?.email || '',
-                binusEmail:
-                  extractedBinusEmail !== '-' ? extractedBinusEmail : '',
-                nim: nimValue || '',
-                lineId: reg?.lineId || '',
-                whatsappNumber: reg?.whatsappNumber || '',
-                regionId: reg?.region?.id ?? '',
-                facultyId: reg?.faculty?.id ?? '',
-                majorId: reg?.major?.id ?? '',
-                lntCourseId: reg?.lntCourse?.id ?? '',
-                scheduleId: reg?.schedule?.id ?? '',
-                status: user?.status ?? '',
-              })
-              setShowEditModal(true)
+              const message = whatsAppMessage.replace(
+                '{nama}',
+                user?.name || user?.fullName || '',
+              )
+              OpenWhatsApp(reg.whatsappNumber, message)
             }}
-            aria-label="Edit"
-            className="mx-1"
+            className="text-blue-600 underline cursor-pointer"
           >
-            <svg
-              width={18}
-              height={18}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+            {reg.whatsappNumber}
+          </span>
+        ) : (
+          '-'
+        ),
+        NIM: nimValue || '-',
+        'LnT Course': reg?.lntCourse?.title || reg?.lntCourse?.name || '-',
+        'Launching Schedule':
+          reg?.schedule?.title || reg?.schedule?.name || '-',
+        Major: reg?.major?.name || '-',
+        Faculty: reg?.faculty?.name || '-',
+        Region: reg?.region?.name || '-',
+        Actions: (
+          <div className="flex flex-row justify-between">
+            <button
+              onClick={() => handleViewUser(user?.id)}
+              aria-label="View"
+              className="mx-1"
             >
-              <path
-                d="M16.862 3.487a2.07 2.07 0 0 1 2.93 2.93l-1.1 1.1-2.93-2.93 1.1-1.1zm-2.1 2.1 2.93 2.93-9.1 9.1H5.662v-3.03l9.1-9.1z"
+              <svg
+                width={18}
+                height={18}
+                fill="none"
+                viewBox="0 0 24 24"
                 stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-          <button
-            onClick={() => {
-              setDeleteTarget(user?.id)
-              setShowDeleteModal(true)
-            }}
-            aria-label="Delete"
-            className="mx-1"
-          >
-            <svg
-              width={18}
-              height={18}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+              >
+                <path
+                  d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="3"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+            <button
+              onClick={() => {
+                setEditForm({
+                  id: user?.id ?? 0,
+                  name: user?.name || user?.fullName || '',
+                  email: user?.email || '',
+                  binusEmail:
+                    extractedBinusEmail !== '-' ? extractedBinusEmail : '',
+                  nim: nimValue || '',
+                  lineId: reg?.lineId || '',
+                  whatsappNumber: reg?.whatsappNumber || '',
+                  regionId: reg?.region?.id ?? '',
+                  facultyId: reg?.faculty?.id ?? '',
+                  majorId: reg?.major?.id ?? '',
+                  lntCourseId: reg?.lntCourse?.id ?? '',
+                  scheduleId: reg?.schedule?.id ?? '',
+                  status: user?.status ?? '',
+                })
+                setShowEditModal(true)
+              }}
+              aria-label="Edit"
+              className="mx-1"
             >
-              <path
-                d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6m3 10v-6m4 6v-6"
+              <svg
+                width={18}
+                height={18}
+                fill="none"
+                viewBox="0 0 24 24"
                 stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-        </div>
-      ),
-    }
-  })
+              >
+                <path
+                  d="M16.862 3.487a2.07 2.07 0 0 1 2.93 2.93l-1.1 1.1-2.93-2.93 1.1-1.1zm-2.1 2.1 2.93 2.93-9.1 9.1H5.662v-3.03l9.1-9.1z"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+            <button
+              onClick={() => {
+                setDeleteTarget(user?.id)
+                setShowDeleteModal(true)
+              }}
+              aria-label="Delete"
+              className="mx-1"
+            >
+              <svg
+                width={18}
+                height={18}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6m3 10v-6m4 6v-6"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+        ),
+      }
+    })
+  }, [filteredUsers, selectedUserIds, whatsAppMessage])
 
   // Add Dynamic Selection Column to Column List
   const updatedColumns = [
@@ -624,14 +674,20 @@ export default function Users() {
     ...(usersColumns || []),
   ]
 
-  const pagedData = allRows
+  // If searching, slice client-side for dynamic pagination across filtered matches
+  const pagedData = useMemo(() => {
+    if (!isSearching) return allRows
+    const startIndex = (pageIndex - 1) * itemsPerPage
+    return allRows.slice(startIndex, startIndex + itemsPerPage)
+  }, [allRows, isSearching, pageIndex, itemsPerPage])
 
-  const totalItems =
-    data?.pagination?.total ||
-    data?.meta?.total ||
-    data?.total ||
-    rawUsers.length ||
-    0
+  const totalItems = isSearching
+    ? allRows.length
+    : data?.pagination?.total ||
+      data?.meta?.total ||
+      data?.total ||
+      rawUsers.length ||
+      0
 
   const handleRetry = () => {
     setShowErrorModal(false)
@@ -1553,7 +1609,7 @@ export default function Users() {
       <div className="flex flex-row flex-wrap items-center gap-4 min-w-fit px-6">
         <input
           type="text"
-          placeholder="Search by Full Name..."
+          placeholder="Search by Full Name, Email, NIM, or WA..."
           value={searchQuery}
           onChange={(e) => {
             setSearchQuery(e.target.value)
