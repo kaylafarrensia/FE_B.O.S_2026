@@ -119,9 +119,11 @@ export default function SignUp() {
   // ── Query Region Links from Links DB ──
   const { linkQuery } = useLinkQuery(watchedRegionId)
 
-  // ── Dynamically fetch WhatsApp Group URL matching WA_INFO tag ──
+  // ── Ultra-Robust WhatsApp URL Matcher ──
   const regionWaGroupUrl = useMemo(() => {
     const rawLinks = linkQuery?.data
+
+    // Safely extract items from any nested structure
     const linksList = Array.isArray(rawLinks)
       ? rawLinks
       : Array.isArray(rawLinks?.data)
@@ -130,25 +132,48 @@ export default function SignUp() {
           ? rawLinks.links
           : []
 
+    if (!watchedRegionId || linksList.length === 0) return null
+
     const targetRegionId = Number(watchedRegionId)
 
-    const matchedLink = linksList.find((item) => {
+    // 1. First Pass: Try finding exact match with regionId AND WA_INFO tag/name
+    let matchedLink = linksList.find((item) => {
+      const itemRegionId = item?.regionId ?? item?.region?.id
       const matchRegion =
-        !item?.regionId || Number(item?.regionId) === targetRegionId
+        !itemRegionId || Number(itemRegionId) === targetRegionId
+
+      const tagUpper = String(item?.tag || '').toUpperCase()
+      const nameLower = String(item?.name || '').toLowerCase()
+      const urlLower = String(item?.url || '').toLowerCase()
 
       const isWA =
-        String(item?.tag).toUpperCase() === 'WA_INFO' ||
-        String(item?.tag).toUpperCase() === 'WHATSAPP' ||
-        String(item?.name).toLowerCase().includes('whatsapp') ||
-        String(item?.url).includes('chat.whatsapp.com')
+        tagUpper === 'WA_INFO' ||
+        tagUpper === 'WHATSAPP' ||
+        nameLower.includes('whatsapp') ||
+        nameLower.includes('wa group') ||
+        urlLower.includes('chat.whatsapp.com')
 
       return matchRegion && isWA
     })
 
-    return (
-      matchedLink?.url || 'https://chat.whatsapp.com/GBwfCl7xyKs1g2KpbX80DV'
-    )
+    // 2. Second Pass Fallback: Any link with 'whatsapp' in name/url if region matches
+    if (!matchedLink) {
+      matchedLink = linksList.find((item) => {
+        const nameLower = String(item?.name || '').toLowerCase()
+        const urlLower = String(item?.url || '').toLowerCase()
+        return (
+          nameLower.includes('whatsapp') ||
+          urlLower.includes('chat.whatsapp.com')
+        )
+      })
+    }
+
+    return matchedLink?.url || null
   }, [linkQuery?.data, watchedRegionId])
+
+  // Final URL with fallback safety
+  const finalWaUrl =
+    regionWaGroupUrl || 'https://chat.whatsapp.com/GBwfCl7xyKs1g2KpbX80DV'
 
   const isPasswordValid =
     watchedPassword.length >= 8 &&
@@ -826,7 +851,7 @@ export default function SignUp() {
                       meaningful experiences together with the BNCC community.
                     </p>
                     <a
-                      href={regionWaGroupUrl}
+                      href={finalWaUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
