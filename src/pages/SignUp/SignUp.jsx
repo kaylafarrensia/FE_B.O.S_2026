@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { FaUsers } from 'react-icons/fa'
@@ -116,73 +116,7 @@ export default function SignUp() {
   } = useLookupQuery(watchedRegionId, watchedFacultyId)
   const { registerMutation } = useAuthMutation()
 
-  // ── Query Region Links from Links DB ──
   const { linkQuery } = useLinkQuery(watchedRegionId)
-
-  // ── Ultra-Robust WhatsApp URL Matcher ──
-  const regionWaGroupUrl = useMemo(() => {
-    // 1. If linkQuery is a flat object and has a direct whatsapp/wa_info key (e.g. MOCK_LINKS)
-    if (linkQuery && typeof linkQuery === 'object' && !Array.isArray(linkQuery)) {
-      if (linkQuery.wa_info) return linkQuery.wa_info
-      if (linkQuery.whatsapp) return linkQuery.whatsapp
-    }
-
-    // 2. Safely extract items from any nested structure
-    const linksList = Array.isArray(linkQuery)
-      ? linkQuery
-      : Array.isArray(linkQuery?.data)
-        ? linkQuery.data
-        : Array.isArray(linkQuery?.links)
-          ? linkQuery.links
-          : []
-
-    if (!watchedRegionId || linksList.length === 0) return null
-
-    const targetRegionId = Number(watchedRegionId)
-
-    // 1. First Pass: Try finding exact match with regionId AND WA_INFO tag/name
-    let matchedLink = linksList.find((item) => {
-      const itemRegionId = item?.regionId ?? item?.region?.id
-      const matchRegion =
-        !itemRegionId || Number(itemRegionId) === targetRegionId
-
-      const tagUpper = String(item?.tag || '').toUpperCase()
-      const nameLower = String(item?.name || '').toLowerCase()
-      const urlLower = String(item?.url || '').toLowerCase()
-
-      const isWA =
-        tagUpper === 'WA_INFO' ||
-        tagUpper === 'WHATSAPP' ||
-        nameLower.includes('whatsapp') ||
-        nameLower.includes('wa group') ||
-        urlLower.includes('chat.whatsapp.com')
-
-      return matchRegion && isWA
-    })
-
-    // 2. Second Pass Fallback: Any link with 'whatsapp' in name/url if region matches
-    if (!matchedLink) {
-      matchedLink = linksList.find((item) => {
-        const itemRegionId = item?.regionId ?? item?.region?.id
-        const matchRegion =
-          !itemRegionId || Number(itemRegionId) === targetRegionId
-
-        const nameLower = String(item?.name || '').toLowerCase()
-        const urlLower = String(item?.url || '').toLowerCase()
-        return (
-          matchRegion &&
-          (nameLower.includes('whatsapp') ||
-            urlLower.includes('chat.whatsapp.com'))
-        )
-      })
-    }
-
-    return matchedLink?.url || null
-  }, [linkQuery, watchedRegionId])
-
-  // Final URL with fallback safety
-  const finalWaUrl =
-    regionWaGroupUrl || 'https://chat.whatsapp.com/GBwfCl7xyKs1g2KpbX80DV'
 
   const isPasswordValid =
     watchedPassword.length >= 8 &&
@@ -268,7 +202,6 @@ export default function SignUp() {
     }
 
     const payload = {
-      name: String(data.fullName || '').trim(),
       fullName: String(data.fullName || '').trim(),
       lineId: String(data.lineId || '').trim(),
       whatsappNumber: String(data.whatsappNumber || '').trim(),
@@ -860,7 +793,7 @@ export default function SignUp() {
                       meaningful experiences together with the BNCC community.
                     </p>
                     <a
-                      href={finalWaUrl}
+                      href="https://chat.whatsapp.com/GBwfCl7xyKs1g2KpbX80DV"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
