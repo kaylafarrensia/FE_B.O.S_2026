@@ -121,7 +121,7 @@ export default function SignUp() {
 
   // ── Ultra-Robust WhatsApp URL Matcher ──
   const regionWaGroupUrl = useMemo(() => {
-    const rawLinks = linkQuery?.data
+    const rawLinks = linkQuery
 
     // Safely extract items from any nested structure
     const linksList = Array.isArray(rawLinks)
@@ -132,7 +132,14 @@ export default function SignUp() {
           ? rawLinks.links
           : []
 
-    if (!watchedRegionId || linksList.length === 0) return null
+    if (!watchedRegionId) return null
+
+    // If it's the mock links object:
+    if (rawLinks && !Array.isArray(rawLinks) && rawLinks.wa_info) {
+      return rawLinks.wa_info
+    }
+
+    if (linksList.length === 0) return null
 
     const targetRegionId = Number(watchedRegionId)
 
@@ -169,7 +176,7 @@ export default function SignUp() {
     }
 
     return matchedLink?.url || null
-  }, [linkQuery?.data, watchedRegionId])
+  }, [linkQuery, watchedRegionId])
 
   // Final URL with fallback safety
   const finalWaUrl =

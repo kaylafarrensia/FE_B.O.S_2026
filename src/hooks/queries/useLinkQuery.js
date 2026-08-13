@@ -13,7 +13,7 @@ export default function useLinkQuery(regionId) {
     queryKey: [QUERY_KEYS.LINKS, regionId],
     queryFn: async () => {
       try {
-        const url = regionId ? `/links/${regionId}` : '/links';
+        const url = regionId ? `/lookup/links?regionId=${regionId}` : '/lookup/links';
         const res = await API.get(url);
         return res.data;
       } catch (err) {
@@ -28,3 +28,4 @@ export default function useLinkQuery(regionId) {
     linkQuery: linkQuery?.data?.data || MOCK_LINKS,
   };
 }
+
