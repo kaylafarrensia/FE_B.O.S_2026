@@ -121,15 +121,19 @@ export default function SignUp() {
 
   // ── Ultra-Robust WhatsApp URL Matcher ──
   const regionWaGroupUrl = useMemo(() => {
-    const rawLinks = linkQuery?.data
+    // 1. If linkQuery is a flat object and has a direct whatsapp/wa_info key (e.g. MOCK_LINKS)
+    if (linkQuery && typeof linkQuery === 'object' && !Array.isArray(linkQuery)) {
+      if (linkQuery.wa_info) return linkQuery.wa_info
+      if (linkQuery.whatsapp) return linkQuery.whatsapp
+    }
 
-    // Safely extract items from any nested structure
-    const linksList = Array.isArray(rawLinks)
-      ? rawLinks
-      : Array.isArray(rawLinks?.data)
-        ? rawLinks.data
-        : Array.isArray(rawLinks?.links)
-          ? rawLinks.links
+    // 2. Safely extract items from any nested structure
+    const linksList = Array.isArray(linkQuery)
+      ? linkQuery
+      : Array.isArray(linkQuery?.data)
+        ? linkQuery.data
+        : Array.isArray(linkQuery?.links)
+          ? linkQuery.links
           : []
 
     if (!watchedRegionId || linksList.length === 0) return null
@@ -159,17 +163,22 @@ export default function SignUp() {
     // 2. Second Pass Fallback: Any link with 'whatsapp' in name/url if region matches
     if (!matchedLink) {
       matchedLink = linksList.find((item) => {
+        const itemRegionId = item?.regionId ?? item?.region?.id
+        const matchRegion =
+          !itemRegionId || Number(itemRegionId) === targetRegionId
+
         const nameLower = String(item?.name || '').toLowerCase()
         const urlLower = String(item?.url || '').toLowerCase()
         return (
-          nameLower.includes('whatsapp') ||
-          urlLower.includes('chat.whatsapp.com')
+          matchRegion &&
+          (nameLower.includes('whatsapp') ||
+            urlLower.includes('chat.whatsapp.com'))
         )
       })
     }
 
     return matchedLink?.url || null
-  }, [linkQuery?.data, watchedRegionId])
+  }, [linkQuery, watchedRegionId])
 
   // Final URL with fallback safety
   const finalWaUrl =
