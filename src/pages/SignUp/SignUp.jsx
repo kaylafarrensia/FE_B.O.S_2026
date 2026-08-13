@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { FaUsers } from 'react-icons/fa'
@@ -116,7 +116,41 @@ export default function SignUp() {
   } = useLookupQuery(watchedRegionId, watchedFacultyId)
   const { registerMutation } = useAuthMutation()
 
+  // ── Query Region Links from Links DB ──
   const { linkQuery } = useLinkQuery(watchedRegionId)
+
+  // Dynamically extract the region-specific WhatsApp group link from the API response
+  const regionWaGroupUrl = useMemo(() => {
+    const rawLinks = linkQuery?.data
+    const linksList = Array.isArray(rawLinks)
+      ? rawLinks
+      : Array.isArray(rawLinks?.data)
+        ? rawLinks.data
+        : Array.isArray(rawLinks?.links)
+          ? rawLinks.links
+          : []
+
+    const targetRegionId = Number(watchedRegionId)
+
+    const matchedLink = linksList.find((item) => {
+      const matchRegion =
+        !item?.regionId || Number(item?.regionId) === targetRegionId
+      const isWA =
+        String(item?.tag).toUpperCase() === 'WHATSAPP' ||
+        String(item?.tag).toUpperCase() === 'OTHER' ||
+        String(item?.name).toUpperCase().includes('WHATSAPP') ||
+        String(item?.name).toUpperCase().includes('WA') ||
+        String(item?.url).includes('chat.whatsapp.com') ||
+        String(item?.url).includes('wa.me')
+
+      return matchRegion && isWA
+    })
+
+    // Fallback to default group if no custom region link exists in DB
+    return (
+      matchedLink?.url || 'https://chat.whatsapp.com/GBwfCl7xyKs1g2KpbX80DV'
+    )
+  }, [linkQuery?.data, watchedRegionId])
 
   const isPasswordValid =
     watchedPassword.length >= 8 &&
@@ -202,6 +236,7 @@ export default function SignUp() {
     }
 
     const payload = {
+      name: String(data.fullName || '').trim(),
       fullName: String(data.fullName || '').trim(),
       lineId: String(data.lineId || '').trim(),
       whatsappNumber: String(data.whatsappNumber || '').trim(),
@@ -793,7 +828,7 @@ export default function SignUp() {
                       meaningful experiences together with the BNCC community.
                     </p>
                     <a
-                      href="https://chat.whatsapp.com/GBwfCl7xyKs1g2KpbX80DV"
+                      href={regionWaGroupUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
