@@ -260,7 +260,6 @@ export default function SignUp() {
     }
 
     const payload = {
-      name: String(data.fullName || '').trim(),
       fullName: String(data.fullName || '').trim(),
       lineId: String(data.lineId || '').trim(),
       whatsappNumber: String(data.whatsappNumber || '').trim(),
