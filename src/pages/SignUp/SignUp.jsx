@@ -119,7 +119,7 @@ export default function SignUp() {
   // ── Query Region Links from Links DB ──
   const { linkQuery } = useLinkQuery(watchedRegionId)
 
-  // Dynamically extract the region-specific WhatsApp group link from the API response
+  // ── Dynamically fetch WhatsApp Group URL matching WA_INFO tag ──
   const regionWaGroupUrl = useMemo(() => {
     const rawLinks = linkQuery?.data
     const linksList = Array.isArray(rawLinks)
@@ -135,18 +135,16 @@ export default function SignUp() {
     const matchedLink = linksList.find((item) => {
       const matchRegion =
         !item?.regionId || Number(item?.regionId) === targetRegionId
+
       const isWA =
+        String(item?.tag).toUpperCase() === 'WA_INFO' ||
         String(item?.tag).toUpperCase() === 'WHATSAPP' ||
-        String(item?.tag).toUpperCase() === 'OTHER' ||
-        String(item?.name).toUpperCase().includes('WHATSAPP') ||
-        String(item?.name).toUpperCase().includes('WA') ||
-        String(item?.url).includes('chat.whatsapp.com') ||
-        String(item?.url).includes('wa.me')
+        String(item?.name).toLowerCase().includes('whatsapp') ||
+        String(item?.url).includes('chat.whatsapp.com')
 
       return matchRegion && isWA
     })
 
-    // Fallback to default group if no custom region link exists in DB
     return (
       matchedLink?.url || 'https://chat.whatsapp.com/GBwfCl7xyKs1g2KpbX80DV'
     )
