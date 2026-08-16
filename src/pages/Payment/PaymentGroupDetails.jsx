@@ -6,7 +6,7 @@ import PaymentStatusButton from '@/components/ui/PaymentStatusButton.jsx';
 import IconAlertBlue from '@/assets/icons/IconAlertBlue.svg';
 import UploadIcon from '@/assets/icons/IconUpload.svg'; // Buat atau ganti path icon upload sesuai file proyekmu
 
-export default function PaymentDetails() {
+export default function PaymentGroupDetails() {
     const navigate = useNavigate();
     const location = useLocation();
 

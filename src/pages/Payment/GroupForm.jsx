@@ -50,7 +50,7 @@ export default function GroupForm() {
         group.maxMembers;
 
     const handlePayment = () => {
-        navigate('/payment/details', { 
+        navigate('/payment/group-details', { 
             state: { 
                 groupCode: group.code,
                 registrationMode: DUMMY_REGISTRATION_MODE,

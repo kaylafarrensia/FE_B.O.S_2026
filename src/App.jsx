@@ -15,7 +15,8 @@ import Payment from './pages/Payment/Payment.jsx'
 import PaymentSchedule from './pages/Payment/Schedule.jsx'
 import IndividualForm from './pages/Payment/IndividualForm.jsx'
 import GroupForm from './pages/Payment/GroupForm.jsx'
-import PaymentDetails from './pages/Payment/PaymentDetails.jsx'
+import PaymentGroupDetails from './pages/Payment/PaymentGroupDetails.jsx'
+import PaymentIndividualDetails from './pages/Payment/PaymentIndividualDetails.jsx'
 
 function App() {
   return (
@@ -42,7 +43,8 @@ function App() {
         <Route path="schedule" element={<PaymentSchedule />} />
         <Route path="individual-form" element={<IndividualForm />} />
         <Route path="group-form" element={<GroupForm />} />
-        <Route path="details" element={<PaymentDetails />} />
+        <Route path="group-details" element={<PaymentGroupDetails />} />
+        <Route path="individual-details" element={<PaymentIndividualDetails />} />
       </Route>
     </Routes>
   )

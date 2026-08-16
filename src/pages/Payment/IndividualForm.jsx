@@ -7,7 +7,7 @@ import { formatDate, formatStartEndTime } from '@/utils/index.js';
 import Calendar from './Calendar.jsx';
 import RegistrationTypeDropdown from './RegistrationTypeDropdown.jsx';
 import ContactPerson from '@/pages/Dashboard/Japres/ContactPerson.jsx';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import PaymentStatusButton from '@/components/ui/PaymentStatusButton.jsx';
 import AlertPopup from './AlertPopup.jsx';
 
@@ -19,21 +19,34 @@ const DUMMY_USER = {
 const DUMMY_REGISTRATION_MODE = 'Individual';
 const DUMMY_PACKAGE_TYPE = 'Early Bird';
 const DUMMY_FEE = 'Rp550.000';
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function IndividualForm() {
     const [popupOpen, setPopupOpen] = useState(false);
     const [tempType, setTempType] = useState(null);
     const [userType, setUserType] = useState(null);
     const navigate = useNavigate();
-    const [isPaid, setIsPaid] = useState(false); // Dummy state for payment status
+    const location = useLocation();
+
+    // Mengambil status dari state lokasi navigasi (default ke 'unpaid' jika kosong)
+    const paymentStatus = location.state?.paymentStatus || 'unpaid';
+    const isPaid = paymentStatus === 'success';
+    const isPending = paymentStatus === 'pending';
 
     const handlePayment = () => {
-        // Simulate payment process
-        setIsPaid(true);
-    }
+        navigate('/payment/individual-details', {
+            state: {
+                registrationMode: DUMMY_REGISTRATION_MODE,
+                packageType: DUMMY_PACKAGE_TYPE,
+                fee: DUMMY_FEE
+            }
+        });
+    };
+
     const handleBack = () => {
         setPopupOpen(true);
-    }
+    };
+
     const handleConfirm = () => {
 
     };
@@ -70,7 +83,8 @@ export default function IndividualForm() {
                                                 </span> Submission
                                             </h1>
 
-                                            <PaymentStatusButton isPaid={isPaid} />
+                                            {/* Kirim status dinamis ke tombol badge */}
+                                            <PaymentStatusButton status={paymentStatus} isPaid={isPaid} />
                                         </div>
 
                                         <div>
@@ -100,18 +114,30 @@ export default function IndividualForm() {
                                             </p>
                                         </div>
                                     </div>
+
                                     <div className="flex flex-col gap-3 mt-5 items-center">
                                         <div className="w-fit">
-                                            <Button disabled={isPaid} onClick={handlePayment}>
+                                            {/* Kondisi label dan penanganan klik tombol bayar */}
+                                            <Button
+                                                disabled={isPaid || isPending}
+                                                onClick={handlePayment}
+                                            >
                                                 PAY NOW
                                             </Button>
                                         </div>
+
                                         {isPaid && (
                                             <p className="text-xs sm:text-sm text-center text-[#0A2745]/70">
                                                 <span className="bg-[#FFF200] px-1.5 py-0.5 rounded-md text-[#0A2745] font-medium">
                                                     Payment
                                                 </span>{' '}
                                                 successful! Time to complete your registration
+                                            </p>
+                                        )}
+
+                                        {isPending && (
+                                            <p className="text-xs sm:text-sm text-center text-[#0A2745]/70">
+                                                Your payment is currently being reviewed. Please wait while we verify your transaction.
                                             </p>
                                         )}
                                     </div>
