@@ -42,6 +42,7 @@ const DEFAULT_WA_MESSAGE = ``
 
 export default function Users() {
   const [searchQuery, setSearchQuery] = useState('')
+  const [searchInput, setSearchInput] = useState('')
   const [pageIndex, setPageIndex] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(10)
   const [showErrorModal, setShowErrorModal] = useState(false)
@@ -168,7 +169,7 @@ export default function Users() {
   )
 
   // ── USER DETAILS QUERY ────────────────────────────────────────────────────────
-  // When searchQuery is present, fetch up to 10,000 records so search covers ALL pages!
+  // When searchQuery is present, fetch up to 1,000 records so search covers ALL pages!
   const isSearching = searchQuery.trim().length > 0
 
   const {
@@ -184,7 +185,7 @@ export default function Users() {
         if (isSearching) {
           return getUsersDetails({
             page: 1,
-            limit: 10000,
+            limit: 1000,
             search: searchQuery,
             searchQuery: searchQuery,
             q: searchQuery,
@@ -1610,10 +1611,15 @@ export default function Users() {
         <input
           type="text"
           placeholder="Search by Full Name, Email, NIM, or WA..."
-          value={searchQuery}
+          value={searchInput}
           onChange={(e) => {
-            setSearchQuery(e.target.value)
-            setPageIndex(1)
+            setSearchInput(e.target.value)
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              setSearchQuery(searchInput)
+              setPageIndex(1)
+            }
           }}
           className="py-2 px-4 w-full md:w-[350px] border rounded"
         />
